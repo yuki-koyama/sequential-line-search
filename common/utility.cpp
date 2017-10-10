@@ -4,8 +4,6 @@
 #include <fstream>
 #include <iomanip>
 #include <Eigen/Core>
-#include <QApplication>
-#include <QDir>
 #include "slicesampler.h"
 
 using Eigen::VectorXd;
@@ -61,35 +59,6 @@ VectorXd generateNormal(const Eigen::VectorXd &mu, const Eigen::MatrixXd &Sigma)
     return x + mu;
 }
 
-std::string getResourceDirectory()
-{
-    return QCoreApplication::applicationDirPath().toStdString() + "/../Resources/";
-}
-
-std::string getTemporaryDirectory()
-{
-    const std::string baseDirPath = "/Users/koyama/Dropbox/tmp/algorithm_comparison/";
-    const std::string mainDirPath = baseDirPath + getCurrentTimeInString();
-    createDirectoryIfNotExist(mainDirPath);
-    return mainDirPath;
-}
-
-std::string getCurrentTimeInString()
-{
-    const std::time_t t = std::time(nullptr);
-    std::stringstream s; s << std::put_time(std::localtime(&t), "%Y%m%d%H%M%S");
-    return s.str();
-}
-
-void createDirectoryIfNotExist(const std::string& dirPath)
-{
-    QDir dir(QString::fromStdString(dirPath));
-    if (!dir.exists())
-    {
-        dir.mkpath(".");
-    }
-}
-
 void exportMatrixToCsv(const std::string& filePath, const Eigen::MatrixXd& X)
 {
     std::ofstream ofs(filePath);
@@ -102,6 +71,13 @@ void exportMatrixToCsv(const std::string& filePath, const Eigen::MatrixXd& X)
         }
         ofs << std::endl;
     }
+}
+
+std::string getCurrentTimeInString()
+{
+    const std::time_t t = std::time(nullptr);
+    std::stringstream s; s << std::put_time(std::localtime(&t), "%Y%m%d%H%M%S");
+    return s.str();
 }
 
 }

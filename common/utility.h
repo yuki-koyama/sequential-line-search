@@ -182,9 +182,6 @@ inline double log_normal(double x, double mu, double sigma_squared)
 // File IO
 ////////////////////////////////////////////////
 
-std::string getResourceDirectory();
-std::string getTemporaryDirectory();
-void createDirectoryIfNotExist(const std::string &dirPath);
 void exportMatrixToCsv(const std::string& filePath, const Eigen::MatrixXd& X);
 
 ////////////////////////////////////////////////
