@@ -18,4 +18,4 @@ The source codes (except for those explicitly described as third party codes) ar
 - [NLopt](https://nlopt.readthedocs.io/) is provided under LGPL.
 
 # Contact and Feedback
-[Yuki Koyama](yuki@koyama.xyz)
+Yuki Koyama (yuki@koyama.xyz)
