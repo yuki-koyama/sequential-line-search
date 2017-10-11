@@ -18,7 +18,7 @@ QMAKE_LFLAGS += \
 }
 
 INCLUDEPATH += \
-    $$PWD/../common \
+    $$PWD/../main \
     $$PWD/../include
 
 LIBS += \
@@ -28,23 +28,24 @@ SOURCES += main.cpp\
     mainwindow.cpp \
     mainwidget.cpp \
     core.cpp \
-    ../common/gaussianprocessregressor.cpp \
-    ../common/expectedimprovementmaximizer.cpp \
-    ../common/nloptutility.cpp \
-    ../common/preferenceregressor.cpp \
-    ../common/utility.cpp \
-    ../common/slicesampler.cpp \
-    ../common/regressor.cpp
+    ../main/gaussianprocessregressor.cpp \
+    ../main/expectedimprovementmaximizer.cpp \
+    ../main/nloptutility.cpp \
+    ../main/preferenceregressor.cpp \
+    ../main/utility.cpp \
+    ../main/slicesampler.cpp \
+    ../main/regressor.cpp
 
 HEADERS  += mainwindow.h \
     mainwidget.h \
     core.h \
-    ../common/gaussianprocessregressor.h \
-    ../common/expectedimprovementmaximizer.h \
-    ../common/nloptutility.h \
-    ../common/preferenceregressor.h \
-    ../common/utility.h \
-    ../common/slicesampler.h \
-    ../common/regressor.h
+    ../main/gaussianprocessregressor.h \
+    ../main/expectedimprovementmaximizer.h \
+    ../main/nloptutility.h \
+    ../main/preferenceregressor.h \
+    ../main/utility.h \
+    ../main/slicesampler.h \
+    ../main/regressor.h
 
-FORMS    += mainwindow.ui
+FORMS += \
+    mainwindow.ui

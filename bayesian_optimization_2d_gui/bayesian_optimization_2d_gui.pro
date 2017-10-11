@@ -18,7 +18,7 @@ QMAKE_LFLAGS += \
 }
 
 INCLUDEPATH += \
-    $$PWD/../common \
+    $$PWD/../main \
     $$PWD/../include
 
 LIBS += \
@@ -32,14 +32,14 @@ SOURCES += \
     widgetsigma.cpp \
     widgetmu.cpp \
     widgetei.cpp \
-    ../common/gaussianprocessregressor.cpp \
-    ../common/expectedimprovementmaximizer.cpp \
-    ../common/colorutility.cpp \
-    ../common/utility.cpp \
-    ../common/preferenceregressor.cpp \
-    ../common/nloptutility.cpp \
-    ../common/slicesampler.cpp \
-    ../common/regressor.cpp
+    ../main/gaussianprocessregressor.cpp \
+    ../main/expectedimprovementmaximizer.cpp \
+    ../main/colorutility.cpp \
+    ../main/utility.cpp \
+    ../main/preferenceregressor.cpp \
+    ../main/nloptutility.cpp \
+    ../main/slicesampler.cpp \
+    ../main/regressor.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -48,14 +48,14 @@ HEADERS += \
     widgetsigma.h \
     widgetmu.h \
     widgetei.h \
-    ../common/gaussianprocessregressor.h \
-    ../common/expectedimprovementmaximizer.h \
-    ../common/colorutility.h \
-    ../common/utility.h \
-    ../common/preferenceregressor.h \
-    ../common/nloptutility.h \
-    ../common/regressor.h \
-    ../common/slicesampler.h
+    ../main/gaussianprocessregressor.h \
+    ../main/expectedimprovementmaximizer.h \
+    ../main/colorutility.h \
+    ../main/utility.h \
+    ../main/preferenceregressor.h \
+    ../main/nloptutility.h \
+    ../main/regressor.h \
+    ../main/slicesampler.h
 
 FORMS += \
     mainwindow.ui
