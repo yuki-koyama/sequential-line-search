@@ -1,5 +1,6 @@
 # Overview
 This repository contains a part of the source codes used in our research project on the **sequential line search** method (which is a variant of Bayesian optimization). The core algorithm is in the source codes in the "mail" folder. This repository also contains the following three example applications:
+
 - bayesian_optimization_1d_gui: A visual demonstration of the standard Bayesian optimization applied to a one-dimensional test function. 
 - bayesian_optimization_2d_gui: A visual demonstration of the standard Bayesian optimization applied to a two-dimensional test function.
 - sequential_line_search_2d_gui: A visual demonstration of the sequential line search method applied to a two-dimensional test function.
