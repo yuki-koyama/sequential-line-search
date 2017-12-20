@@ -179,6 +179,8 @@ GaussianProcessRegressor::GaussianProcessRegressor(const MatrixXd& X, const Vect
     this->X = X;
     this->y = y;
 
+    if (X.rows() == 0) return;
+       
     compute_MAP();
 
     C     = calc_C(X, a, b, r);
