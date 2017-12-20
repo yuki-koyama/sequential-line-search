@@ -46,11 +46,11 @@ public:
     void dampData(const std::string& dirPath) const;
 
     // Getter
-    const Eigen::MatrixXd& getX() const { return X; }
-    const Eigen::VectorXd& gety() const { return y; }
-    double geta() const { return a; }
-    double getb() const { return b; }
-    const Eigen::VectorXd& getr() const { return r; }
+    const Eigen::MatrixXd& getX() const override { return X; }
+    const Eigen::VectorXd& gety() const override { return y; }
+    double geta() const override { return a; }
+    double getb() const override { return b; }
+    const Eigen::VectorXd& getr() const override { return r; }
 
     struct Params
     {
