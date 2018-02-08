@@ -23,6 +23,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    // Setup widgets
+    ui->widget_y->content = MainWidget::Content::Objective;
+    ui->widget_e->content = MainWidget::Content::ExpectedImprovement;
+    ui->widget_m->content = MainWidget::Content::Mean;
+    ui->widget_s->content = MainWidget::Content::StandardDeviation;
+
     core.computeRegression();
 }
 

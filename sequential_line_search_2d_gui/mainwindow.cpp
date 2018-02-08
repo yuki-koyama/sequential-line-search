@@ -60,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->widget_s->draw_data_points  = true;
     ui->widget_s->draw_data_maximum = true;
 
-    const unsigned s = 500;
+    const unsigned s = 320;
     ui->widget_y->setFixedSize(s, s);
     ui->widget_s->setFixedSize(s, s);
     ui->widget_m->setFixedSize(s, s);
