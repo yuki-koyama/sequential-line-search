@@ -1,9 +1,11 @@
 # Overview
-This repository contains a part of the source codes used in our research project on the **sequential line search** method (which is a variant of Bayesian optimization). The core algorithm is in the source codes in the "sequential_line_search_core" folder. This repository also contains the following three example applications:
+This repository contains a part of the source codes used in our research project on the **sequential line search** method (which is a variant of Bayesian optimization). The core algorithm is implemented in the source codes in the "sequential_line_search_core" folder. This repository also contains the following example applications:
 
-- **bayesian_optimization_1d_gui**: A visual demonstration of the standard Bayesian optimization applied to a one-dimensional test function. 
-- **bayesian_optimization_2d_gui**: A visual demonstration of the standard Bayesian optimization applied to a two-dimensional test function.
-- **sequential_line_search_2d_gui**: A visual demonstration of the sequential line search method applied to a two-dimensional test function.
+- **bayesian_optimization_1d**: A simple demo of the standard Bayesian optimization applied to a one-dimensional test function. 
+- **sequential_line_search**: A simple demo of the sequential line search method applied to a multi-dimensional test function.
+- **bayesian_optimization_1d_gui**: A visual demo of the standard Bayesian optimization applied to a one-dimensional test function. (Qt5 required)
+- **bayesian_optimization_2d_gui**: A visual demo of the standard Bayesian optimization applied to a two-dimensional test function. (Qt5 required)
+- **sequential_line_search_2d_gui**: A visual interactive demo of the sequential line search method applied to a two-dimensional test function. (Qt5 required)
 
 # Project Web Site
 http://koyama.xyz/project/sequential_line_search/
@@ -13,22 +15,26 @@ Yuki Koyama, Issei Sato, Daisuke Sakamoto, and Takeo Igarashi. 2017. Sequential 
 DOI: https://doi.org/10.1145/3072959.3073598
 
 # Dependencies
-- [Qt5](http://doc.qt.io/qt-5/)
+## Required
 - [NLopt](https://nlopt.readthedocs.io/)
 - [Eigen](http://eigen.tuxfamily.org/)
 
+## Optional (Required for Visual Demos)
+- [Qt5](http://doc.qt.io/qt-5/)
+
 # How to Compile and Run
-We use [cmake](https://cmake.org/) for managing the source codes. You can compile all the applications by, for example, 
+We use [cmake](https://cmake.org/) for managing the source codes. You can compile all the applications at once by, for example, 
 ```
 mkdir build
 cd build
 cmake PATH_FOR_THE_SOURCE_DIR
 make
 ```
-Then you can test the applications by, for example,
+Then you can run the applications by, for example,
 ```
 ./sequential_line_search_2d_gui/SequentialLineSearch2dGui
 ```
+Note that you might need to specify CMAKE_PREFIX_PATH adequately so that cmake can find Qt5.
 
 # License
 The source codes are distributed under the **MIT License**. For details of the MIT License, see the LICENSE file.
