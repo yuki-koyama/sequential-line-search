@@ -23,11 +23,13 @@ DOI: https://doi.org/10.1145/3072959.3073598
 - [Qt5](http://doc.qt.io/qt-5/)
 
 # How to Compile and Run
-We use [cmake](https://cmake.org/) for managing the source codes. You can compile all the applications at once by, for example, 
+We use [cmake](https://cmake.org/) for managing the source codes. You can compile the core module and the demo applications at once by, for example, 
 ```
+git clone https://github.com/yuki-koyama/sequential-line-search.git
+cd sequential-line-search
 mkdir build
 cd build
-cmake PATH_FOR_THE_SOURCE_DIR
+cmake ../
 make
 ```
 Then you can run the applications by, for example,
