@@ -14,12 +14,14 @@ http://koyama.xyz/project/sequential_line_search/
 Yuki Koyama, Issei Sato, Daisuke Sakamoto, and Takeo Igarashi. 2017. Sequential Line Search for Efficient Visual Design Optimization by Crowds. ACM Trans. Graph. 36, 4, pp.48:1--48:11 (2017). (a.k.a. Proceedings of SIGGRAPH 2017)
 DOI: https://doi.org/10.1145/3072959.3073598
 
-# Dependencies
-## Required
-- [NLopt](https://nlopt.readthedocs.io/)
+# External Libraries
+## Required (you have to pre-install it manually)
 - [Eigen](http://eigen.tuxfamily.org/)
 
-## Optional (Required for Visual Demos)
+## Automatically Included via CMake (you do not have to install it manually)
+- [NLopt](https://nlopt.readthedocs.io/)
+
+## Optional (required to be pre-installed for building visual demos)
 - [Qt5](http://doc.qt.io/qt-5/)
 
 # How to Compile and Run
