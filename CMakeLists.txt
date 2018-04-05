@@ -17,6 +17,14 @@ ExternalProject_Add(
 	INSTALL_DIR ${ExternalInstallDir}/
 	GIT_REPOSITORY https://github.com/yuki-koyama/nlopt.git
 	GIT_TAG master
+	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> -DBUILD_SHARED_LIBS:BOOL=0 -DNLOPT_GUILE:BOOL=0 -DNLOPT_SWIG:BOOL=0 -DNLOPT_PYTHON:BOOL=0 -DNLOPT_MATLAB:BOOL=0 -DNLOPT_OCTAVE:BOOL=0
+)
+ExternalProject_Add(
+	external_tinycolormap
+	PREFIX ${ExternalInstallDir}/
+	INSTALL_DIR ${ExternalInstallDir}/
+	GIT_REPOSITORY https://github.com/yuki-koyama/tinycolormap.git
+	GIT_TAG master
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
 )
 link_directories(${ExternalInstallDir}/lib)

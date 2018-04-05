@@ -2,10 +2,10 @@
 #include <iostream>
 #include <QPainter>
 #include <QPaintEvent>
+#include <tinycolormap.h>
 #include "core.h"
 #include "gaussianprocessregressor.h"
 #include "expectedimprovementmaximizer.h"
-#include "colorutility.h"
 
 using Eigen::VectorXd;
 
@@ -75,7 +75,7 @@ void MainWidget::paintEvent(QPaintEvent *event)
     {
         for (int pix_y = 0; pix_y < h; ++ pix_y)
         {
-            const VectorXd color = ColorUtility::getColor(val(pix_x, pix_y));
+            const VectorXd color = tinycolormap::GetJetColor(val(pix_x, pix_y));
             image.setPixel(pix_x, pix_y, qRgba(color(0) * 255, color(1) * 255, color(2) * 255, 255));
         }
     }

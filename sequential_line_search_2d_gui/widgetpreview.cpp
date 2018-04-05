@@ -2,9 +2,9 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include <Eigen/Core>
+#include <tinycolormap.h>
 #include "core.h"
 #include "mainwindow.h"
-#include "colorutility.h"
 
 using Eigen::VectorXd;
 using Eigen::Vector3d;
@@ -26,7 +26,7 @@ void WidgetPreview::paintEvent(QPaintEvent *event)
 
     const VectorXd x = core.computeParametersFromSlider(core.mainWindow->obtainSliderPosition());
     const double   y = core.evaluateObjectiveFunction(x);
-    const Vector3d c = ColorUtility::getColor(y);
+    const Vector3d c = tinycolormap::GetJetColor(y);
 
     const QBrush backgroundBrush = QBrush(QColor(c(0) * 255.0, c(1) * 255.0, c(2) * 255.0));
     painter.setRenderHint(QPainter::Antialiasing);
