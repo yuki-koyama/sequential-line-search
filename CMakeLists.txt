@@ -33,13 +33,13 @@ include_directories(${ExternalInstallDir}/include)
 ###############################################
 # Sub-directories
 ###############################################
-add_subdirectory(sequential_line_search_core)
-add_subdirectory(bayesian_optimization_1d)
 add_subdirectory(sequential_line_search)
+add_subdirectory(demos/bayesian_optimization_1d)
+add_subdirectory(demos/sequential_line_search_nd)
 if(Qt5_FOUND)
-	add_subdirectory(bayesian_optimization_1d_gui)
-	add_subdirectory(bayesian_optimization_2d_gui)
-	add_subdirectory(sequential_line_search_2d_gui)
+	add_subdirectory(demos/bayesian_optimization_1d_gui)
+	add_subdirectory(demos/bayesian_optimization_2d_gui)
+	add_subdirectory(demos/sequential_line_search_2d_gui)
 endif()
 
 ###############################################
@@ -47,5 +47,5 @@ endif()
 ###############################################
 enable_testing()
 add_test(NAME bayesian_optimization_1d_test COMMAND $<TARGET_FILE:BayesianOptimization1d>)
-add_test(NAME sequential_line_search_test COMMAND $<TARGET_FILE:SequentialLineSearch>)
+add_test(NAME sequential_line_search_nd_test COMMAND $<TARGET_FILE:SequentialLineSearchNd>)
 
