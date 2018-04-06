@@ -138,7 +138,7 @@ double objective(const std::vector<double> &x, std::vector<double>& grad, void* 
 #else
     const double   b = x[1];
 #endif
-    const VectorXd r = [&x]() { std::vector<double> _x = x; return Eigen::Map<VectorXd>(&_x[2], _x.size() - 2); }();
+    const VectorXd r = Eigen::Map<const VectorXd>(&x[2], x.size() - 2);
 
     const MatrixXd C     = Regressor::calc_C(X, a, b, r);
     const MatrixXd C_inv = C.inverse();
