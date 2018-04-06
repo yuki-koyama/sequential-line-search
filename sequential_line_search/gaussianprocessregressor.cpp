@@ -1,12 +1,10 @@
 #include "gaussianprocessregressor.h"
 #include <iostream>
 #include <cmath>
-#include <ctime>
 #include <Eigen/LU>
 #include "nloptutility.h"
 #include "utility.h"
 
-//#define VERBOSE
 //#define NOISELESS
 
 using Eigen::MatrixXd;
@@ -110,10 +108,6 @@ VectorXd calc_grad(const MatrixXd& X, const MatrixXd& C_inv, const VectorXd& y, 
 
 struct Data
 {
-    Data(const MatrixXd& X, const VectorXd& y) : X(X), y(y)
-    {
-    }
-
     const MatrixXd X;
     const VectorXd y;
 };
@@ -215,25 +209,13 @@ void GaussianProcessRegressor::compute_MAP()
 {
     const unsigned D = X.rows();
 
-    Data data(X, y); // Constant during optimization
-
-#ifdef VERBOSE
-    const auto t1 = std::chrono::system_clock::now();
-    count = 0;
-#endif
+    Data data{ X, y };
 
     const VectorXd x_ini = VectorXd::Constant(D + 2, 1e+00);
     const VectorXd upper = VectorXd::Constant(D + 2, 5e+01);
     const VectorXd lower = VectorXd::Constant(D + 2, 1e-08);
 
     const VectorXd x_glo = nloptUtility::compute(x_ini, upper, lower, objective, &data, nlopt::GN_DIRECT, 300);
-
-#ifdef VERBOSE
-    const auto t2 = std::chrono::system_clock::now();
-    const unsigned g_count = count;
-    count = 0;
-#endif
-
     const VectorXd x_loc = nloptUtility::compute(x_glo, upper, lower, objective, &data, nlopt::LD_TNEWTON, 1000);
 
     a = x_loc(0);
@@ -242,14 +224,5 @@ void GaussianProcessRegressor::compute_MAP()
 
 #ifdef NOISELESS
     b = b_fixed;
-#endif
-
-#ifdef VERBOSE
-    const auto t3 = std::chrono::system_clock::now();
-    const unsigned l_count = count;
-
-    std::cout << "global optimization: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms, " << g_count << " evaluations, obj = " << objective(x_star_global, x_ini, &data) << std::endl;
-    std::cout << "local optimization: " << std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count() << " ms, " << l_count << " evaluations, obj = " << objective(x_star_local, x_ini, &data) << std::endl;
-    std::cout << "a = " << a << ", b = " << b << ", r = " << r.transpose() << std::endl;
 #endif
 }
