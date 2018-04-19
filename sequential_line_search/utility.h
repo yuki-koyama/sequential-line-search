@@ -23,9 +23,6 @@ double generateUniformReal();
 // Sampling from the standard normal distribution
 double generateStandardNormal();
 
-// Sampling from multivariate normal distribution
-Eigen::VectorXd generateNormal(const Eigen::VectorXd& mu, const Eigen::MatrixXd& Sigma);
-
 ////////////////////////////////////////////////
 // Math
 ////////////////////////////////////////////////

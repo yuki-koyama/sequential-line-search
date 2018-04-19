@@ -4,7 +4,6 @@
 #include <fstream>
 #include <iomanip>
 #include <Eigen/Core>
-#include "slicesampler.h"
 
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
@@ -38,25 +37,6 @@ double generateUniformReal()
 double generateStandardNormal()
 {
     return normal_dist(gen);
-}
-
-double temp(const Eigen::VectorXd& x, const void* data)
-{
-    const MatrixXd& Sigma_inv = static_cast<const std::pair<MatrixXd, double>*>(data)->first;
-    const double    Sigma_det = static_cast<const std::pair<MatrixXd, double>*>(data)->second;
-    return Utility::gauss(x, VectorXd::Zero(x.rows()), Sigma_inv, Sigma_det);
-}
-
-VectorXd generateNormal(const Eigen::VectorXd &mu, const Eigen::MatrixXd &Sigma)
-{
-    VectorXd x = VectorXd::Zero(mu.rows());
-    std::pair<MatrixXd, double> data(Sigma.inverse(), Sigma.determinant());
-    x = SliceSampler::sampling(temp, &data, x, VectorXd::Constant(x.rows(), Sigma.maxCoeff() * 3.0));
-    x = SliceSampler::sampling(temp, &data, x, VectorXd::Constant(x.rows(), Sigma.maxCoeff() * 3.0));
-    x = SliceSampler::sampling(temp, &data, x, VectorXd::Constant(x.rows(), Sigma.maxCoeff() * 3.0));
-    x = SliceSampler::sampling(temp, &data, x, VectorXd::Constant(x.rows(), Sigma.maxCoeff() * 3.0));
-    x = SliceSampler::sampling(temp, &data, x, VectorXd::Constant(x.rows(), Sigma.maxCoeff() * 3.0));
-    return x + mu;
 }
 
 void exportMatrixToCsv(const std::string& filePath, const Eigen::MatrixXd& X)
