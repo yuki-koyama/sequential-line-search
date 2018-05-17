@@ -53,7 +53,7 @@ void MainWidget::paintEvent(QPaintEvent *event)
     painter.setRenderHint(QPainter::Antialiasing);
     painter.fillRect(rect, backgroundBrush);
 
-    if (!isnan(core.y_max))
+    if (!std::isnan(core.y_max))
     {
         // Variance and mean
         std::vector<QPointF> variancePolygon;
