@@ -1,6 +1,7 @@
 #include "sliderutility.h"
 #include <cmath>
 #include <map>
+#include <memory>
 #include "nloptutility.h"
 
 using Eigen::VectorXd;
