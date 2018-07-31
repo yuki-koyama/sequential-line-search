@@ -5,6 +5,14 @@ project(SequentialLineSearch CXX)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_BUILD_TYPE Release)
 
+# Append possible paths to Qt5 for macOS
+if(APPLE AND EXISTS /usr/local/opt/qt5)
+	list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt5")
+endif()
+if(APPLE AND EXISTS /usr/local/opt/qt)
+	list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt")
+endif()
+
 ###############################################
 # Handling external libraries
 ###############################################
