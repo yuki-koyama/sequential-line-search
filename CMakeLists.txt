@@ -28,9 +28,15 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/tinycolormap)
 set(TIMER_BUILD_TEST OFF CACHE INTERNAL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/timer)
 
-set(ExternalInstallDir "${CMAKE_BINARY_DIR}/external")
-link_directories(${ExternalInstallDir}/lib)
-include_directories(${ExternalInstallDir}/include)
+set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "" FORCE)
+set(NLOPT_GUILE       OFF CACHE INTERNAL "" FORCE)
+set(NLOPT_LINK_PYTHON OFF CACHE INTERNAL "" FORCE)
+set(NLOPT_MATLAB      OFF CACHE INTERNAL "" FORCE)
+set(NLOPT_OCTAVE      OFF CACHE INTERNAL "" FORCE)
+set(NLOPT_PYTHON      OFF CACHE INTERNAL "" FORCE)
+set(NLOPT_SWIG        OFF CACHE INTERNAL "" FORCE)
+set(NLOPT_TESTS       OFF CACHE INTERNAL "" FORCE)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/nlopt)
 
 ###############################################
 # Sub-directories
@@ -43,26 +49,6 @@ if(Qt5_FOUND)
 	add_subdirectory(demos/bayesian_optimization_2d_gui)
 	add_subdirectory(demos/sequential_line_search_2d_gui)
 endif()
-
-###############################################
-# Building external libraries
-###############################################
-include(ExternalProject)
-ExternalProject_Add(
-	nlopt
-	INSTALL_DIR ${ExternalInstallDir}/
-	GIT_REPOSITORY https://github.com/stevengj/nlopt.git
-	GIT_TAG eafdc8ce9403a4e1532239c1bebbdb86064eda38
-	CMAKE_ARGS 
-	-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-	-DBUILD_SHARED_LIBS:BOOL=0
-	-DNLOPT_GUILE:BOOL=0
-	-DNLOPT_SWIG:BOOL=0
-	-DNLOPT_PYTHON:BOOL=0
-	-DNLOPT_MATLAB:BOOL=0
-	-DNLOPT_OCTAVE:BOOL=0
-)
-add_dependencies(SequentialLineSearch nlopt)
 
 ###############################################
 # Tests
