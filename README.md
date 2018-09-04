@@ -16,14 +16,15 @@ DOI: https://doi.org/10.1145/3072959.3073598
 
 ## Dependencies
 ### Required (you have to pre-install it manually)
-- [Eigen](http://eigen.tuxfamily.org/)
+- Eigen <http://eigen.tuxfamily.org/>
 
-### Automatically Included via CMake (you do not have to install it manually)
-- [NLopt](https://nlopt.readthedocs.io/)
-- [tinycolormap](https://github.com/yuki-koyama/tinycolormap)
+### Included via Git Submodule
+- NLopt <https://nlopt.readthedocs.io/>
+- tinycolormap <https://github.com/yuki-koyama/tinycolormap>
+- timer <https://github.com/yuki-koyama/timer>
 
 ### Optional (required to be pre-installed for building visual demos)
-- [Qt5](http://doc.qt.io/qt-5/)
+- Qt5 <http://doc.qt.io/qt-5/>
 
 ## How to Compile and Run
 We use [cmake](https://cmake.org/) for managing the source codes. You can compile the core module and the demo applications at once by, for example, 
