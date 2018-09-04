@@ -21,7 +21,6 @@ if(Qt5_FOUND)
 	include_directories(${Qt5Widgets_INCLUDE_DIRS})
 endif()
 find_package(Eigen3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
 
 set(TINYCOLORMAP_BUILD_TOOLS OFF CACHE INTERNAL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/tinycolormap)
