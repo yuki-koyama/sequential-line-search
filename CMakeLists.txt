@@ -23,6 +23,9 @@ endif()
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
+set(TINYCOLORMAP_BUILD_TOOLS OFF CACHE INTERNAL "" FORCE)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/tinycolormap)
+
 set(ExternalInstallDir "${CMAKE_BINARY_DIR}/external")
 link_directories(${ExternalInstallDir}/lib)
 include_directories(${ExternalInstallDir}/include)
@@ -57,15 +60,7 @@ ExternalProject_Add(
 	-DNLOPT_MATLAB:BOOL=0
 	-DNLOPT_OCTAVE:BOOL=0
 )
-ExternalProject_Add(
-	tinycolormap
-	PREFIX ${ExternalInstallDir}/
-	INSTALL_DIR ${ExternalInstallDir}/
-	GIT_REPOSITORY https://github.com/yuki-koyama/tinycolormap.git
-	GIT_TAG v0.1.0
-	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-)
-add_dependencies(SequentialLineSearch nlopt tinycolormap)
+add_dependencies(SequentialLineSearch nlopt)
 
 ###############################################
 # Tests

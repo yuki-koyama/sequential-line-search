@@ -2,7 +2,7 @@
 #include <iostream>
 #include <QPainter>
 #include <QPaintEvent>
-#include <tinycolormap.h>
+#include <tinycolormap.hpp>
 #include "core.h"
 #include "mainwindow.h"
 #include "preferenceregressor.h"
@@ -87,8 +87,8 @@ void MainWidget::paintEvent(QPaintEvent *event)
     {
         for (int pix_y = 0; pix_y < h; ++ pix_y)
         {
-            const VectorXd color = tinycolormap::GetJetColor(val(pix_x, pix_y));
-            image.setPixel(pix_x, pix_y, qRgba(color(0) * 255, color(1) * 255, color(2) * 255, 255));
+            const auto color = tinycolormap::GetJetColor(val(pix_x, pix_y));
+            image.setPixel(pix_x, pix_y, qRgba(color[0] * 255, color[1] * 255, color[2] * 255, 255));
         }
     }
     painter.drawImage(0, 0, image);
