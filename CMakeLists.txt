@@ -25,6 +25,9 @@ find_package(Eigen3 REQUIRED)
 set(TINYCOLORMAP_BUILD_TOOLS OFF CACHE INTERNAL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/tinycolormap)
 
+set(TIMER_BUILD_TEST OFF CACHE INTERNAL "" FORCE)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/timer)
+
 set(ExternalInstallDir "${CMAKE_BINARY_DIR}/external")
 link_directories(${ExternalInstallDir}/lib)
 include_directories(${ExternalInstallDir}/include)

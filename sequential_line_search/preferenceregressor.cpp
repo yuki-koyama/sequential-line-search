@@ -5,13 +5,16 @@
 #include <Eigen/LU>
 #include "utility.h"
 #include "nloptutility.h"
-#include "timer.h"
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
 //#define VERBOSE
 //#define NOISELESS
+
+#ifdef VERBOSE
+#include <timer.hpp>
+#endif
 
 namespace
 {
@@ -258,7 +261,7 @@ void PreferenceRegressor::compute_MAP(const PreferenceRegressor *previous)
     }
 
 #ifdef VERBOSE
-    Timer t("PreferenceRegressor::compute_MAP");
+    timer::Timer t("PreferenceRegressor::compute_MAP");
 #endif
 
     const VectorXd x_opt = nloptUtility::compute(x_ini, upper, lower, objective, this, nlopt::LD_TNEWTON, 500);
