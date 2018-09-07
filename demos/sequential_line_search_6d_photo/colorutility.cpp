@@ -58,56 +58,6 @@ namespace
 
 namespace ColorUtility
 {
-    Vector3d rgb2XYZ(const Vector3d &rgb)
-    {
-        Matrix3d M;
-        M << 0.4124564,  0.3575761,  0.1804375,
-        0.2126729,  0.7151522,  0.0721750,
-        0.0193339,  0.1191920,  0.9503041;
-        return M * rgb;
-    }
-    
-    Vector3d XYZ2rgb(const Vector3d& XYZ)
-    {
-        Matrix3d M;
-        M <<  3.2404542, -1.5371385, -0.4985314,
-        -0.9692660,  1.8760108,  0.0415560,
-        0.0556434, -0.2040259,  1.0572252;
-        return M * XYZ;
-    }
-    
-    Vector3d XYZ2Lab(const Vector3d& XYZ, const Vector3d& referenceXYZ)
-    {
-        const double x = 100.0 * XYZ(0) / referenceXYZ(0);
-        const double y = 100.0 * XYZ(1) / referenceXYZ(1);
-        const double z = 100.0 * XYZ(2) / referenceXYZ(2);
-        
-        auto f_XYZ2Lab = [] (double t) -> double
-        {
-            const double t_0 = 6.0 / 29.0;
-            
-            if (t > t_0 * t_0 * t_0)
-            {
-                return pow(t, 1.0 / 3.0);
-            }
-            else
-            {
-                return t * (1.0 / 3.0) / (t_0 * t_0) + 4.0 / 29.0;
-            }
-        };
-        
-        const double fx = f_XYZ2Lab(x);
-        const double fy = f_XYZ2Lab(y);
-        const double fz = f_XYZ2Lab(z);
-        
-        Vector3d Lab;
-        Lab(0) = 116.0 * fy - 16.0;
-        Lab(1) = 500.0 * (fx - fy);
-        Lab(2) = 200.0 * (fy - fz);
-        
-        return Lab;
-    }
-    
     // This implementation is based on https://gist.github.com/liovch/3168961
     Vector3d hsl2rgb(const Vector3d& hsl)
     {
