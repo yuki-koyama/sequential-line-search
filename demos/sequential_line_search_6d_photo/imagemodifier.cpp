@@ -6,23 +6,19 @@
 #ifdef MULTI_THREAD
 #include <thread>
 #endif
-#include <QImage>
 #include <enhancer.hpp>
 
 using std::vector;
-using std::max;
-using std::min;
 using std::thread;
-using Eigen::Vector3d;
 
 namespace ImageModifier
 {
-    inline Vector3d qRgb2rgb(const QRgb& qRgb)
+    inline Eigen::Vector3d qRgb2rgb(const QRgb& qRgb)
     {
-        const int r = qRed(qRgb);
+        const int r = qRed  (qRgb);
         const int g = qGreen(qRgb);
-        const int b = qBlue(qRgb);
-        Vector3d rgb(r, g, b);
+        const int b = qBlue (qRgb);
+        const Eigen::Vector3d rgb(r, g, b);
         return rgb / 255.0;
     }
     
@@ -41,50 +37,25 @@ namespace ImageModifier
     QImage modifyImage(const QImage& image, const std::vector<double>& set)
     {
         assert (set.size() == 3 || set.size() == 6);
-        
-        const double brightness = set[0] - 0.5;
-        const double contrast   = set[1] - 0.5;
-        const double saturation = set[2] - 0.5;
-        Vector3d balance;
-        for (int i = 0; i < 3; ++ i) {
-            if (set.size() == 3) balance[i] = 0.5        - 0.5;
-            if (set.size() == 6) balance[i] = set[i + 3] - 0.5;
-        }
+
+        std::vector<double> raw_parameters = set;
+        raw_parameters.resize(6, 0.5);
+        const Eigen::VectorXd parameters = Eigen::Map<const Eigen::VectorXd>(&raw_parameters[0], 6);
         
         const int w = image.rect().width();
         const int h = image.rect().height();
         
         QImage newImg = QImage(w, h, QImage::Format_RGB32);
         
-        auto changePixelColor = [&] (const int i, const int j)
+        auto changePixelColor = [&](const int x, const int y)
         {
-            QRgb rgb = image.pixel(i, j);
-            Vector3d rgbArray = qRgb2rgb(rgb);
-            
-            // color balance
-            rgbArray = enhancer::internal::changeColorBalance(rgbArray, balance);
-            
-            // brightness
-            for (int k = 0; k < 3; ++ k) rgbArray[k] *= 1.0 + brightness;
-            
-            // contrast
-            for (int k = 0; k < 3; ++ k) rgbArray[k] = (rgbArray[k] - 0.5) * (tan((contrast + 1.0) * M_PI_4) ) + 0.5;
-            
-            // clamp
-            for (int k = 0; k < 3; ++ k) rgbArray[k] = enhancer::internal::clamp(rgbArray[k]);
-            
-            // saturation
-            Vector3d hsvVector = enhancer::internal::rgb2hsv(rgbArray);
-            double s = hsvVector.y();
-            s *= saturation + 1.0;
-            hsvVector(1) = enhancer::internal::clamp(s);
-            const Vector3d rgbVector = enhancer::internal::hsv2rgb(hsvVector);
-            
-            rgb = qRgb(static_cast<int>(rgbVector(0) * 255.0),
-                       static_cast<int>(rgbVector(1) * 255.0),
-                       static_cast<int>(rgbVector(2) * 255.0));
-            
-            newImg.setPixel(i, j, rgb);
+            const QRgb            original_rgb = image.pixel(x, y);
+            const Eigen::Vector3d input_rgb    = qRgb2rgb(original_rgb);
+            const Eigen::Vector3d output_rgb   = enhancer::enhance(input_rgb, parameters);
+            const QRgb            new_rgb = qRgb(static_cast<int>(output_rgb(0) * 255.0),
+                                                 static_cast<int>(output_rgb(1) * 255.0),
+                                                 static_cast<int>(output_rgb(2) * 255.0));
+            newImg.setPixel(x, y, new_rgb);
         };
         
 #ifdef MULTI_THREAD
