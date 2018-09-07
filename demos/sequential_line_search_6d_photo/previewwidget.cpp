@@ -31,17 +31,17 @@ void PreviewWidget::setCurrentImage(const QImage &image)
 void PreviewWidget::initializeGL()
 {
     glEnable(GL_MULTISAMPLE);
-
-    static const string mainShaderName("enhance");
-
+    
+    static const string mainShaderName("enhancer");
+    
     const string bundlePath             = DirectoryUtility::getResourceDirectory() + "/../Resources/shaders";
-    const string mainVertexShaderPath   = bundlePath + "/" + mainShaderName + ".vsh";
-    const string mainFragmentShaderPath = bundlePath + "/" + mainShaderName + ".fsh";
-
+    const string mainVertexShaderPath   = bundlePath + "/" + mainShaderName + ".vs";
+    const string mainFragmentShaderPath = bundlePath + "/" + mainShaderName + ".fs";
+    
     // set shader program
     const int success = DrawUtility::loadShader(mainVertexShaderPath, mainFragmentShaderPath, &shaderProgram);
     if (success < 0) exit(1);
-
+    
     texLocation = glGetUniformLocation(shaderProgram, "texture");
     p1Location  = glGetUniformLocation(shaderProgram, "first");
     p2Location  = glGetUniformLocation(shaderProgram, "second");

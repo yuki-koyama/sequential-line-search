@@ -1,5 +1,5 @@
 # Resources
-file(GLOB shader_files ./resources/shaders/enhance.fsh ./resources/shaders/enhance.vsh)
+file(GLOB shader_files ${CMAKE_SOURCE_DIR}/external/enhancer/shaders/enhancer.fs ${CMAKE_SOURCE_DIR}/external/enhancer/shaders/enhancer.vs)
 file(GLOB photo_files ./resources/data/*.jpg)
 
 # Dependencies
