@@ -2,8 +2,6 @@
 
 #include <list>
 #include <stdlib.h>
-#include <OpenGL/glu.h>
-#include <GLUT/glut.h>
 
 using std::string;
 using std::vector;
