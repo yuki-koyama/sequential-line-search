@@ -2,11 +2,11 @@
 #include <iostream>
 #include <QPainter>
 #include <QPaintEvent>
+#include <tinycolormap.hpp>
 #include "core.h"
 #include "preferenceregressor.h"
 #include "gaussianprocessregressor.h"
 #include "expectedimprovementmaximizer.h"
-#include "colorutility.h"
 
 using Eigen::VectorXd;
 
@@ -48,9 +48,9 @@ void WidgetEI::paintEvent(QPaintEvent *event)
             const double x1 = static_cast<double>(pix_y) / static_cast<double>(h);
             VectorXd x = VectorXd::Constant(core.dim, 0.50); x(0) = x0; x(1) = x1;
 
-            const double   y     = 8.0 * ExpectedImprovement::calculateExpectedImprovedment(*core.regressor, x);
-            const VectorXd color = ColorUtility::getColor(y);
-
+            const double y     = 8.0 * ExpectedImprovement::calculateExpectedImprovedment(*core.regressor, x);
+            const auto   color = tinycolormap::GetColor(y);
+            
             image.setPixel(pix_x, pix_y, qRgba(color(0) * 255, color(1) * 255, color(2) * 255, 255));
         }
     }

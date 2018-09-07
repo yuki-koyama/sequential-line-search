@@ -9,12 +9,13 @@
 
 using namespace std;
 
-namespace {
-Core& core = Core::getInstance();
+namespace
+{
+    Core& core = Core::getInstance();
 }
 
 PreviewWidget::PreviewWidget(QWidget *parent) :
-    QGLWidget(parent)
+QGLWidget(parent)
 {
 }
 
@@ -68,27 +69,23 @@ void PreviewWidget::paintGL()
         const int h_corrected = w * hRate / wRate;
         glViewport(0, (h - h_corrected) / 2, w, h_corrected);
     }
-
+    
     // Draw background and image
-#if 0
-    glClearColor(150.0 / 255.0, 150.0 / 255.0, 150.0 / 255.0, 1.0);
-#else
     glClearColor(0.0, 0.0, 0.0, 1.0);
-#endif
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-
+    
     glUseProgram(shaderProgram);
-
+    
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
+    
     glEnable(GL_TEXTURE_2D);
     texture = bindTexture(this->image, GL_TEXTURE_2D, GL_RGB);
     glUniform1ui(texLocation, texture);
-
+    
     const Eigen::VectorXd x = core.computeParametersFromSlider();
     if (x.rows() == 2)
     {
@@ -100,14 +97,14 @@ void PreviewWidget::paintGL()
         glUniform3f(p1Location, x(0), x(1), x(2));
         glUniform3f(p2Location, x(3), x(4), x(5));
     }
-
+    
     glBegin(GL_TRIANGLE_FAN);
     glTexCoord2d(0.0, 0.0); glVertex2d(-1.0, -1.0);
     glTexCoord2d(1.0, 0.0); glVertex2d(+1.0, -1.0);
     glTexCoord2d(1.0, 1.0); glVertex2d(+1.0, +1.0);
     glTexCoord2d(0.0, 1.0); glVertex2d(-1.0, +1.0);
     glEnd();
-
+    
     glDisable(GL_TEXTURE_2D);
     glUseProgram(0);
 }

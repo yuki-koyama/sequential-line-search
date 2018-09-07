@@ -30,10 +30,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Generate sliders for visualization
     std::vector<std::string> names;
-    for (unsigned i = 0; i < core.dim; ++ i) names.push_back("x" + std::to_string(i));
+    for (unsigned i = 0; i < core.dim; ++ i) { names.push_back("x" + std::to_string(i)); }
 
-    if (core.dim == 6) names = std::vector<std::string>{ "Brightness", "Contrast", "Saturation", "Color Balance [R]", "Color Balance [G]", "Color Balance [B]" };
-    if (core.dim == 2) names = std::vector<std::string>{ "Saturation", "Color Balance [B]" };
+    if (core.dim == 6)
+    {
+        names = std::vector<std::string>{ "Brightness", "Contrast", "Saturation", "Color Balance [R]", "Color Balance [G]", "Color Balance [B]" };
+    } else if (core.dim == 2)
+    {
+        names = std::vector<std::string>{ "Saturation", "Color Balance [B]" };
+    }
 
     for (unsigned i = 0; i < core.dim; ++ i)
     {
