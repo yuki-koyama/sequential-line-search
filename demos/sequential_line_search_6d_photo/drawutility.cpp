@@ -8,89 +8,8 @@ using std::vector;
 
 namespace
 {
-    extern int _loadShader(GLuint shader, string shdName);
-}
-
-int DrawUtility::loadShader(string vtxShdName, string frgShdName, GLuint *lpProg)
-{
-    GLuint vtxShader;
-    GLuint frgShader;
-    GLuint prog;
-    GLint linked;
-    
-    vtxShader = glCreateShader(GL_VERTEX_SHADER);
-    frgShader = glCreateShader(GL_FRAGMENT_SHADER);
-    
-    if (_loadShader(vtxShader, vtxShdName) < 0) {
-        return -1;
-    }
-    
-    if (_loadShader(frgShader, frgShdName) < 0) {
-        return -1;
-    }
-    
-    prog = glCreateProgram();
-    
-    glAttachShader(prog, vtxShader);
-    glAttachShader(prog, frgShader);
-    
-    glDeleteShader(vtxShader);
-    glDeleteShader(frgShader);
-    
-    glLinkProgram(prog);
-    glGetProgramiv(prog, GL_LINK_STATUS, &linked);
-    
-    if (linked == GL_FALSE) {
-        fprintf(stderr, "Link error of %s & %s!!\n", vtxShdName.c_str(), frgShdName.c_str());
-        printProgramInfoLog(prog);
-        return -1;
-    }
-    
-    *lpProg = prog;
-    
-    return 0;
-}
-
-void DrawUtility::printShaderLog(GLuint shader) {
-    int logSize;
-    int length;
-    
-    glGetShaderiv(shader, GL_INFO_LOG_LENGTH , &logSize);
-    
-    GLchar *log = (GLchar *)malloc(sizeof(GLchar) * logSize);
-    
-    if (logSize > 1) {
-        glGetShaderInfoLog(shader, logSize, &length, log);
-        fprintf(stderr, "Shader Info Log\n%s\n", log);
-    }
-    
-    free(log);
-}
-
-void DrawUtility::printProgramInfoLog(GLuint program) {
-    GLsizei bufSize;
-    
-    glGetProgramiv(program, GL_INFO_LOG_LENGTH , &bufSize);
-    
-    if (bufSize > 1) {
-        GLchar *infoLog;
-        
-        infoLog = (GLchar *)malloc(bufSize);
-        if (infoLog != NULL) {
-            GLsizei length;
-            
-            glGetProgramInfoLog(program, bufSize, &length, infoLog);
-            fprintf(stderr, "Program Info Log:\n%s\n", infoLog);
-        } else {
-            fprintf(stderr, "Could not allocate InfoLog buffer.\n");
-        }
-        free(infoLog);
-    }
-}
-
-namespace
-{
-    int _loadShader(GLuint shader, string shdName) {
+    int _loadShader(GLuint shader, string shdName)
+    {
         FILE *fp;
         void *buf;
         int size;
@@ -139,5 +58,85 @@ namespace
         }
         
         return 0;
+    }
+}
+
+namespace DrawUtility
+{
+    int loadShader(string vtxShdName, string frgShdName, GLuint *lpProg)
+    {
+        GLuint vtxShader;
+        GLuint frgShader;
+        GLuint prog;
+        GLint linked;
+        
+        vtxShader = glCreateShader(GL_VERTEX_SHADER);
+        frgShader = glCreateShader(GL_FRAGMENT_SHADER);
+        
+        if (_loadShader(vtxShader, vtxShdName) < 0) {
+            return -1;
+        }
+        
+        if (_loadShader(frgShader, frgShdName) < 0) {
+            return -1;
+        }
+        
+        prog = glCreateProgram();
+        
+        glAttachShader(prog, vtxShader);
+        glAttachShader(prog, frgShader);
+        
+        glDeleteShader(vtxShader);
+        glDeleteShader(frgShader);
+        
+        glLinkProgram(prog);
+        glGetProgramiv(prog, GL_LINK_STATUS, &linked);
+        
+        if (linked == GL_FALSE) {
+            fprintf(stderr, "Link error of %s & %s!!\n", vtxShdName.c_str(), frgShdName.c_str());
+            printProgramInfoLog(prog);
+            return -1;
+        }
+        
+        *lpProg = prog;
+        
+        return 0;
+    }
+    
+    void printShaderLog(GLuint shader) {
+        int logSize;
+        int length;
+        
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH , &logSize);
+        
+        GLchar *log = (GLchar *)malloc(sizeof(GLchar) * logSize);
+        
+        if (logSize > 1) {
+            glGetShaderInfoLog(shader, logSize, &length, log);
+            fprintf(stderr, "Shader Info Log\n%s\n", log);
+        }
+        
+        free(log);
+    }
+    
+    void printProgramInfoLog(GLuint program) {
+        GLsizei bufSize;
+        
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH , &bufSize);
+        
+        if (bufSize > 1) {
+            GLchar *infoLog;
+            
+            infoLog = (GLchar *)malloc(bufSize);
+            if (infoLog != NULL) {
+                GLsizei length;
+                
+                glGetProgramInfoLog(program, bufSize, &length, infoLog);
+                fprintf(stderr, "Program Info Log:\n%s\n", infoLog);
+            } else {
+                fprintf(stderr, "Could not allocate InfoLog buffer.\n");
+            }
+            free(infoLog);
+        }
     }
 }

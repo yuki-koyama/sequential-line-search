@@ -5,12 +5,11 @@
 #include <vector>
 #include <OpenGL/gl.h>
 
-class DrawUtility
+namespace DrawUtility
 {
-public:
-    static int  loadShader(std::string vtxShdName, std::string frgShdName, GLuint *lpProg);
-    static void printShaderLog(GLuint shader);
-    static void printProgramInfoLog(GLuint program);
-};
+    int  loadShader(std::string vtxShdName, std::string frgShdName, GLuint *lpProg);
+    void printShaderLog(GLuint shader);
+    void printProgramInfoLog(GLuint program);
+}
 
 #endif // DRAWUTILITY_H
