@@ -32,8 +32,8 @@ namespace DirectoryUtility
     
     inline std::string getTemporaryDirectory()
     {
-        const std::string baseDirPath = "/Users/koyama/Dropbox/tmp/algorithm_comparison/";
-        const std::string mainDirPath = baseDirPath + getCurrentTimeInString();
+        const std::string baseDirPath = QCoreApplication::applicationDirPath().toStdString();
+        const std::string mainDirPath = baseDirPath + "/" + getCurrentTimeInString();
         createDirectoryIfNotExist(mainDirPath);
         return mainDirPath;
     }
