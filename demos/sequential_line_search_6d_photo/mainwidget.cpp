@@ -6,7 +6,6 @@
 #include "mainwindow.h"
 #include "gaussianprocessregressor.h"
 #include "expectedimprovementmaximizer.h"
-#include "colorutility.h"
 
 using Eigen::VectorXd;
 

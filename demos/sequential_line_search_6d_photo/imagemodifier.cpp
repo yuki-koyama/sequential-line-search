@@ -7,7 +7,7 @@
 #include <thread>
 #endif
 #include <QImage>
-#include "colorutility.h"
+#include <enhancer.hpp>
 
 using std::vector;
 using std::max;
@@ -79,11 +79,11 @@ QImage modifyImage(const QImage& image, const std::vector<double>& set)
         for (int k = 0; k < 3; ++ k) rgbArray[k] = clamp(rgbArray[k]);
 
         // saturation
-        Vector3d hsvVector = ColorUtility::rgb2hsv(rgbArray);
+        Vector3d hsvVector = enhancer::internal::rgb2hsv(rgbArray);
         double s = hsvVector.y();
         s *= saturation + 1.0;
         hsvVector(1) = clamp(s);
-        const Vector3d rgbVector = ColorUtility::hsv2rgb(hsvVector);
+        const Vector3d rgbVector = enhancer::internal::hsv2rgb(hsvVector);
 
         rgb = qRgb(static_cast<int>(rgbVector(0) * 255.0),
                    static_cast<int>(rgbVector(1) * 255.0),
@@ -125,12 +125,12 @@ Vector3d changeColorBalance(const Vector3d& inputRgb, const Vector3d& shift)
     const double   b         = 0.333;
     const double   scale     = 0.700;
 
-    const double   lightness = ColorUtility::rgb2l(inputRgb);
+    const double   lightness = enhancer::internal::rgb2l(inputRgb);
     const Vector3d midtones  = (clamp((lightness - b) / a + 0.5) * clamp((lightness + b - 1.0) / (- a) + 0.5) * scale) * shift;
     const Vector3d newColor  = clamp(inputRgb + midtones);
-    const Vector3d newHsl    = ColorUtility::rgb2hsl(newColor);
+    const Vector3d newHsl    = enhancer::internal::rgb2hsl(newColor);
 
-    return ColorUtility::hsl2rgb(Vector3d(newHsl(0), newHsl(1), lightness));
+    return enhancer::internal::hsl2rgb(Vector3d(newHsl(0), newHsl(1), lightness));
 }
 
 }
