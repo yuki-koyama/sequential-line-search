@@ -28,6 +28,8 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/tinycolormap)
 set(TIMER_BUILD_TEST OFF CACHE INTERNAL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/timer)
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/enhancer)
+
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "" FORCE)
 set(NLOPT_GUILE       OFF CACHE INTERNAL "" FORCE)
 set(NLOPT_LINK_PYTHON OFF CACHE INTERNAL "" FORCE)

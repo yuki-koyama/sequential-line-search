@@ -1,5 +1,5 @@
 # Resources
-file(GLOB shader_files ${CMAKE_SOURCE_DIR}/external/enhancer/shaders/enhancer.fs ${CMAKE_SOURCE_DIR}/external/enhancer/shaders/enhancer.vs)
+file(GLOB shader_files ${ENHANCER_VERT_SHADER_PATH} ${ENHANCER_FRAG_SHADER_PATH})
 file(GLOB photo_files ./resources/data/*.jpg)
 
 # Dependencies
@@ -22,7 +22,7 @@ file(GLOB files ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.
 # Executable definition for macOS
 add_executable(sequential_line_search_6d_photo MACOSX_BUNDLE ${files} ${shader_files} ${photo_files})
 set_target_properties(sequential_line_search_6d_photo PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/resources/Info.plist.in)
-target_link_libraries(sequential_line_search_6d_photo ${OPENGL_LIBRARIES} Qt5::Gui Qt5::Widgets Qt5::OpenGL Eigen3::Eigen NLopt::nlopt SequentialLineSearch tinycolormap)
+target_link_libraries(sequential_line_search_6d_photo ${OPENGL_LIBRARIES} Qt5::Gui Qt5::Widgets Qt5::OpenGL Eigen3::Eigen NLopt::nlopt SequentialLineSearch tinycolormap enhancer)
 
 # Resource properties
 set_source_files_properties(
