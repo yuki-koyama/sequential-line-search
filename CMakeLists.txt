@@ -48,6 +48,7 @@ if(Qt5_FOUND)
 	add_subdirectory(demos/bayesian_optimization_1d_gui)
 	add_subdirectory(demos/bayesian_optimization_2d_gui)
 	add_subdirectory(demos/sequential_line_search_2d_gui)
+	add_subdirectory(demos/sequential_line_search_6d_photo)
 endif()
 
 ###############################################
