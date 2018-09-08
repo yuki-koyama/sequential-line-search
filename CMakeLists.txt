@@ -13,9 +13,9 @@ if(APPLE AND EXISTS /usr/local/opt/qt)
 	list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt")
 endif()
 
-set(SEQUENTIL_LINE_SEARCH_BUILD_COMMAND_DEMOS  ON  CACHE BOOL "")
-set(SEQUENTIL_LINE_SEARCH_BUILD_VISUAL_DEMOS   OFF CACHE BOOL "")
-set(SEQUENTIL_LINE_SEARCH_BUILD_PHOTO_DEMOS    OFF CACHE BOOL "")
+set(SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS  ON  CACHE BOOL "")
+set(SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS   OFF CACHE BOOL "")
+set(SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS    OFF CACHE BOOL "")
 
 ###############################################
 # Handling external libraries
@@ -45,12 +45,12 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/nlopt)
 ###############################################
 add_subdirectory(sequential_line_search)
 
-if(SEQUENTIL_LINE_SEARCH_BUILD_COMMAND_DEMOS)
+if(SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS)
 	# Demos
 	add_subdirectory(demos/bayesian_optimization_1d)
 	add_subdirectory(demos/sequential_line_search_nd)
 endif()
-if(SEQUENTIL_LINE_SEARCH_BUILD_VISUAL_DEMOS)
+if(SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS)
 	# Qt
 	find_package(Qt5 COMPONENTS Gui Widgets Concurrent REQUIRED)
 
@@ -63,7 +63,7 @@ if(SEQUENTIL_LINE_SEARCH_BUILD_VISUAL_DEMOS)
 	add_subdirectory(demos/bayesian_optimization_2d_gui)
 	add_subdirectory(demos/sequential_line_search_2d_gui)
 endif()
-if(SEQUENTIL_LINE_SEARCH_BUILD_PHOTO_DEMOS)
+if(SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS)
 	# Qt
 	find_package(Qt5 COMPONENTS Gui Widgets OpenGL Concurrent REQUIRED)
 

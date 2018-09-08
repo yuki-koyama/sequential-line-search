@@ -18,7 +18,7 @@ namespace DirectoryUtility
     
     inline std::string getResourceDirectory()
     {
-        return QCoreApplication::applicationDirPath().toStdString() + "/../Resources/";
+        return QCoreApplication::applicationDirPath().toStdString() + "/../Resources";
     }
     
     inline void createDirectoryIfNotExist(const std::string& dirPath)

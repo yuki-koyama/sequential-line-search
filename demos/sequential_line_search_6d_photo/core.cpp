@@ -15,7 +15,7 @@ Core::Core() : dim(6)
 {
     X = MatrixXd::Zero(0, 0);
     D.clear();
-
+    
     x_max = VectorXd::Zero(0);
     y_max = NAN;
 }
@@ -29,17 +29,17 @@ void Core::proceedOptimization()
 {
     // Add new preference data
     const VectorXd x = computeParametersFromSlider();
-
+    
     addData(x, slider->orig_0, slider->orig_1);
-
+    
     // Compute regression
     computeRegression();
-
+    
     // Check the current best
     unsigned index;
     y_max = regressor->y.maxCoeff(&index);
     x_max = regressor->X.col(index);
-
+    
     // Update slider ends
     updateSliderEnds();
 }
@@ -65,15 +65,15 @@ void Core::addData(const std::vector<Eigen::VectorXd> &xs)
         D.push_back(Preference(indices));
         return;
     }
-
+    
     const unsigned d = X.rows();
     const unsigned N = X.cols();
-
+    
     MatrixXd newX(d, N + xs.size());
     newX.block(0, 0, d, N) = X;
     for (unsigned i = 0; i < xs.size(); ++ i) newX.col(N + i) = xs[i];
     this->X = newX;
-
+    
     std::vector<unsigned> indices(xs.size());
     for (unsigned i = 0; i < xs.size(); ++ i) indices[i] = N + i;
     D.push_back(Preference(indices));
@@ -92,10 +92,10 @@ void Core::updateSliderEnds()
         slider = make_shared<Slider>(Utility::generateRandomVector(dim), Utility::generateRandomVector(dim), true);
         return;
     }
-
+    
     const VectorXd x_1 = regressor->find_arg_max();
     const VectorXd x_2 = findNextPoint();
-
+    
     slider = make_shared<Slider>(x_1, x_2, true);
 }
 
