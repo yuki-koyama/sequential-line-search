@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>960</width>
+    <height>490</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Prototype</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="1">
+       <widget class="WidgetEI" name="widget_e" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>160</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="WidgetSigma" name="widget_s" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>160</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>y_mean</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>slider</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>y_var</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="WidgetMu" name="widget_m" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>160</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>EI</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="MainWidget" name="widget_y" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>160</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="5" column="1">
+       <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="PreviewWidget" name="widget_preview" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>540</width>
+          <height>360</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>540</width>
+          <height>360</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSlider" name="horizontalSlider">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_buttons">
+        <item>
+         <widget class="QPushButton" name="pushButton">
+          <property name="text">
+           <string>Next</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_2">
+          <property name="text">
+           <string>Finish</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="Line" name="line_2">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QFormLayout" name="formLayout">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+      </property>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>960</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuAdd">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionProceed_optimization"/>
+    <addaction name="actionClear_all_data"/>
+    <addaction name="actionPrint_current_best"/>
+    <addaction name="actionExport_photos_on_slider"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+   </widget>
+   <addaction name="menuAdd"/>
+   <addaction name="menuView"/>
+  </widget>
+  <action name="actionBatch_visualization">
+   <property name="text">
+    <string>Batch visualization</string>
+   </property>
+  </action>
+  <action name="actionProceed_optimization">
+   <property name="text">
+    <string>Proceed optimization</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Return</string>
+   </property>
+  </action>
+  <action name="actionClear_all_data">
+   <property name="text">
+    <string>Clear all data</string>
+   </property>
+  </action>
+  <action name="actionPrint_current_best">
+   <property name="text">
+    <string>Print current best</string>
+   </property>
+  </action>
+  <action name="actionExport_photos_on_slider">
+   <property name="text">
+    <string>Export photos</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>MainWidget</class>
+   <extends>QWidget</extends>
+   <header>mainwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>WidgetSigma</class>
+   <extends>QWidget</extends>
+   <header>widgetsigma.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>WidgetMu</class>
+   <extends>QWidget</extends>
+   <header>widgetmu.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>WidgetEI</class>
+   <extends>QWidget</extends>
+   <header>widgetei.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PreviewWidget</class>
+   <extends>QWidget</extends>
+   <header>previewwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

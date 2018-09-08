@@ -1,0 +1,8 @@
+- 1.jpg: by Yuki Koyama ([CC BY](http://creativecommons.org/licenses/by/2.0/))
+- 2.jpg: by houroumono ([CC BY](http://creativecommons.org/licenses/by/2.0/)) <https://www.flickr.com/photos/hourou/8602819394/>
+- 3.jpg: by Kathleen Conklin ([CC BY](http://creativecommons.org/licenses/by/2.0/)) <https://www.flickr.com/photos/ktylerconk/2381370624/>
+- 4.jpg: by Yuki Koyama ([CC BY](http://creativecommons.org/licenses/by/2.0/))
+- 5.jpg: by Roland Tanglao (Public Domain) <https://www.flickr.com/photos/roland/32822129>
+- 6.jpg: by Yuki Koyama ([CC BY](http://creativecommons.org/licenses/by/2.0/))
+- flower.jpg: by Yuki Koyama ([CC BY](http://creativecommons.org/licenses/by/2.0/))
+- hawaii.jpg: by Yuki Koyama ([CC BY](http://creativecommons.org/licenses/by/2.0/))

@@ -7,3 +7,9 @@
 [submodule "external/nlopt"]
 	path = external/nlopt
 	url = https://github.com/stevengj/nlopt.git
+[submodule "external/enhancer"]
+	path = external/enhancer
+	url = https://github.com/yuki-koyama/enhancer
+[submodule "external/parallel-util"]
+	path = external/parallel-util
+	url = https://github.com/yuki-koyama/parallel-util
