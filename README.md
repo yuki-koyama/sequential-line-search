@@ -29,11 +29,15 @@ DOI: https://doi.org/10.1145/3072959.3073598
 
 - (None)
 
+To build these demos, the CMake variable: `SEQUENTIL_LINE_SEARCH_BUILD_COMMAND_DEMOS` should be set `ON`. (Default value is `ON`)
+
 ### Required for Visual Demos
 
 - Qt5 <http://doc.qt.io/qt-5/> (`brew install qt`)
 - OpenGL
 - tinycolormap <https://github.com/yuki-koyama/tinycolormap> (included via gitsubmodule)
+
+To build these demos, the CMake variable: `SEQUENTIL_LINE_SEARCH_BUILD_VISUAL_DEMOS` should be set `ON`. (Default value is `OFF`)
 
 ### Required for Photo Enhancement Demos
 
@@ -42,6 +46,8 @@ DOI: https://doi.org/10.1145/3072959.3073598
 - tinycolormap <https://github.com/yuki-koyama/tinycolormap> (included via gitsubmodule)
 - enhancer <https://github.com/yuki-koyama/enhancer> (included via gitsubmodule)
 - parallel-util <https://github.com/yuki-koyama/parallel-util> (included via gitsubmodule)
+
+To build these demos, the CMake variable: `SEQUENTIL_LINE_SEARCH_BUILD_PHOTO_DEMOS` should be set `ON`. (Default value is `ON`)
 
 ## How to Compile and Run
 
@@ -56,11 +62,10 @@ make
 ```
 Then you can run the applications by, for example,
 ```
-./demos/sequential_line_search_2d_gui/SequentialLineSearch2dGui
+./demos/sequential_line_search_nd/SequentialLineSearchNd
 ```
-Note that you might need to specify CMAKE_PREFIX_PATH adequately so that cmake can find Qt5.
 
-We tested on macOS 10.13 only.
+We tested on macOS 10.13 only. We are aware that the visual demos cannot be built as it is in other OSs; some OpenGL paths etc. need to be resolved. Pull requiests welcome.
 
 ## License
 
