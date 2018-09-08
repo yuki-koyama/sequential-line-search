@@ -16,20 +16,32 @@ endif()
 ###############################################
 # Handling external libraries
 ###############################################
+
+# Qt
 find_package(Qt5 COMPONENTS Widgets)
 if(Qt5_FOUND)
 	include_directories(${Qt5Widgets_INCLUDE_DIRS})
 endif()
+
+# Eigen
 find_package(Eigen3 REQUIRED)
 
+# tinycolormap
 set(TINYCOLORMAP_BUILD_TOOLS OFF CACHE INTERNAL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/tinycolormap)
 
+# timer
 set(TIMER_BUILD_TEST OFF CACHE INTERNAL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/timer)
 
+# enhancer
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/enhancer)
 
+# parallel-util
+set(PARALLELUTIL_BUILD_TESTS OFF CACHE INTERNAL "" FORCE)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/parallel-util)
+
+# nlopt
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "" FORCE)
 set(NLOPT_GUILE       OFF CACHE INTERNAL "" FORCE)
 set(NLOPT_LINK_PYTHON OFF CACHE INTERNAL "" FORCE)
@@ -38,6 +50,7 @@ set(NLOPT_OCTAVE      OFF CACHE INTERNAL "" FORCE)
 set(NLOPT_PYTHON      OFF CACHE INTERNAL "" FORCE)
 set(NLOPT_SWIG        OFF CACHE INTERNAL "" FORCE)
 set(NLOPT_TESTS       OFF CACHE INTERNAL "" FORCE)
+set(NLOPT_CXX         ON  CACHE INTERNAL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/nlopt)
 
 ###############################################

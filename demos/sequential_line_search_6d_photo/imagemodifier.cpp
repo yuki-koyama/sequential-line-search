@@ -1,15 +1,8 @@
-#define MULTI_THREAD
-
 #include "imagemodifier.h"
 #include <cmath>
 #include <cassert>
-#ifdef MULTI_THREAD
-#include <thread>
-#endif
 #include <enhancer.hpp>
-
-using std::vector;
-using std::thread;
+#include <parallel-util.hpp>
 
 namespace ImageModifier
 {
@@ -58,28 +51,7 @@ namespace ImageModifier
             newImg.setPixel(x, y, new_rgb);
         };
         
-#ifdef MULTI_THREAD
-        vector<thread> ts;
-        for (int y = 0; y < h; ++ y)
-        {
-            ts.push_back(thread([changePixelColor, w] (const int y)
-                                {
-                                    for (int x = 0; x < w; ++ x)
-                                    {
-                                        changePixelColor(x, y);
-                                    }
-                                }, y));
-        }
-        for (thread& t : ts) t.join();
-#else
-        for (int x = 0; x < w; ++ x)
-        {
-            for (int y = 0; y < h; ++ y)
-            {
-                changePixelColor(x, y);
-            }
-        }
-#endif
+        parallelutil::parallel_for_2d(w, h, changePixelColor);
         
         return newImg;
     }
