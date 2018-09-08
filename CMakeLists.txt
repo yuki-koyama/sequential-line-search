@@ -84,7 +84,7 @@ if(SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS)
 	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/parallel-util)
 
 	# Demos
-	add_subdirectory(demos/sequential_line_search_6d_photo)
+	add_subdirectory(demos/sequential_line_search_photo)
 endif()
 
 ###############################################
