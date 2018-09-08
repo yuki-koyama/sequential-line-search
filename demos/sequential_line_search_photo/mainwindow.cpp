@@ -107,10 +107,21 @@ void MainWindow::on_actionClear_all_data_triggered()
 
 void MainWindow::on_actionProceed_optimization_triggered()
 {
+    // Proceed optimization step
     core.proceedOptimization();
-    ui->widget_s->update();
-    ui->widget_m->update();
-    ui->widget_e->update();
+    
+    // Damp data
+    core.regressor->dampData(DirectoryUtility::getTemporaryDirectory());
+    
+    // Reset slider position
+    ui->horizontalSlider->setValue((ui->horizontalSlider->maximum() - ui->horizontalSlider->minimum()) / 2 + ui->horizontalSlider->minimum());
+
+    // Repaint evary widget
+    ui->widget_s->repaint();
+    ui->widget_m->repaint();
+    ui->widget_e->repaint();
+    ui->horizontalSlider->repaint();
+    ui->widget_preview->repaint();
 }
 
 void MainWindow::on_horizontalSlider_valueChanged(int /*value*/)
@@ -122,13 +133,7 @@ void MainWindow::on_horizontalSlider_valueChanged(int /*value*/)
 
 void MainWindow::on_pushButton_clicked()
 {
-    core.proceedOptimization();
-    ui->horizontalSlider->setValue((ui->horizontalSlider->maximum() + ui->horizontalSlider->minimum()) / 2);
-    ui->widget_s->update();
-    ui->widget_m->update();
-    ui->widget_e->update();
-    
-    core.regressor->dampData(DirectoryUtility::getTemporaryDirectory());
+    on_actionProceed_optimization_triggered();
 }
 
 void MainWindow::on_actionPrint_current_best_triggered()
