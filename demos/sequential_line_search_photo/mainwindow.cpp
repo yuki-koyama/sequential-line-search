@@ -83,6 +83,18 @@ ui(new Ui::MainWindow)
     ui->horizontalSlider->setValue((ui->horizontalSlider->maximum() + ui->horizontalSlider->minimum()) / 2);
     updateRawSliders();
     
+    if (core.dim != 2)
+    {
+        ui->widget_y->setVisible(false);
+        ui->widget_e->setVisible(false);
+        ui->widget_m->setVisible(false);
+        ui->widget_s->setVisible(false);
+        ui->label_y->setVisible(false);
+        ui->label_e->setVisible(false);
+        ui->label_m->setVisible(false);
+        ui->label_s->setVisible(false);
+    }
+    
     this->adjustSize();
 }
 
