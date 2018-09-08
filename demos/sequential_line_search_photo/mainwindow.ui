@@ -18,7 +18,7 @@
     <item>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="1">
-       <widget class="WidgetEI" name="widget_e" native="true">
+       <widget class="MainWidget" name="widget_e" native="true">
         <property name="minimumSize">
          <size>
           <width>160</width>
@@ -28,7 +28,7 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="WidgetSigma" name="widget_s" native="true">
+       <widget class="MainWidget" name="widget_s" native="true">
         <property name="minimumSize">
          <size>
           <width>160</width>
@@ -68,7 +68,7 @@
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="WidgetMu" name="widget_m" native="true">
+       <widget class="MainWidget" name="widget_m" native="true">
         <property name="minimumSize">
          <size>
           <width>160</width>
@@ -254,24 +254,6 @@
    <class>MainWidget</class>
    <extends>QWidget</extends>
    <header>mainwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>WidgetSigma</class>
-   <extends>QWidget</extends>
-   <header>widgetsigma.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>WidgetMu</class>
-   <extends>QWidget</extends>
-   <header>widgetmu.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>WidgetEI</class>
-   <extends>QWidget</extends>
-   <header>widgetei.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

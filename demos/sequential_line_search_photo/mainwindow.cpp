@@ -26,6 +26,23 @@ ui(new Ui::MainWindow)
     core.mainWindow = this;
     ui->setupUi(this);
     
+    // Set Widgets
+    ui->widget_y->content = MainWidget::Content::None;
+    ui->widget_y->draw_slider_space = true;
+    ui->widget_y->draw_slider_tick  = true;
+    
+    ui->widget_e->content = MainWidget::Content::ExpectedImprovement;
+    ui->widget_e->draw_maximum      = true;
+    ui->widget_e->draw_data_points  = true;
+    
+    ui->widget_m->content = MainWidget::Content::Mean;
+    ui->widget_m->draw_maximum      = true;
+    ui->widget_m->draw_data_points  = true;
+    
+    ui->widget_s->content = MainWidget::Content::StandardDeviation;
+    ui->widget_s->draw_maximum      = true;
+    ui->widget_s->draw_data_points  = true;
+    
     // Set a target photo
     const std::string photo_name = SEQUENTIAL_LINE_SEARCH_PHOTO_NAME;
     const QImage      image      = QImage((DirectoryUtility::getResourceDirectory() + "/data/" + photo_name).c_str());
@@ -53,7 +70,7 @@ ui(new Ui::MainWindow)
         };
     }
     assert(core.dim == names.size());
-
+    
     for (unsigned i = 0; i < core.dim; ++ i)
     {
         sliders.push_back(new QSlider(Qt::Horizontal, this));
@@ -115,7 +132,7 @@ void MainWindow::on_actionProceed_optimization_triggered()
     
     // Reset slider position
     ui->horizontalSlider->setValue((ui->horizontalSlider->maximum() - ui->horizontalSlider->minimum()) / 2 + ui->horizontalSlider->minimum());
-
+    
     // Repaint evary widget
     ui->widget_s->repaint();
     ui->widget_m->repaint();
