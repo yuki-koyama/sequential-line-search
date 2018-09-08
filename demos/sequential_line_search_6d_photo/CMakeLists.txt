@@ -1,3 +1,7 @@
+# Variables
+set(SEQUENTIAL_LINE_SEARCH_PHOTO_NAME "hawaii.jpg" CACHE STRING "")
+add_definitions(-DSEQUENTIAL_LINE_SEARCH_PHOTO_NAME=\"${SEQUENTIAL_LINE_SEARCH_PHOTO_NAME}\")
+
 # Resources
 file(GLOB shader_files ${ENHANCER_VERT_SHADER_PATH} ${ENHANCER_FRAG_SHADER_PATH})
 file(GLOB photo_files ./resources/data/*.jpg)

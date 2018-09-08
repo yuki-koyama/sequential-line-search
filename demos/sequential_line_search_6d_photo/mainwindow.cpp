@@ -27,8 +27,10 @@ ui(new Ui::MainWindow)
     ui->setupUi(this);
     
     // Set a target photo
-    ui->widget_preview->setCurrentImage(QImage((DirectoryUtility::getResourceDirectory() + "data/1.jpg").c_str()));
-
+    const std::string photo_name = SEQUENTIAL_LINE_SEARCH_PHOTO_NAME;
+    const QImage      image      = QImage((DirectoryUtility::getResourceDirectory() + "/data/" + photo_name).c_str());
+    ui->widget_preview->setCurrentImage(image.scaledToWidth(std::min(1600, image.width())));
+    
     // Generate sliders for visualization
     std::vector<std::string> names;
     for (unsigned i = 0; i < core.dim; ++ i) { names.push_back("x" + std::to_string(i)); }
