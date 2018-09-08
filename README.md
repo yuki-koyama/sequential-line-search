@@ -30,7 +30,7 @@ DOI: https://doi.org/10.1145/3072959.3073598
 
 - (None)
 
-To build these demos, the CMake variable: `SEQUENTIL_LINE_SEARCH_BUILD_COMMAND_DEMOS` should be set `ON`. (Default value is `ON`)
+To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS` should be set `ON`.
 
 ### Required for Visual Demos
 
@@ -38,7 +38,7 @@ To build these demos, the CMake variable: `SEQUENTIL_LINE_SEARCH_BUILD_COMMAND_D
 - OpenGL
 - tinycolormap <https://github.com/yuki-koyama/tinycolormap> (included via gitsubmodule)
 
-To build these demos, the CMake variable: `SEQUENTIL_LINE_SEARCH_BUILD_VISUAL_DEMOS` should be set `ON`. (Default value is `OFF`)
+To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS` should be set `ON`.
 
 ### Required for Photo Enhancement Demos
 
@@ -48,7 +48,7 @@ To build these demos, the CMake variable: `SEQUENTIL_LINE_SEARCH_BUILD_VISUAL_DE
 - enhancer <https://github.com/yuki-koyama/enhancer> (included via gitsubmodule)
 - parallel-util <https://github.com/yuki-koyama/parallel-util> (included via gitsubmodule)
 
-To build these demos, the CMake variable: `SEQUENTIL_LINE_SEARCH_BUILD_PHOTO_DEMOS` should be set `ON`. (Default value is `ON`)
+To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS` should be set `ON`.
 
 ## How to Compile and Run
 
