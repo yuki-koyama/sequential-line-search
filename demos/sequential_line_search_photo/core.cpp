@@ -11,7 +11,13 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 using std::make_shared;
 
-Core::Core() : dim(6)
+#ifdef SEQUENTIAL_LINE_SEARCH_PHOTO_DIM_SUBSET
+#define PHOTO_DIM 2
+#else
+#define PHOTO_DIM 6
+#endif
+
+Core::Core() : dim(PHOTO_DIM)
 {
     X = MatrixXd::Zero(0, 0);
     D.clear();
