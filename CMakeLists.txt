@@ -13,33 +13,20 @@ if(APPLE AND EXISTS /usr/local/opt/qt)
 	list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt")
 endif()
 
+set(SEQUENTIL_LINE_SEARCH_BUILD_COMMAND_DEMOS  ON  CACHE BOOL "")
+set(SEQUENTIL_LINE_SEARCH_BUILD_VISUAL_DEMOS   OFF CACHE BOOL "")
+set(SEQUENTIL_LINE_SEARCH_BUILD_PHOTO_DEMOS    OFF CACHE BOOL "")
+
 ###############################################
 # Handling external libraries
 ###############################################
 
-# Qt
-find_package(Qt5 COMPONENTS Widgets)
-if(Qt5_FOUND)
-	include_directories(${Qt5Widgets_INCLUDE_DIRS})
-endif()
-
 # Eigen
 find_package(Eigen3 REQUIRED)
-
-# tinycolormap
-set(TINYCOLORMAP_BUILD_TOOLS OFF CACHE INTERNAL "" FORCE)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/tinycolormap)
 
 # timer
 set(TIMER_BUILD_TEST OFF CACHE INTERNAL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/timer)
-
-# enhancer
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/enhancer)
-
-# parallel-util
-set(PARALLELUTIL_BUILD_TESTS OFF CACHE INTERNAL "" FORCE)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/parallel-util)
 
 # nlopt
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "" FORCE)
@@ -57,12 +44,46 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/nlopt)
 # Sub-directories
 ###############################################
 add_subdirectory(sequential_line_search)
-add_subdirectory(demos/bayesian_optimization_1d)
-add_subdirectory(demos/sequential_line_search_nd)
-if(Qt5_FOUND)
+
+if(SEQUENTIL_LINE_SEARCH_BUILD_COMMAND_DEMOS)
+	# Demos
+	add_subdirectory(demos/bayesian_optimization_1d)
+	add_subdirectory(demos/sequential_line_search_nd)
+endif()
+if(SEQUENTIL_LINE_SEARCH_BUILD_VISUAL_DEMOS)
+	# Qt
+	find_package(Qt5 COMPONENTS Gui Widgets Concurrent REQUIRED)
+
+	# tinycolormap
+	set(TINYCOLORMAP_BUILD_TOOLS OFF CACHE INTERNAL "" FORCE)
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/tinycolormap)
+
+	# Demos
 	add_subdirectory(demos/bayesian_optimization_1d_gui)
 	add_subdirectory(demos/bayesian_optimization_2d_gui)
 	add_subdirectory(demos/sequential_line_search_2d_gui)
+endif()
+if(SEQUENTIL_LINE_SEARCH_BUILD_PHOTO_DEMOS)
+	# Qt
+	find_package(Qt5 COMPONENTS Gui Widgets OpenGL Concurrent REQUIRED)
+
+	# OpenGL
+	find_package(OpenGL REQUIRED)
+
+	# tinycolormap
+	if(NOT TARGET tinycolormap)
+		set(TINYCOLORMAP_BUILD_TOOLS OFF CACHE INTERNAL "" FORCE)
+		add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/tinycolormap)
+	endif()
+
+	# enhancer
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/enhancer)
+
+	# parallel-util
+	set(PARALLELUTIL_BUILD_TESTS OFF CACHE INTERNAL "" FORCE)
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/parallel-util)
+
+	# Demos
 	add_subdirectory(demos/sequential_line_search_6d_photo)
 endif()
 
