@@ -54,7 +54,7 @@ To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DE
 
 We use [cmake](https://cmake.org/) for managing the source codes. You can compile the core module and the demo applications at once by, for example, 
 ```
-git clone https://github.com/yuki-koyama/sequential-line-search.git
+git clone https://github.com/yuki-koyama/sequential-line-search.git --recursive
 cd sequential-line-search
 mkdir build
 cd build
