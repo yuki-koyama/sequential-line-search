@@ -11,15 +11,6 @@ Eigen::VectorXd compute(const Eigen::VectorXd& x_initial,
                         const Eigen::VectorXd& upper,
                         const Eigen::VectorXd& lower,
                         nlopt::vfunc objective_function,
-                        void *data = nullptr,
-                        nlopt::algorithm algorithm = nlopt::LD_TNEWTON,
-                        int max_evaluations = 1000
-                        );
-
-Eigen::VectorXd compute(const Eigen::VectorXd& x_initial,
-                        const Eigen::VectorXd& upper,
-                        const Eigen::VectorXd& lower,
-                        nlopt::vfunc objective_function,
                         nlopt::vfunc constraint_function,
                         void *data = nullptr,
                         nlopt::algorithm algorithm = nlopt::LN_COBYLA,

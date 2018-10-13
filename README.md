@@ -47,6 +47,7 @@ To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_D
 - tinycolormap <https://github.com/yuki-koyama/tinycolormap> (included via gitsubmodule)
 - enhancer <https://github.com/yuki-koyama/enhancer> (included via gitsubmodule)
 - parallel-util <https://github.com/yuki-koyama/parallel-util> (included via gitsubmodule)
+- nlopt-util <https://github.com/yuki-koyama/nlopt-util> (included via gitsubmodule)
 
 To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS` should be set `ON`.
 

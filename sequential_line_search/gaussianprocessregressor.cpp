@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cmath>
 #include <Eigen/LU>
-#include "nloptutility.h"
+#include <nlopt-util.hpp>
 #include "utility.h"
 
 //#define NOISELESS
@@ -215,8 +215,8 @@ void GaussianProcessRegressor::compute_MAP()
     const VectorXd upper = VectorXd::Constant(D + 2, 5e+01);
     const VectorXd lower = VectorXd::Constant(D + 2, 1e-08);
 
-    const VectorXd x_glo = nloptUtility::compute(x_ini, upper, lower, objective, &data, nlopt::GN_DIRECT, 300);
-    const VectorXd x_loc = nloptUtility::compute(x_glo, upper, lower, objective, &data, nlopt::LD_TNEWTON, 1000);
+    const VectorXd x_glo = nloptutil::compute(x_ini, upper, lower, objective, &data, nlopt::GN_DIRECT, 300);
+    const VectorXd x_loc = nloptutil::compute(x_glo, upper, lower, objective, &data, nlopt::LD_TNEWTON, 1000);
 
     a = x_loc(0);
     b = x_loc(1);

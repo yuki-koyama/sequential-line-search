@@ -8,7 +8,7 @@ file(GLOB
 )
 add_library(SequentialLineSearch STATIC ${headers} ${sources})
 target_include_directories(SequentialLineSearch PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(SequentialLineSearch Eigen3::Eigen timer nlopt)
+target_link_libraries(SequentialLineSearch Eigen3::Eigen timer nlopt nlopt-util)
 
 install(FILES ${headers} DESTINATION include/SequentialLineSearch)
 install(TARGETS SequentialLineSearch ARCHIVE DESTINATION lib)

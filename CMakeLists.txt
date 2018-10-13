@@ -40,6 +40,8 @@ set(NLOPT_TESTS       OFF CACHE INTERNAL "" FORCE)
 set(NLOPT_CXX         ON  CACHE INTERNAL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/nlopt)
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/nlopt-util)
+
 ###############################################
 # Sub-directories
 ###############################################

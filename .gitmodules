@@ -13,3 +13,6 @@
 [submodule "external/parallel-util"]
 	path = external/parallel-util
 	url = https://github.com/yuki-koyama/parallel-util
+[submodule "external/nlopt-util"]
+	path = external/nlopt-util
+	url = https://github.com/yuki-koyama/nlopt-util.git

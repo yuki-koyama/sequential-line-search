@@ -7,9 +7,9 @@
 #include <QProgressDialog>
 #include <QFutureWatcher>
 #include <QtConcurrent>
+#include <nlopt-util.hpp>
 #include "core.h"
 #include "preferenceregressor.h"
-#include "nloptutility.h"
 
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
@@ -110,13 +110,13 @@ void MainWindow::on_actionBatch_visualization_triggered()
 
     auto background_process = [&]()
     {
-        const Eigen::Vector2d x_opt = nloptUtility::compute(Eigen::Vector2d(0.5, 0.5),
-                                                            Eigen::Vector2d(1.0, 1.0),
-                                                            Eigen::Vector2d(0.0, 0.0),
-                                                            objectiveFunc,
-                                                            nullptr,
-                                                            nlopt::LN_COBYLA,
-                                                            1000);
+        const Eigen::Vector2d x_opt = nloptutil::compute(Eigen::Vector2d(0.5, 0.5),
+                                                         Eigen::Vector2d(1.0, 1.0),
+                                                         Eigen::Vector2d(0.0, 0.0),
+                                                         objectiveFunc,
+                                                         nullptr,
+                                                         nlopt::LN_COBYLA,
+                                                         1000);
 
         ui->widget_y->draw_slider_space = false;
         ui->widget_y->draw_slider_tick  = false;

@@ -2,7 +2,7 @@
 #include <cmath>
 #include <iostream>
 #include <utility>
-#include "nloptutility.h"
+#include <nlopt-util.hpp>
 #include "regressor.h"
 #include "gaussianprocessregressor.h"
 
@@ -42,8 +42,8 @@ VectorXd findNextPoint(Regressor& regressor)
     const VectorXd lower = VectorXd::Constant(D, 0.0);
     const VectorXd x_ini = VectorXd::Constant(D, 0.5);
 
-    const VectorXd x_star_global = nloptUtility::compute(x_ini, upper, lower, objective, &regressor, nlopt::GN_DIRECT, 800);
-    const VectorXd x_star_local  = nloptUtility::compute(x_star_global, upper, lower, objective, &regressor, nlopt::LN_COBYLA, 200);
+    const VectorXd x_star_global = nloptutil::compute(x_ini, upper, lower, objective, &regressor, nlopt::GN_DIRECT, 800);
+    const VectorXd x_star_local  = nloptutil::compute(x_star_global, upper, lower, objective, &regressor, nlopt::LN_COBYLA, 200);
 
     return x_star_local;
 }
@@ -84,8 +84,8 @@ vector<VectorXd> findNextPoints(const Regressor &regressor, unsigned n)
     for (unsigned i = 0; i < n; ++ i)
     {
         pair<const Regressor*, const GaussianProcessRegressor*> data(&regressor, &reg);
-        const VectorXd x_star_global = nloptUtility::compute(x_ini, upper, lower, obj, &data, nlopt::GN_DIRECT, 800);
-        const VectorXd x_star_local  = nloptUtility::compute(x_star_global, upper, lower, obj, &data, nlopt::LN_COBYLA, 200);
+        const VectorXd x_star_global = nloptutil::compute(x_ini, upper, lower, obj, &data, nlopt::GN_DIRECT, 800);
+        const VectorXd x_star_local  = nloptutil::compute(x_star_global, upper, lower, obj, &data, nlopt::LN_COBYLA, 200);
 
         points.push_back(x_star_local);
 
