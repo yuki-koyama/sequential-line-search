@@ -264,7 +264,7 @@ void PreferenceRegressor::compute_MAP(const PreferenceRegressor *previous)
     timer::Timer t("PreferenceRegressor::compute_MAP");
 #endif
 
-    const VectorXd x_opt = nloptutil::compute(x_ini, upper, lower, objective, this, nlopt::LD_TNEWTON, 500);
+    const VectorXd x_opt = nloptutil::solve(x_ini, upper, lower, objective, nlopt::LD_TNEWTON, this, 500);
 
     y = x_opt.block(0, 0, M, 1);
 

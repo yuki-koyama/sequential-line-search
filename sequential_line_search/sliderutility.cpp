@@ -2,7 +2,7 @@
 #include <cmath>
 #include <map>
 #include <memory>
-#include "nloptutility.h"
+#include <nlopt-util.hpp>
 
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
@@ -78,8 +78,8 @@ pair<VectorXd, VectorXd> enlargeSliderEnds(const VectorXd& x_1, const VectorXd& 
 
     auto data = std::make_shared<Data>(c, r, scale);
 
-    const double t_1 = nloptutil::solve_with_constraints(VectorXd::Constant(1, 1.0), VectorXd::Constant(1, scale), VectorXd::Constant(1, 0.0), objective, constraint_p, data.get(), nlopt::LN_COBYLA, 1000)(0);
-    const double t_2 = nloptutil::solve_with_constraints(VectorXd::Constant(1, 1.0), VectorXd::Constant(1, scale), VectorXd::Constant(1, 0.0), objective, constraint_n, data.get(), nlopt::LN_COBYLA, 1000)(0);
+    const double t_1 = nloptutil::solve(VectorXd::Constant(1, 1.0), VectorXd::Constant(1, scale), VectorXd::Constant(1, 0.0), objective, {}, { constraint_p }, nlopt::LN_COBYLA, data.get(), 1000)(0);
+    const double t_2 = nloptutil::solve(VectorXd::Constant(1, 1.0), VectorXd::Constant(1, scale), VectorXd::Constant(1, 0.0), objective, {}, { constraint_n }, nlopt::LN_COBYLA, data.get(), 1000)(0);
 
     const VectorXd x_1_new = crop(c + t_1 * r);
     const VectorXd x_2_new = crop(c - t_2 * r);

@@ -37,14 +37,14 @@ double calculateExpectedImprovedment(const Regressor &regressor, const VectorXd&
 VectorXd findNextPoint(Regressor& regressor)
 {
     const unsigned D = regressor.getX().rows();
-
+    
     const VectorXd upper = VectorXd::Constant(D, 1.0);
     const VectorXd lower = VectorXd::Constant(D, 0.0);
     const VectorXd x_ini = VectorXd::Constant(D, 0.5);
-
-    const VectorXd x_star_global = nloptutil::compute(x_ini, upper, lower, objective, &regressor, nlopt::GN_DIRECT, 800);
-    const VectorXd x_star_local  = nloptutil::compute(x_star_global, upper, lower, objective, &regressor, nlopt::LN_COBYLA, 200);
-
+    
+    const VectorXd x_star_global = nloptutil::solve(x_ini, upper, lower, objective, nlopt::GN_DIRECT, &regressor, 800);
+    const VectorXd x_star_local  = nloptutil::solve(x_star_global, upper, lower, objective, nlopt::LN_COBYLA, &regressor, 200);
+    
     return x_star_local;
 }
 
@@ -84,8 +84,8 @@ vector<VectorXd> findNextPoints(const Regressor &regressor, unsigned n)
     for (unsigned i = 0; i < n; ++ i)
     {
         pair<const Regressor*, const GaussianProcessRegressor*> data(&regressor, &reg);
-        const VectorXd x_star_global = nloptutil::compute(x_ini, upper, lower, obj, &data, nlopt::GN_DIRECT, 800);
-        const VectorXd x_star_local  = nloptutil::compute(x_star_global, upper, lower, obj, &data, nlopt::LN_COBYLA, 200);
+        const VectorXd x_star_global = nloptutil::solve(x_ini, upper, lower, obj, nlopt::GN_DIRECT, &data, 800);
+        const VectorXd x_star_local  = nloptutil::solve(x_star_global, upper, lower, obj, nlopt::LN_COBYLA, &data, 200);
 
         points.push_back(x_star_local);
 
