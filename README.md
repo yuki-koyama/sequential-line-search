@@ -25,6 +25,7 @@ DOI: https://doi.org/10.1145/3072959.3073598
 - Eigen <http://eigen.tuxfamily.org/> (`brew install eigen`)
 - NLopt <https://nlopt.readthedocs.io/> (included via gitsubmodule)
 - timer <https://github.com/yuki-koyama/timer> (included via gitsubmodule)
+- nlopt-util <https://github.com/yuki-koyama/nlopt-util> (included via gitsubmodule)
 
 ### Required for Command Line Demos
 
@@ -35,19 +36,18 @@ To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_
 ### Required for Visual Demos
 
 - Qt5 <http://doc.qt.io/qt-5/> (`brew install qt`)
-- OpenGL
 - tinycolormap <https://github.com/yuki-koyama/tinycolormap> (included via gitsubmodule)
+- OpenGL
 
 To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS` should be set `ON`.
 
 ### Required for Photo Enhancement Demos
 
 - Qt5 <http://doc.qt.io/qt-5/> (`brew install qt`)
-- OpenGL
 - tinycolormap <https://github.com/yuki-koyama/tinycolormap> (included via gitsubmodule)
 - enhancer <https://github.com/yuki-koyama/enhancer> (included via gitsubmodule)
 - parallel-util <https://github.com/yuki-koyama/parallel-util> (included via gitsubmodule)
-- nlopt-util <https://github.com/yuki-koyama/nlopt-util> (included via gitsubmodule)
+- OpenGL
 
 To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS` should be set `ON`.
 
