@@ -21,12 +21,15 @@ namespace sequential_line_search
                                         const Eigen::VectorXd& x,
                                         const FunctionType     function_type = FunctionType::ExpectedImprovement);
         
-        Eigen::VectorXd findNextPoint(Regressor &regressor);
+        Eigen::VectorXd FindNextPoint(Regressor& regressor,
+                                      const FunctionType function_type = FunctionType::ExpectedImprovement);
         
         /// \brief Find the next n sampled points that should be observed. These points are determined
         ///        using the method by Schonlau et al. (1997)
         /// \param n The number of the sampled points.
-        std::vector<Eigen::VectorXd> findNextPoints(const Regressor &regressor, unsigned n);
+        std::vector<Eigen::VectorXd> FindNextPoints(const Regressor&   regressor,
+                                                    const unsigned     n,
+                                                    const FunctionType function_type = FunctionType::ExpectedImprovement);
     }
 }
 

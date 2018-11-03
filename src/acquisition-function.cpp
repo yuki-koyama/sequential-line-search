@@ -24,7 +24,7 @@ namespace sequential_line_search
                                         const Eigen::VectorXd& x,
                                         const FunctionType     function_type)
         {
-            assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported.");
+            assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
             
             if (regressor.gety().rows() == 0) { return 0.0; }
             
@@ -38,8 +38,11 @@ namespace sequential_line_search
             return (s_x < 1e-10 || std::isnan(EI)) ? 0.0 : EI;
         }
         
-        VectorXd findNextPoint(Regressor& regressor)
+        Eigen::VectorXd FindNextPoint(Regressor& regressor,
+                                      const FunctionType function_type)
         {
+            assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
+            
             const unsigned D = regressor.getX().rows();
             
             const VectorXd upper = VectorXd::Constant(D, 1.0);
@@ -73,8 +76,12 @@ namespace sequential_line_search
             return (s_x < 1e-08 || std::isnan(EI)) ? 0.0 : EI;
         }
         
-        vector<VectorXd> findNextPoints(const Regressor &regressor, unsigned n)
+        vector<VectorXd> FindNextPoints(const Regressor&   regressor,
+                                        const unsigned     n,
+                                        const FunctionType function_type)
         {
+            assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
+            
             const unsigned D = regressor.getX().rows();
             
             const VectorXd upper = VectorXd::Constant(D, 1.0);

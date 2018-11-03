@@ -126,7 +126,7 @@ void Core::updateSliderEnds()
     }
 
     const VectorXd x_1 = regressor->find_arg_max();
-    const VectorXd x_2 = acquisition_function::findNextPoint(*regressor);
+    const VectorXd x_2 = acquisition_function::FindNextPoint(*regressor);
 
     slider = std::make_shared<Slider>(x_1, x_2, true);
 }
