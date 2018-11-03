@@ -1,5 +1,5 @@
-#ifndef UTILITY_H
-#define UTILITY_H
+#ifndef utils_h
+#define utils_h
 
 #include <cmath>
 #include <cassert>
@@ -190,4 +190,4 @@ namespace sequential_line_search
     }
 }
 
-#endif // UTILITY_H
+#endif // utils_h

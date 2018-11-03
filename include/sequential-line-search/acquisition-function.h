@@ -1,5 +1,5 @@
-#ifndef EXPECTEDIMPROVEMENTMAXIMIZER_H
-#define EXPECTEDIMPROVEMENTMAXIMIZER_H
+#ifndef acquisition_function_h
+#define acquisition_function_h
 
 #include <memory>
 #include <vector>
@@ -17,4 +17,4 @@ namespace acquisition_function
     std::vector<Eigen::VectorXd> findNextPoints(const Regressor &regressor, unsigned n);
 }
 
-#endif // EXPECTEDIMPROVEMENTMAXIMIZER_H
+#endif // acquisition_function_h

@@ -1,5 +1,5 @@
-#ifndef SLIDERUTILITY_H
-#define SLIDERUTILITY_H
+#ifndef data_h
+#define data_h
 
 #include <Eigen/Core>
 #include <vector>
@@ -15,4 +15,4 @@ namespace sequential_line_search
     }
 }
 
-#endif // SLIDERUTILITY_H
+#endif // data_h
