@@ -7,6 +7,7 @@
 #include "core.h"
 #include "mainwindow.h"
 
+using namespace sequential_line_search;
 using Eigen::VectorXd;
 
 namespace

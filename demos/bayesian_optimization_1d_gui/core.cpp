@@ -4,6 +4,7 @@
 #include <random>
 #include <sequential-line-search/sequential-line-search.h>
 
+using namespace sequential_line_search;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 

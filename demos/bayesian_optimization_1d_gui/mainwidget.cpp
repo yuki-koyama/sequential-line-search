@@ -5,6 +5,7 @@
 #include <sequential-line-search/sequential-line-search.h>
 #include "core.h"
 
+using namespace sequential_line_search;
 using Eigen::VectorXd;
 
 namespace
