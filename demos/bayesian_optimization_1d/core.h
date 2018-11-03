@@ -4,7 +4,10 @@
 #include <memory>
 #include <Eigen/Core>
 
-class GaussianProcessRegressor;
+namespace sequential_line_search
+{
+    class GaussianProcessRegressor;
+}
 
 class Core
 {
@@ -16,7 +19,7 @@ public:
         return core;
     }
 
-    std::shared_ptr<GaussianProcessRegressor> regressor;
+    std::shared_ptr<sequential_line_search::GaussianProcessRegressor> regressor;
 
     Eigen::MatrixXd X;
     Eigen::VectorXd y;

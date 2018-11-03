@@ -12,6 +12,8 @@ using Eigen::VectorXd;
 
 namespace
 {
+    using sequential_line_search::GaussianProcessRegressor;
+    
     double objective(const std::vector<double> &x, std::vector<double>& /*grad*/, void* data)
     {
         const Regressor* regressor = static_cast<const Regressor*>(data);
