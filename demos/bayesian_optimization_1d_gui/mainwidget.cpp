@@ -95,7 +95,7 @@ void MainWidget::paintEvent(QPaintEvent *event)
         for (int pix_x = 0; pix_x <= rect.width(); ++ pix_x)
         {
             const double x  = static_cast<double>(pix_x) / static_cast<double>(rect.width());
-            const double EI = ExpectedImprovement::calculateExpectedImprovedment(*core.regressor, VectorXd::Constant(1, x));
+            const double EI = AcquisitionFunction::calculateExpectedImprovedment(*core.regressor, VectorXd::Constant(1, x));
             EIs(pix_x) = EI;
         }
         EIs /= EIs.maxCoeff();

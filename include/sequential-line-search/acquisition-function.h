@@ -7,7 +7,7 @@
 
 class Regressor;
 
-namespace ExpectedImprovement
+namespace AcquisitionFunction
 {
     double calculateExpectedImprovedment(const Regressor& regressor, const Eigen::VectorXd &x);
     Eigen::VectorXd findNextPoint(Regressor &regressor);

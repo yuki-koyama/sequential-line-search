@@ -25,7 +25,7 @@ Core::Core() : dim(PHOTO_DIM)
 
 VectorXd Core::findNextPoint() const
 {
-    return ExpectedImprovement::findNextPoint(*regressor);
+    return AcquisitionFunction::findNextPoint(*regressor);
 }
 
 void Core::proceedOptimization()

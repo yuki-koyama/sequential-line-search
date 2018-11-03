@@ -19,7 +19,7 @@ Core::Core()
 
 void Core::proceedOptimization()
 {
-    const VectorXd x = (X.cols() == 0) ? Utility::generateRandomVector(1) : ExpectedImprovement::findNextPoint(*regressor);
+    const VectorXd x = (X.cols() == 0) ? Utility::generateRandomVector(1) : AcquisitionFunction::findNextPoint(*regressor);
     const double   y = evaluateObjectiveFunction(x);
     
     std::cout << "x: " << x.transpose() << ((X.cols() == 0) ? " (randomly chosen)" : "") << std::endl;

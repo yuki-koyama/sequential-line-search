@@ -18,7 +18,7 @@ Core::Core() : show_slider_value(false)
 
 void Core::proceedOptimization()
 {
-    const VectorXd x = (X.cols() == 0) ? VectorXd::Constant(1, 0.49) : ExpectedImprovement::findNextPoint(*regressor);
+    const VectorXd x = (X.cols() == 0) ? VectorXd::Constant(1, 0.49) : AcquisitionFunction::findNextPoint(*regressor);
     const double   y = evaluateObjectiveFunction(x);
 
     std::cout << y << std::endl;
