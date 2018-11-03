@@ -4,6 +4,8 @@
 #include <sequential-line-search/sequential-line-search.h>
 #include "mainwindow.h"
 
+using namespace sequential_line_search;
+
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 using std::make_shared;
@@ -92,7 +94,7 @@ void Core::updateSliderEnds()
     // If this is the first time...
     if (x_max.rows() == 0)
     {
-        slider = make_shared<Slider>(Utility::generateRandomVector(dim), Utility::generateRandomVector(dim), true);
+        slider = make_shared<Slider>(utils::generateRandomVector(dim), utils::generateRandomVector(dim), true);
         return;
     }
     

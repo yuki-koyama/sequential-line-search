@@ -1,10 +1,12 @@
 #include <sequential-line-search/preferenceregressor.h>
-#include <sequential-line-search/utility.h>
+#include <sequential-line-search/utils.h>
 #include <iostream>
 #include <fstream>
 #include <cmath>
 #include <Eigen/LU>
 #include <nlopt-util.hpp>
+
+using namespace sequential_line_search; // TODO
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -74,7 +76,7 @@ inline double calc_log_likelihood(const Preference& p, const double w, const Vec
     const double btl_scale = w * PreferenceRegressor::Params::getInstance().btl_scale;
 
     VectorXd tmp(p.size()); for (unsigned i = 0; i < p.size(); ++ i) tmp(i) = y(p[i]);
-    return std::log(Utility::BTL(tmp, btl_scale));
+    return std::log(utils::BTL(tmp, btl_scale));
 }
 
 // Log likelihood that will be maximized
@@ -123,13 +125,13 @@ double objective(const std::vector<double> &x, std::vector<double>& grad, void* 
         const double   r_prior  = PreferenceRegressor::Params::getInstance().r;
         const double   variance = PreferenceRegressor::Params::getInstance().variance;
 
-        obj += std::log(Utility::log_normal(a, std::log(a_prior), variance));
+        obj += std::log(utils::log_normal(a, std::log(a_prior), variance));
 #ifndef NOISELESS
-        obj += std::log(Utility::log_normal(b, std::log(b_prior), variance));
+        obj += std::log(utils::log_normal(b, std::log(b_prior), variance));
 #endif
         for (unsigned i = 0; i < r.rows(); ++ i)
         {
-            obj += std::log(Utility::log_normal(r(i), std::log(r_prior), variance));
+            obj += std::log(utils::log_normal(r(i), std::log(r_prior), variance));
         }
     }
 
@@ -145,7 +147,7 @@ double objective(const std::vector<double> &x, std::vector<double>& grad, void* 
             const Preference& p = D[i];
             const double      s = btl_scale * w(i);
             VectorXd tmp1(p.size()); for (unsigned i = 0; i < p.size(); ++ i) tmp1(i) = y(p[i]);
-            const VectorXd tmp2 = Utility::derivative_BTL(tmp1, s) / Utility::BTL(tmp1, s);
+            const VectorXd tmp2 = utils::derivative_BTL(tmp1, s) / utils::BTL(tmp1, s);
             for (unsigned i = 0; i < p.size(); ++ i) grad_y(p[i]) += tmp2(i);
         }
 
@@ -344,7 +346,7 @@ VectorXd PreferenceRegressor::find_arg_max()
     const VectorXd upper     = VectorXd::Constant(M, 1.0);
     const VectorXd lower     = VectorXd::Constant(M, 0.0);
 
-    return nloptUtility::compute(x_initial, upper, lower, objective_function, static_cast<void*>(this), nlopt::LD_TNEWTON, 100);
+    return nloptutils::compute(x_initial, upper, lower, objective_function, static_cast<void*>(this), nlopt::LD_TNEWTON, 100);
 #else
     return X.col(i);
 #endif
@@ -353,7 +355,7 @@ VectorXd PreferenceRegressor::find_arg_max()
 void PreferenceRegressor::dampData(const std::string &dirPath) const
 {
     // Export X using CSV
-    Utility::exportMatrixToCsv(dirPath + "/X.csv", X);
+    utils::exportMatrixToCsv(dirPath + "/X.csv", X);
 
     // Export D using CSV
     std::ofstream ofs_D(dirPath + "/D.csv");

@@ -112,9 +112,9 @@ void Core::updateSliderEnds()
     if (slider.get() == nullptr)
     {
 #ifdef TWO_DIM
-        slider = std::make_shared<Slider>(Utility::generateRandomVector(2), Utility::generateRandomVector(2), false);
+        slider = std::make_shared<Slider>(utils::generateRandomVector(2), utils::generateRandomVector(2), false);
 #else
-        slider = std::make_shared<Slider>(Utility::generateRandomVector(test_dimension), Utility::generateRandomVector(test_dimension), false);
+        slider = std::make_shared<Slider>(utils::generateRandomVector(test_dimension), utils::generateRandomVector(test_dimension), false);
 #endif
         return;
     }

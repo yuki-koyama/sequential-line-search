@@ -1,11 +1,13 @@
 #include <sequential-line-search/gaussianprocessregressor.h>
-#include <sequential-line-search/utility.h>
+#include <sequential-line-search/utils.h>
 #include <iostream>
 #include <cmath>
 #include <Eigen/LU>
 #include <nlopt-util.hpp>
 
 //#define NOISELESS
+
+using namespace sequential_line_search; // TODO
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -44,19 +46,19 @@ double calc_grad_r_i_prior(const Eigen::VectorXd &r, const int index)
 
 double calc_a_prior(const double a)
 {
-    return std::log(Utility::log_normal(a, a_prior_mu, a_prior_sigma_squared));
+    return std::log(utils::log_normal(a, a_prior_mu, a_prior_sigma_squared));
 }
 
 #ifndef NOISELESS
 double calc_b_prior(const double b)
 {
-    return std::log(Utility::log_normal(b, b_prior_mu, b_prior_sigma_squared));
+    return std::log(utils::log_normal(b, b_prior_mu, b_prior_sigma_squared));
 }
 #endif
 
 double calc_r_i_prior(const Eigen::VectorXd &r, const int index)
 {
-    return std::log(Utility::log_normal(r(index), r_prior_mu, r_prior_sigma_squared));
+    return std::log(utils::log_normal(r(index), r_prior_mu, r_prior_sigma_squared));
 }
 
 double calc_grad_a(const MatrixXd& X, const MatrixXd& C_inv, const VectorXd& y, const double a, const double b, const VectorXd& r)

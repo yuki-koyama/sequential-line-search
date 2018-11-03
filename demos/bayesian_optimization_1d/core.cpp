@@ -4,6 +4,8 @@
 #include <random>
 #include <sequential-line-search/sequential-line-search.h>
 
+using namespace sequential_line_search;
+
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
@@ -19,7 +21,7 @@ Core::Core()
 
 void Core::proceedOptimization()
 {
-    const VectorXd x = (X.cols() == 0) ? Utility::generateRandomVector(1) : acquisition_function::findNextPoint(*regressor);
+    const VectorXd x = (X.cols() == 0) ? utils::generateRandomVector(1) : acquisition_function::findNextPoint(*regressor);
     const double   y = evaluateObjectiveFunction(x);
     
     std::cout << "x: " << x.transpose() << ((X.cols() == 0) ? " (randomly chosen)" : "") << std::endl;

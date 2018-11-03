@@ -6,8 +6,6 @@
 #include <Eigen/Core>
 #include <sequential-line-search/sequential-line-search.h>
 
-using namespace sequential_line_search;
-
 class PreferenceRegressor;
 class MainWindow;
 
@@ -45,7 +43,7 @@ public:
 
     // For slider management
     void updateSliderEnds();
-    std::shared_ptr<Slider> slider;
+    std::shared_ptr<sequential_line_search::Slider> slider;
     Eigen::VectorXd computeParametersFromSlider(int sliderValue, int minValue, int maxValue) const;
     Eigen::VectorXd computeParametersFromSlider(double value) const;
     Eigen::VectorXd computeParametersFromSlider() const;
