@@ -6,7 +6,10 @@
 #include <Eigen/Core>
 #include <sequential-line-search/sequential-line-search.h>
 
-class PreferenceRegressor;
+namespace sequential_line_search
+{
+    class PreferenceRegressor;
+}
 class MainWindow;
 
 class Core
@@ -19,7 +22,7 @@ public:
         return core;
     }
 
-    std::shared_ptr<PreferenceRegressor> regressor;
+    std::shared_ptr<sequential_line_search::PreferenceRegressor> regressor;
 
     MainWindow* mainWindow;
 
