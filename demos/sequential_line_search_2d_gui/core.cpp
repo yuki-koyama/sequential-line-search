@@ -69,7 +69,7 @@ void Core::addData(const std::vector<Eigen::VectorXd> &xs)
     for (unsigned i = 0; i < xs.size(); ++ i) indices[i] = N + i;
     D.push_back(Preference(indices));
 
-    mergeData(X, D, 5e-03);
+    data::MergeCloseData(X, D, 5e-03);
 }
 
 double Core::evaluateObjectiveFunction(const Eigen::VectorXd& x) const
