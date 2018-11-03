@@ -12,12 +12,12 @@ using Eigen::VectorXd;
 
 namespace
 {
-    using sequential_line_search::GaussianProcessRegressor;
+    using namespace sequential_line_search;
     
     double objective(const std::vector<double> &x, std::vector<double>& /*grad*/, void* data)
     {
         const Regressor* regressor = static_cast<const Regressor*>(data);
-        return sequential_line_search::acquisition_function::CalculateAcqusitionValue(*regressor, Eigen::Map<const VectorXd>(&x[0], x.size()));
+        return acquisition_function::CalculateAcqusitionValue(*regressor, Eigen::Map<const VectorXd>(&x[0], x.size()));
     }
     
     // Schonlau et al, Global Versus Local Search in Constrained Optimization of Computer Models, 1997.
