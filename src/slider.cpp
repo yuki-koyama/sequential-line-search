@@ -1,5 +1,5 @@
-#include "slider.h"
-#include "sliderutility.h"
+#include <sequential-line-search/slider.h>
+#include <sequential-line-search/sliderutility.h>
 
 Slider::Slider(const Eigen::VectorXd& end_0, const Eigen::VectorXd& end_1, const bool enlarge, const double scale, const double minimum_length) :
     enlarge(enlarge),

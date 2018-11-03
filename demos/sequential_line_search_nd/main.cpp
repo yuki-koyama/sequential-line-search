@@ -1,6 +1,6 @@
 #include <iostream>
+#include <sequential-line-search/sequential-line-search.h>
 #include "core.h"
-#include "preferenceregressor.h"
 
 using Eigen::VectorXd;
 using Eigen::MatrixXd;

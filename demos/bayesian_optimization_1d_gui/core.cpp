@@ -2,9 +2,7 @@
 #include <iostream>
 #include <cmath>
 #include <random>
-#include "utility.h"
-#include "gaussianprocessregressor.h"
-#include "acquisition-function.h"
+#include <sequential-line-search/sequential-line-search.h>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;

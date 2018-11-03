@@ -1,9 +1,9 @@
-#include "gaussianprocessregressor.h"
+#include <sequential-line-search/gaussianprocessregressor.h>
+#include <sequential-line-search/utility.h>
 #include <iostream>
 #include <cmath>
 #include <Eigen/LU>
 #include <nlopt-util.hpp>
-#include "utility.h"
 
 //#define NOISELESS
 

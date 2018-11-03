@@ -3,9 +3,8 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include <tinycolormap.hpp>
+#include <sequential-line-search/sequential-line-search.h>
 #include "core.h"
-#include "gaussianprocessregressor.h"
-#include "acquisition-function.h"
 
 using Eigen::VectorXd;
 

@@ -5,7 +5,7 @@
 #include <QDir>
 #include <QFileDialog>
 #include "core.h"
-#include "gaussianprocessregressor.h"
+#include <sequential-line-search/gaussianprocessregressor.h>
 
 using Eigen::VectorXd;
 using Eigen::MatrixXd;

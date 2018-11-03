@@ -1,4 +1,4 @@
-#include "utility.h"
+#include <sequential-line-search/utility.h>
 #include <random>
 #include <ctime>
 #include <fstream>

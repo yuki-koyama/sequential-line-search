@@ -1,5 +1,5 @@
-#include "regressor.h"
-#include "utility.h"
+#include <sequential-line-search/regressor.h>
+#include <sequential-line-search/utility.h>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;

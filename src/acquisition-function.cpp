@@ -1,10 +1,9 @@
-#include "acquisition-function.h"
+#include <sequential-line-search/acquisition-function.h>
+#include <sequential-line-search/gaussianprocessregressor.h>
 #include <cmath>
 #include <iostream>
 #include <utility>
 #include <nlopt-util.hpp>
-#include "regressor.h"
-#include "gaussianprocessregressor.h"
 
 using std::vector;
 using std::pair;

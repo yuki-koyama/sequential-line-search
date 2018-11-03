@@ -4,8 +4,7 @@
 #include <vector>
 #include <memory>
 #include <Eigen/Core>
-#include "preference.h"
-#include "slider.h"
+#include <sequential-line-search/sequential-line-search.h>
 
 class PreferenceRegressor;
 

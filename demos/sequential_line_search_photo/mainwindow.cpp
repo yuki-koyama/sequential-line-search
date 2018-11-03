@@ -4,10 +4,9 @@
 #include <memory>
 #include <QDir>
 #include <QImage>
+#include <sequential-line-search/sequential-line-search.h>
 #include "core.h"
-#include "preferenceregressor.h"
 #include "previewwidget.h"
-#include "utility.h"
 #include "imagemodifier.h"
 #include "directoryutility.h"
 

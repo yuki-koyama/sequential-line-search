@@ -2,9 +2,9 @@
 
 #include <string>
 #include <QPainter>
+#include <sequential-line-search/sequential-line-search.h>
 #include "drawutility.h"
 #include "core.h"
-#include "utility.h"
 #include "directoryutility.h"
 
 using namespace std;

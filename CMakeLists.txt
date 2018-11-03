@@ -43,9 +43,27 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/nlopt)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/nlopt-util)
 
 ###############################################
+# Main library
+###############################################
+
+file(GLOB
+	headers
+	${CMAKE_CURRENT_SOURCE_DIR}/include/sequential-line-search/*.h
+)
+file(GLOB
+	sources
+	${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+)
+add_library(SequentialLineSearch STATIC ${headers} ${sources})
+target_include_directories(SequentialLineSearch PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(SequentialLineSearch Eigen3::Eigen timer nlopt nlopt-util)
+
+install(FILES ${headers} DESTINATION include/SequentialLineSearch)
+install(TARGETS SequentialLineSearch ARCHIVE DESTINATION lib)
+
+###############################################
 # Sub-directories
 ###############################################
-add_subdirectory(sequential_line_search)
 
 if(SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS)
 	# Demos

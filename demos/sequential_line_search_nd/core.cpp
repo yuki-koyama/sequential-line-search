@@ -1,10 +1,7 @@
 #include "core.h"
 #include <iostream>
 #include <cmath>
-#include "utility.h"
-#include "sliderutility.h"
-#include "acquisition-function.h"
-#include "preferenceregressor.h"
+#include <sequential-line-search/sequential-line-search.h>
 
 // #define TWO_DIM
 

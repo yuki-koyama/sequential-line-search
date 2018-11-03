@@ -1,4 +1,4 @@
-#include "sliderutility.h"
+#include <sequential-line-search/sliderutility.h>
 #include <cmath>
 #include <map>
 #include <memory>

@@ -1,11 +1,8 @@
 #include "core.h"
 #include <iostream>
 #include <cmath>
+#include <sequential-line-search/sequential-line-search.h>
 #include "mainwindow.h"
-#include "utility.h"
-#include "sliderutility.h"
-#include "acquisition-function.h"
-#include "preferenceregressor.h"
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;

@@ -1,10 +1,10 @@
-#include "preferenceregressor.h"
+#include <sequential-line-search/preferenceregressor.h>
+#include <sequential-line-search/utility.h>
 #include <iostream>
 #include <fstream>
 #include <cmath>
 #include <Eigen/LU>
 #include <nlopt-util.hpp>
-#include "utility.h"
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
