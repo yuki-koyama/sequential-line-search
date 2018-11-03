@@ -5,8 +5,8 @@
 #include <string>
 #include <utility>
 #include <Eigen/Core>
-#include "regressor.h"
-#include "preference.h"
+#include <sequential-line-search/regressor.h>
+#include <sequential-line-search/preference.h>
 
 ///////////////////////////////////////
 // Chu+, ICML 2005; Brochu+, NIPS 2007
@@ -14,6 +14,8 @@
 
 class PreferenceRegressor : public Regressor
 {
+    using Preference = sequential_line_search::Preference; // TODO
+    
 public:
 
     PreferenceRegressor(const Eigen::MatrixXd &X, const std::vector<Preference>& D, bool use_MAP_hyperparameters = false);
@@ -30,7 +32,7 @@ public:
     // Data
     Eigen::MatrixXd         X;
     std::vector<Preference> D;
-    Eigen::VectorXd         w; // Weights for calculating the scales in the BTL model (default = ones), used in crowdsourcing settings
+    Eigen::VectorXd         w; ///< Weights for calculating the scales in the BTL model (default = ones), used in crowdsourcing settings
 
     // Derived by MAP estimation
     Eigen::VectorXd         y;

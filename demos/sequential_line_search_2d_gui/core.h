@@ -25,8 +25,8 @@ public:
 
     bool use_MAP_hyperparameters;
 
-    Eigen::MatrixXd         X;
-    std::vector<Preference> D;
+    Eigen::MatrixXd                                 X;
+    std::vector<sequential_line_search::Preference> D;
 
     double evaluateObjectiveFunction(const Eigen::VectorXd &x) const;
 

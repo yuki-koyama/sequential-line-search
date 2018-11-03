@@ -25,8 +25,8 @@ public:
 
     MainWindow* mainWindow;
 
-    Eigen::MatrixXd         X;
-    std::vector<Preference> D;
+    Eigen::MatrixXd                                 X;
+    std::vector<sequential_line_search::Preference> D;
 
     // For optimization
     void proceedOptimization();
