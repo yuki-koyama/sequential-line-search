@@ -4,10 +4,9 @@
 #include <memory>
 #include <vector>
 #include <Eigen/Core>
+#include <sequential-line-search/regressor.h>
 
-class Regressor;
-
-namespace AcquisitionFunction
+namespace acquisition_function
 {
     double calculateExpectedImprovedment(const Regressor& regressor, const Eigen::VectorXd &x);
     Eigen::VectorXd findNextPoint(Regressor &regressor);

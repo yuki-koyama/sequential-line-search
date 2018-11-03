@@ -24,7 +24,7 @@ Core::Core() : show_slider_value(false)
 
 VectorXd Core::findNextPoint() const
 {
-    return AcquisitionFunction::findNextPoint(*regressor);
+    return acquisition_function::findNextPoint(*regressor);
 }
 
 void Core::proceedOptimization()

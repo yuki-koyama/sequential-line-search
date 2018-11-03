@@ -6,6 +6,8 @@
 #include <Eigen/Core>
 #include <sequential-line-search/sequential-line-search.h>
 
+using namespace sequential_line_search;
+
 class PreferenceRegressor;
 class MainWindow;
 

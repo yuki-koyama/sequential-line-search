@@ -4,6 +4,8 @@
 #include <sequential-line-search/sequential-line-search.h>
 #include "mainwindow.h"
 
+using namespace sequential_line_search;
+
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
@@ -67,7 +69,7 @@ void Core::addData(const std::vector<Eigen::VectorXd> &xs)
     for (unsigned i = 0; i < xs.size(); ++ i) indices[i] = N + i;
     D.push_back(Preference(indices));
 
-    SliderUtility::mergeData(X, D, 5e-03);
+    mergeData(X, D, 5e-03);
 }
 
 double Core::evaluateObjectiveFunction(const Eigen::VectorXd& x) const
@@ -124,7 +126,7 @@ void Core::updateSliderEnds()
     }
 
     const VectorXd x_1 = regressor->find_arg_max();
-    const VectorXd x_2 = AcquisitionFunction::findNextPoint(*regressor);
+    const VectorXd x_2 = acquisition_function::findNextPoint(*regressor);
 
     slider = std::make_shared<Slider>(x_1, x_2, true);
 }

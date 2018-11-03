@@ -10,7 +10,7 @@ using std::pair;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
-namespace AcquisitionFunction
+namespace acquisition_function
 {
     double objective(const std::vector<double> &x, std::vector<double>& /*grad*/, void* data)
     {

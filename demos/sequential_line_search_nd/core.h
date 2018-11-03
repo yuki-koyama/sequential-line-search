@@ -44,7 +44,7 @@ public:
 
     // For slider management
     void updateSliderEnds();
-    std::shared_ptr<Slider> slider;
+    std::shared_ptr<sequential_line_search::Slider> slider;
     Eigen::VectorXd computeParametersFromSlider(double value) const;
 };
 
