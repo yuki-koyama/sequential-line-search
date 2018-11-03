@@ -10,7 +10,17 @@ namespace sequential_line_search
 {
     namespace acquisition_function
     {
-        double calculateExpectedImprovedment(const Regressor& regressor, const Eigen::VectorXd &x);
+        enum class FunctionType
+        {
+            ExpectedImprovement
+        };
+        
+        /// \brief Calculate the value of the acquisition function value.
+        /// \param function_type Type of the acquisition function.
+        double CalculateAcqusitionValue(const Regressor&       regressor,
+                                        const Eigen::VectorXd& x,
+                                        const FunctionType     function_type = FunctionType::ExpectedImprovement);
+        
         Eigen::VectorXd findNextPoint(Regressor &regressor);
         
         /// \brief Find the next n sampled points that should be observed. These points are determined

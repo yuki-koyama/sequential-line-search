@@ -17,11 +17,15 @@ namespace sequential_line_search
         double objective(const std::vector<double> &x, std::vector<double>& /*grad*/, void* data)
         {
             const Regressor* regressor = static_cast<const Regressor*>(data);
-            return calculateExpectedImprovedment(*regressor, Eigen::Map<const VectorXd>(&x[0], x.size()));
+            return CalculateAcqusitionValue(*regressor, Eigen::Map<const VectorXd>(&x[0], x.size()));
         }
         
-        double calculateExpectedImprovedment(const Regressor &regressor, const VectorXd& x)
+        double CalculateAcqusitionValue(const Regressor&       regressor,
+                                        const Eigen::VectorXd& x,
+                                        const FunctionType     function_type)
         {
+            assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported.");
+            
             if (regressor.gety().rows() == 0) { return 0.0; }
             
             const double y_best = regressor.gety().maxCoeff();

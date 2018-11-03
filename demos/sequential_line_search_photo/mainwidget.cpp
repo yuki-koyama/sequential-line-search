@@ -69,7 +69,7 @@ void MainWidget::paintEvent(QPaintEvent *event)
                     val(pix_x, pix_y) = (core.regressor.get() != nullptr) ? core.regressor->estimate_s(x) : 0.0;
                     break;
                 case Content::ExpectedImprovement:
-                    val(pix_x, pix_y) = (core.regressor.get() != nullptr) ? acquisition_function::calculateExpectedImprovedment(*core.regressor, x) : 0.0;
+                    val(pix_x, pix_y) = (core.regressor.get() != nullptr) ? acquisition_function::CalculateAcqusitionValue(*core.regressor, x) : 0.0;
                     break;
                 default:
                     break;
