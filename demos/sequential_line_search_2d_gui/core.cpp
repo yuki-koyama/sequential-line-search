@@ -4,7 +4,7 @@
 #include "mainwindow.h"
 #include "utility.h"
 #include "sliderutility.h"
-#include "expectedimprovementmaximizer.h"
+#include "acquisition-function.h"
 #include "preferenceregressor.h"
 
 using Eigen::MatrixXd;

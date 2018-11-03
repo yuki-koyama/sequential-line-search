@@ -4,7 +4,7 @@
 #include <QPaintEvent>
 #include "core.h"
 #include "gaussianprocessregressor.h"
-#include "expectedimprovementmaximizer.h"
+#include "acquisition-function.h"
 
 using Eigen::VectorXd;
 

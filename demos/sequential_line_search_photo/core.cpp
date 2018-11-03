@@ -3,7 +3,7 @@
 #include <cmath>
 #include "mainwindow.h"
 #include "utility.h"
-#include "expectedimprovementmaximizer.h"
+#include "acquisition-function.h"
 #include "preferenceregressor.h"
 #include "sliderutility.h"
 

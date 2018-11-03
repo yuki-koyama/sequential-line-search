@@ -1,4 +1,4 @@
-#include "expectedimprovementmaximizer.h"
+#include "acquisition-function.h"
 #include <cmath>
 #include <iostream>
 #include <utility>

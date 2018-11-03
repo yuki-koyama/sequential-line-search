@@ -4,7 +4,7 @@
 #include <random>
 #include "utility.h"
 #include "gaussianprocessregressor.h"
-#include "expectedimprovementmaximizer.h"
+#include "acquisition-function.h"
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;

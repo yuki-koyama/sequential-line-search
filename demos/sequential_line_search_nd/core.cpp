@@ -3,7 +3,7 @@
 #include <cmath>
 #include "utility.h"
 #include "sliderutility.h"
-#include "expectedimprovementmaximizer.h"
+#include "acquisition-function.h"
 #include "preferenceregressor.h"
 
 // #define TWO_DIM
