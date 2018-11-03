@@ -1,4 +1,4 @@
-#include <sequential-line-search/sliderutility.h>
+#include <sequential-line-search/data.h>
 #include <map>
 
 using Eigen::VectorXd;

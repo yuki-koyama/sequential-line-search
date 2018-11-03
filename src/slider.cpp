@@ -1,5 +1,4 @@
 #include <sequential-line-search/slider.h>
-#include <sequential-line-search/sliderutility.h>
 #include <nlopt-util.hpp>
 
 namespace sequential_line_search
