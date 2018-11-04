@@ -16,43 +16,39 @@ class Core
 {
 public:
     Core();
-
+    
     static Core& getInstance() {
         static Core core;
         return core;
     }
-
+    
     std::shared_ptr<sequential_line_search::PreferenceRegressor> regressor;
-
+    
     MainWindow* mainWindow;
-
+    
     bool use_MAP_hyperparameters;
-
-    Eigen::MatrixXd                                 X;
-    std::vector<sequential_line_search::Preference> D;
-
+    
+    sequential_line_search::Data data;
+    
     double evaluateObjectiveFunction(const Eigen::VectorXd &x) const;
-
+    
     void clear()
     {
-        X = Eigen::MatrixXd::Zero(0, 0);
-        D.clear();
+        data.X = Eigen::MatrixXd::Zero(0, 0);
+        data.D.clear();
         x_max = Eigen::VectorXd::Zero(0);
         regressor = nullptr;
         slider    = nullptr;
     }
-
+    
     // For optimization
     void proceedOptimization();
     Eigen::VectorXd x_max;
     double          y_max;
-
+    
     // For regression
-    void addData(const Eigen::VectorXd& x1, const Eigen::VectorXd &x2);
-    void addData(const Eigen::VectorXd& x1, const Eigen::VectorXd &x2, const Eigen::VectorXd &x3);
-    void addData(const std::vector<Eigen::VectorXd>& xs);
     void computeRegression();
-
+    
     // For slider management
     void updateSliderEnds();
     std::shared_ptr<sequential_line_search::Slider> slider;

@@ -56,7 +56,7 @@ namespace sequential_line_search
             double a         = 0.500;
             double r         = 0.500;
             double b         = 0.005;
-            double variance  = 0.250; // Used when hyperparameters are estimated via MAP
+            double variance  = 0.250; ///< Used when hyperparameters are estimated via MAP
             double btl_scale = 0.010;
             static Params& getInstance() { static Params p; return p; }
         };

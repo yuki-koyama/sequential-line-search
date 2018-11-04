@@ -119,8 +119,8 @@ void MainWindow::updateRawSliders()
 
 void MainWindow::on_actionClear_all_data_triggered()
 {
-    core.X     = MatrixXd::Constant(0, 0, 0.0);
-    core.D.clear();
+    core.data.X     = MatrixXd::Constant(0, 0, 0.0);
+    core.data.D.clear();
     
     core.x_max = VectorXd::Constant(0, 0.0);
     core.y_max = NAN;
@@ -188,7 +188,7 @@ void MainWindow::on_actionExport_photos_on_slider_triggered()
     }
     
     // Export the current best photo
-    if (core.X.rows() != 0)
+    if (core.data.X.rows() != 0)
     {
         const Eigen::VectorXd x_best = core.regressor->find_arg_max();
         const QImage enhanced = ImageModifier::modifyImage(ui->widget_preview->getImage(), x_best);

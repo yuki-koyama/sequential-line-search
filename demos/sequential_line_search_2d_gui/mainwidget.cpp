@@ -119,10 +119,10 @@ void MainWidget::paintEvent(QPaintEvent *event)
     // Data points
     if (draw_data_points)
     {
-        unsigned N = core.X.cols();
+        unsigned N = core.data.X.cols();
         for (unsigned i = 0; i < N; ++ i)
         {
-            const VectorXd x = core.X.col(i);
+            const VectorXd x = core.data.X.col(i);
             const double pix_x = x(0) * rect.width();
             const double pix_y = x(1) * rect.height();
             painter.setPen(Qt::NoPen);
@@ -131,7 +131,7 @@ void MainWidget::paintEvent(QPaintEvent *event)
         }
         for (unsigned i = 0; i < N; ++ i)
         {
-            const VectorXd x = core.X.col(i);
+            const VectorXd x = core.data.X.col(i);
             const double pix_x = x(0) * rect.width();
             const double pix_y = x(1) * rect.height();
             painter.setPen(Qt::NoPen);
@@ -152,7 +152,7 @@ void MainWidget::paintEvent(QPaintEvent *event)
     }
 
     // Maximum in area
-    if (draw_maximum && core.X.cols() != 0)
+    if (draw_maximum && core.data.X.cols() != 0)
     {
         int pix_x;
         int pix_y;

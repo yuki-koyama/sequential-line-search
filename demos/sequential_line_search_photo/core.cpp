@@ -18,8 +18,8 @@ using std::make_shared;
 
 Core::Core() : dim(PHOTO_DIM)
 {
-    X = MatrixXd::Zero(0, 0);
-    D.clear();
+    data.X = MatrixXd::Zero(0, 0);
+    data.D.clear();
     
     x_max = VectorXd::Zero(0);
     y_max = NAN;
@@ -34,8 +34,7 @@ void Core::proceedOptimization()
 {
     // Add new preference data
     const VectorXd x = computeParametersFromSlider();
-    
-    addData(x, slider->orig_0, slider->orig_1);
+    data.AddNewPoints(x, { slider->orig_0, slider->orig_1 });
     
     // Compute regression
     computeRegression();
@@ -49,44 +48,9 @@ void Core::proceedOptimization()
     updateSliderEnds();
 }
 
-void Core::addData(const VectorXd &x1, const VectorXd &x2)
-{
-    addData(std::vector<Eigen::VectorXd>{x1, x2});
-}
-
-void Core::addData(const Eigen::VectorXd &x1, const Eigen::VectorXd &x2, const Eigen::VectorXd &x3)
-{
-    addData(std::vector<Eigen::VectorXd>{x1, x2, x3});
-}
-
-void Core::addData(const std::vector<Eigen::VectorXd> &xs)
-{
-    if (X.rows() == 0)
-    {
-        this->X = MatrixXd(xs[0].rows(), xs.size());
-        for (unsigned i = 0; i < xs.size(); ++ i) X.col(i) = xs[i];
-        std::vector<unsigned> indices(xs.size());
-        for (unsigned i = 0; i < xs.size(); ++ i) indices[i] = i;
-        D.push_back(Preference(indices));
-        return;
-    }
-    
-    const unsigned d = X.rows();
-    const unsigned N = X.cols();
-    
-    MatrixXd newX(d, N + xs.size());
-    newX.block(0, 0, d, N) = X;
-    for (unsigned i = 0; i < xs.size(); ++ i) newX.col(N + i) = xs[i];
-    this->X = newX;
-    
-    std::vector<unsigned> indices(xs.size());
-    for (unsigned i = 0; i < xs.size(); ++ i) indices[i] = N + i;
-    D.push_back(Preference(indices));
-}
-
 void Core::computeRegression()
 {
-    regressor = std::make_shared<PreferenceRegressor>(X, D);
+    regressor = std::make_shared<PreferenceRegressor>(data.X, data.D);
 }
 
 void Core::updateSliderEnds()

@@ -15,7 +15,8 @@ using namespace sequential_line_search;
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
 
-namespace{
+namespace
+{
     Core& core = Core::getInstance();
     
     constexpr double   a          = 0.500;
@@ -174,8 +175,8 @@ void MainWindow::on_actionBatch_visualization_triggered()
 
 void MainWindow::on_actionClear_all_data_triggered()
 {
-    core.X     = MatrixXd::Constant(0, 0, 0.0);
-    core.D.clear();
+    core.data.X = MatrixXd::Constant(0, 0, 0.0);
+    core.data.D.clear();
     
     core.x_max = VectorXd::Constant(0, 0.0);
     core.y_max = NAN;
