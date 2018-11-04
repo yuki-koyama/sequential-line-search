@@ -7,6 +7,7 @@
 
 namespace sequential_line_search
 {
+    /// \brief Utility class for managing observed data during optimization.
     class Data
     {
     public:

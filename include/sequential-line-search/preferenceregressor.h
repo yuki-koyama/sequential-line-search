@@ -10,6 +10,7 @@
 
 namespace sequential_line_search
 {
+    /// \brief Class for performing regression based on preference data.
     /// \details See [Chu+, ICML 2005; Brochu+, NIPS 2007].
     class PreferenceRegressor : public Regressor
     {
