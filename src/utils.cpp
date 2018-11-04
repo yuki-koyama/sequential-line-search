@@ -1,5 +1,4 @@
 #include <sequential-line-search/utils.h>
-#include <random>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
@@ -8,36 +7,13 @@
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
 
-namespace
-{
-    std::random_device seed;
-    std::default_random_engine gen(seed());
-    std::uniform_real_distribution<double> uniform_dist(0.0, 1.0);
-    std::normal_distribution<> normal_dist(0.0, 1.0);
-}
-
 namespace sequential_line_search
 {
     namespace utils
     {
         Eigen::VectorXd generateRandomVector(unsigned n)
         {
-            Eigen::VectorXd x(n);
-            for (unsigned i = 0; i < n; ++ i)
-            {
-                x(i) = uniform_dist(gen);
-            }
-            return x;
-        }
-        
-        double generateUniformReal()
-        {
-            return uniform_dist(gen);
-        }
-        
-        double generateStandardNormal()
-        {
-            return normal_dist(gen);
+            return 0.5 * (Eigen::VectorXd::Random(n) + Eigen::VectorXd::Ones(n));
         }
         
         void exportMatrixToCsv(const std::string& filePath, const Eigen::MatrixXd& X)

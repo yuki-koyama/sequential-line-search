@@ -26,6 +26,7 @@ DOI: https://doi.org/10.1145/3072959.3073598
 - NLopt <https://nlopt.readthedocs.io/> (included via gitsubmodule)
 - timer <https://github.com/yuki-koyama/timer> (included via gitsubmodule)
 - nlopt-util <https://github.com/yuki-koyama/nlopt-util> (included via gitsubmodule)
+- rand-util <https://github.com/yuki-koyama/rand-util> (included via gitsubmodule)
 
 ### Required for Command Line Demos
 

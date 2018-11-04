@@ -40,7 +40,11 @@ set(NLOPT_TESTS       OFF CACHE INTERNAL "" FORCE)
 set(NLOPT_CXX         ON  CACHE INTERNAL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/nlopt)
 
+# nlopt-util
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/nlopt-util)
+
+# rand-util
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/rand-util)
 
 ###############################################
 # Main library
@@ -56,7 +60,7 @@ file(GLOB
 )
 add_library(SequentialLineSearch STATIC ${headers} ${sources})
 target_include_directories(SequentialLineSearch PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(SequentialLineSearch Eigen3::Eigen timer nlopt nlopt-util)
+target_link_libraries(SequentialLineSearch Eigen3::Eigen timer nlopt nlopt-util rand-util)
 
 install(FILES ${headers} DESTINATION include/SequentialLineSearch)
 install(TARGETS SequentialLineSearch ARCHIVE DESTINATION lib)

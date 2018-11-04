@@ -16,3 +16,6 @@
 [submodule "external/nlopt-util"]
 	path = external/nlopt-util
 	url = https://github.com/yuki-koyama/nlopt-util.git
+[submodule "external/rand-util"]
+	path = external/rand-util
+	url = https://github.com/yuki-koyama/rand-util.git

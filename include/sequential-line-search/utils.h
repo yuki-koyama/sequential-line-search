@@ -18,12 +18,6 @@ namespace sequential_line_search
         // Uniform sampling from [0, 1]^n
         Eigen::VectorXd generateRandomVector(unsigned n);
         
-        // Uniform sampling from [0, 1]
-        double generateUniformReal();
-        
-        // Sampling from the standard normal distribution
-        double generateStandardNormal();
-        
         ////////////////////////////////////////////////
         // Math
         ////////////////////////////////////////////////
