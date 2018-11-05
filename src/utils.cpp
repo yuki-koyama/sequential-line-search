@@ -18,16 +18,9 @@ namespace sequential_line_search
         
         void exportMatrixToCsv(const std::string& filePath, const Eigen::MatrixXd& X)
         {
-            std::ofstream ofs(filePath);
-            for (unsigned i = 0; i < X.rows(); ++ i)
-            {
-                for (unsigned j = 0; j < X.cols(); ++ j)
-                {
-                    ofs << X(i, j);
-                    if (j + 1 != X.cols()) ofs << ",";
-                }
-                ofs << std::endl;
-            }
+            std::ofstream file(filePath);
+            Eigen::IOFormat format(Eigen::StreamPrecision, Eigen::DontAlignCols, ",");
+            file << X.format(format);
         }
         
         std::string getCurrentTimeInString()
