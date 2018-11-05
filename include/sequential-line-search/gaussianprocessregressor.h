@@ -18,10 +18,10 @@ namespace sequential_line_search
         double estimate_y(const Eigen::VectorXd& x) const override;
         double estimate_s(const Eigen::VectorXd& x) const override;
         
-        /// \brief Data.
+        /// \brief Data points.
         Eigen::MatrixXd X;
         
-        /// \brief Data.
+        /// \brief Values on data points.
         Eigen::VectorXd y;
         
         /// \brief A hyperparameter about signal level of ARD.

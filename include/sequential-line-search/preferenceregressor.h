@@ -24,6 +24,7 @@ namespace sequential_line_search
         
         const bool use_MAP_hyperparameters;
         
+        /// \brief Find the data point that is likely to have the largest value from the so-far observed data points.
         Eigen::VectorXd find_arg_max();
         
         // Data
@@ -33,9 +34,9 @@ namespace sequential_line_search
         
         // Derived by MAP estimation
         Eigen::VectorXd         y;
-        double                  a;
-        double                  b;
-        Eigen::VectorXd         r;
+        double                  a; ///< ARD hyperparameter about signal level.
+        double                  b; ///< ARD hyperparameter about noise level.
+        Eigen::VectorXd         r; ///< ARD hyperparameter about length scales.
         
         // Can be derived after MAP estimation
         Eigen::MatrixXd         C;
