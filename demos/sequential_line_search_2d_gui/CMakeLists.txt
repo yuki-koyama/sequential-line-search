@@ -5,3 +5,8 @@ set(CMAKE_AUTOUIC ON)
 file(GLOB files *.cpp *.h)
 add_executable(SequentialLineSearch2dGui ${files})
 target_link_libraries(SequentialLineSearch2dGui Qt5::Widgets Qt5::Concurrent SequentialLineSearch tinycolormap)
+
+# set working folder as Qt5 binary folder
+if(WIN32 AND MSVC)
+set_property(TARGET SequentialLineSearch2dGui PROPERTY VS_DEBUGGER_WORKING_DIRECTORY ${_qt5Core_install_prefix}/bin)
+endif(WIN32 AND MSVC)
