@@ -1,5 +1,6 @@
 #include <sequential-line-search/slider.h>
 #include <nlopt-util.hpp>
+#include <memory>
 
 namespace
 {
