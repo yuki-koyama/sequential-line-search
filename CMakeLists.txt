@@ -100,6 +100,19 @@ if(SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS)
 	# OpenGL
 	find_package(OpenGL REQUIRED)
 
+	# GLEW for Windows
+	if(WIN32)
+		find_package(GLEW REQUIRED)
+		set(GLEW_STATIC OFF CACHE BOOL GLEW)
+		set(GLEW_DYNAMIC_DLL ${GLEW_DYNAMIC_DLL} CACHE STRING GLEW)
+		if (GLEW_STATIC)
+			add_definitions(-DGLEW_STATIC)
+		endif(GLEW_STATIC)
+		if (GLEW_FOUND)
+			include_directories(${GLEW_INCLUDE_DIRS})
+		endif(GLEW_FOUND)
+	endif(WIN32)
+
 	# tinycolormap
 	if(NOT TARGET tinycolormap)
 		set(TINYCOLORMAP_BUILD_TOOLS OFF CACHE INTERNAL "" FORCE)

@@ -23,6 +23,11 @@ add_executable(SequentialLineSearchPhoto MACOSX_BUNDLE ${files} ${shader_files} 
 set_target_properties(SequentialLineSearchPhoto PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/resources/Info.plist.in)
 target_link_libraries(SequentialLineSearchPhoto ${OPENGL_LIBRARIES} Qt5::Gui Qt5::Widgets Qt5::OpenGL Eigen3::Eigen SequentialLineSearch tinycolormap enhancer parallel-util)
 
+# GLEW for Windows
+if(WIN32)
+	target_link_libraries(SequentialLineSearchPhoto ${GLEW_LIBRARY})
+endif(WIN32)
+
 # Resource properties
 set_source_files_properties(
 	${shader_files}
@@ -34,3 +39,25 @@ set_source_files_properties(
 	PROPERTIES
 	MACOSX_PACKAGE_LOCATION Resources/data
 )
+
+# copy required DLLs
+if(WIN32 AND MSVC)
+	# Qt5 
+	add_custom_command(TARGET SequentialLineSearchPhoto POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			$<TARGET_FILE:Qt5::Core>
+			$<TARGET_FILE:Qt5::Gui>
+			$<TARGET_FILE:Qt5::Widgets>
+			$<TARGET_FILE:Qt5::OpenGL>
+			$<TARGET_FILE:Qt5::Concurrent>
+			./$<CONFIGURATION>
+	)
+	# GLEW DLL (dynamic linking)
+	if (NOT ${GLEW_STATIC})
+		add_custom_command(TARGET SequentialLineSearchPhoto POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different
+				${GLEW_DYNAMIC_DLL}
+				./$<CONFIGURATION>
+		)
+	endif()
+endif(WIN32 AND MSVC)

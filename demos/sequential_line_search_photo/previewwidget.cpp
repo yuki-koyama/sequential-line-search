@@ -1,9 +1,9 @@
+#include "drawutility.h"   // glew.h should be included before gl.h
 #include "previewwidget.h"
 
 #include <string>
 #include <QPainter>
 #include <sequential-line-search/sequential-line-search.h>
-#include "drawutility.h"
 #include "core.h"
 #include "directoryutility.h"
 
@@ -31,6 +31,10 @@ void PreviewWidget::setCurrentImage(const QImage &image)
 
 void PreviewWidget::initializeGL()
 {
+	#ifdef WIN32
+	glewInit();
+	#endif
+
     glEnable(GL_MULTISAMPLE);
     
     static const string mainShaderName("enhancer");
