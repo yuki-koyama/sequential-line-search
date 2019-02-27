@@ -19,3 +19,6 @@
 [submodule "external/rand-util"]
 	path = external/rand-util
 	url = https://github.com/yuki-koyama/rand-util.git
+[submodule "external/pybind11"]
+	path = external/pybind11
+	url = https://github.com/pybind/pybind11

@@ -16,6 +16,7 @@ endif()
 set(SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS  ON  CACHE BOOL "")
 set(SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS   OFF CACHE BOOL "")
 set(SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS    OFF CACHE BOOL "")
+set(SEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING OFF CACHE BOOL "")
 
 ###############################################
 # Handling external libraries
@@ -45,6 +46,9 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/nlopt-util)
 
 # rand-util
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/rand-util)
+
+# pybind11 for python binding
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/pybind11)
 
 ###############################################
 # Main library
@@ -79,6 +83,9 @@ if(SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS)
 	# Demos
 	add_subdirectory(demos/bayesian_optimization_1d)
 	add_subdirectory(demos/sequential_line_search_nd)
+endif()
+if(SEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING)
+	add_subdirectory(python)
 endif()
 if(SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS)
 	# Qt
