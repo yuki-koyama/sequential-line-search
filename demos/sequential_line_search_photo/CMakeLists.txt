@@ -7,7 +7,6 @@ if(SEQUENTIAL_LINE_SEARCH_PHOTO_DIM_SUBSET)
 endif()
 
 # Resources
-file(GLOB shader_files ${ENHANCER_VERT_SHADER_PATH} ${ENHANCER_FRAG_SHADER_PATH})
 file(GLOB photo_files ./resources/data/*.jpg)
 
 # Qt Widgets
@@ -19,16 +18,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 file(GLOB files ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.h ${CMAKE_CURRENT_SOURCE_DIR}/*.ui)
 
 # Executable definition for macOS
-add_executable(SequentialLineSearchPhoto MACOSX_BUNDLE ${files} ${shader_files} ${photo_files})
+add_executable(SequentialLineSearchPhoto MACOSX_BUNDLE ${files} ${photo_files})
 set_target_properties(SequentialLineSearchPhoto PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/resources/Info.plist.in)
 target_link_libraries(SequentialLineSearchPhoto ${OPENGL_LIBRARIES} Qt5::Gui Qt5::Widgets Qt5::OpenGL Eigen3::Eigen SequentialLineSearch tinycolormap enhancer parallel-util)
 
 # Resource properties
-set_source_files_properties(
-	${shader_files}
-	PROPERTIES
-	MACOSX_PACKAGE_LOCATION Resources/shaders
-)
 set_source_files_properties(
 	${photo_files}
 	PROPERTIES
