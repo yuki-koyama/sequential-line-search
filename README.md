@@ -2,7 +2,7 @@
 
 This repository contains a part of the source codes used in our research project on the **sequential line search** method (which is a variant of Bayesian optimization). The core algorithm is implemented in the source codes in the "sequential_line_search" folder. This repository also contains the following example applications:
 
-- **bayesian_optimization_1d**: A simple demo of the standard Bayesian optimization applied to a one-dimensional test function. 
+- **bayesian_optimization_1d**: A simple demo of the standard Bayesian optimization applied to a one-dimensional test function.
 - **sequential_line_search_nd**: A simple demo of the sequential line search method applied to a multi-dimensional test function.
 - **bayesian_optimization_1d_gui**: A visual demo of the standard Bayesian optimization applied to a one-dimensional test function.
 - **bayesian_optimization_2d_gui**: A visual demo of the standard Bayesian optimization applied to a two-dimensional test function.
@@ -38,23 +38,21 @@ To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_
 
 - Qt5 <http://doc.qt.io/qt-5/> (`brew install qt`)
 - tinycolormap <https://github.com/yuki-koyama/tinycolormap> (included via gitsubmodule)
-- OpenGL
 
 To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS` should be set `ON`.
 
 ### Required for Photo Enhancement Demos
 
 - Qt5 <http://doc.qt.io/qt-5/> (`brew install qt`)
-- tinycolormap <https://github.com/yuki-koyama/tinycolormap> (included via gitsubmodule)
 - enhancer <https://github.com/yuki-koyama/enhancer> (included via gitsubmodule)
 - parallel-util <https://github.com/yuki-koyama/parallel-util> (included via gitsubmodule)
-- OpenGL
+- tinycolormap <https://github.com/yuki-koyama/tinycolormap> (included via gitsubmodule)
 
-To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS` should be set `ON`.
+To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS` should be set `ON`. They require runtime environments to support OpenGL 3.2 Core Profile and GLSL 3.3.
 
 ## How to Compile and Run
 
-We use [cmake](https://cmake.org/) for managing the source codes. You can compile the core module and the demo applications at once by, for example, 
+We use [cmake](https://cmake.org/) for managing the source codes. You can compile the core module and the demo applications at once by, for example,
 ```
 git clone https://github.com/yuki-koyama/sequential-line-search.git --recursive
 cd sequential-line-search
