@@ -1,7 +1,7 @@
 #include "imagemodifier.h"
 #include <cmath>
 #include <cassert>
-#include <enhancer.hpp>
+#include <enhancer/enhancer.hpp>
 #include <parallel-util.hpp>
 
 namespace ImageModifier

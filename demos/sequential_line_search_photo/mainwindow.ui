@@ -135,22 +135,6 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="PreviewWidget" name="widget_preview" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>540</width>
-          <height>360</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>540</width>
-          <height>360</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QSlider" name="horizontalSlider">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -247,12 +231,6 @@
    <class>MainWidget</class>
    <extends>QWidget</extends>
    <header>mainwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>PreviewWidget</class>
-   <extends>QWidget</extends>
-   <header>previewwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

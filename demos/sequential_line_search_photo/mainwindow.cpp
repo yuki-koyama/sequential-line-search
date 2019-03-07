@@ -2,11 +2,12 @@
 #include "ui_mainwindow.h"
 #include <iostream>
 #include <memory>
+#include <enhancer/enhancerwidget.hpp>
 #include <QDir>
 #include <QImage>
+#include <QTimer>
 #include <sequential-line-search/sequential-line-search.h>
 #include "core.h"
-#include "previewwidget.h"
 #include "imagemodifier.h"
 #include "directoryutility.h"
 
@@ -24,33 +25,38 @@ ui(new Ui::MainWindow)
 {
     core.mainWindow = this;
     ui->setupUi(this);
-    
+
+    // Instantiate and set the preview widget
+    enhancer_widget = new enhancer::EnhancerWidget(this);
+    enhancer_widget->setMinimumSize(600, 400);
+    ui->verticalLayout->insertWidget(0, enhancer_widget);
+
     // Set Widgets
     ui->widget_y->content = MainWidget::Content::None;
     ui->widget_y->draw_slider_space = true;
     ui->widget_y->draw_slider_tick  = true;
-    
+
     ui->widget_e->content = MainWidget::Content::ExpectedImprovement;
     ui->widget_e->draw_maximum      = true;
     ui->widget_e->draw_data_points  = true;
-    
+
     ui->widget_m->content = MainWidget::Content::Mean;
     ui->widget_m->draw_maximum      = true;
     ui->widget_m->draw_data_points  = true;
-    
+
     ui->widget_s->content = MainWidget::Content::StandardDeviation;
     ui->widget_s->draw_maximum      = true;
     ui->widget_s->draw_data_points  = true;
-    
+
     // Set a target photo
     const std::string photo_name = SEQUENTIAL_LINE_SEARCH_PHOTO_NAME;
     const QImage      image      = QImage((DirectoryUtility::getResourceDirectory() + "/data/" + photo_name).c_str());
-    ui->widget_preview->setCurrentImage(image.scaledToWidth(std::min(1600, image.width())));
-    
+    enhancer_widget->setImage(image.scaledToWidth(std::min(1600, image.width())));
+
     // Generate sliders for visualization
     std::vector<std::string> names;
     for (unsigned i = 0; i < core.dim; ++ i) { names.push_back("x" + std::to_string(i)); }
-    
+
     if (core.dim == 6)
     {
         names = std::vector<std::string>{
@@ -69,19 +75,19 @@ ui(new Ui::MainWindow)
         };
     }
     assert(core.dim == names.size());
-    
+
     for (unsigned i = 0; i < core.dim; ++ i)
     {
         sliders.push_back(new QSlider(Qt::Horizontal, this));
         sliders[i]->setMinimumWidth(100);
         ui->formLayout->addRow(new QLabel(QString(names[i].c_str()), this), sliders[i]);
     }
-    
+
     core.computeRegression();
     core.updateSliderEnds();
     ui->horizontalSlider->setValue((ui->horizontalSlider->maximum() + ui->horizontalSlider->minimum()) / 2);
     updateRawSliders();
-    
+
     if (core.dim != 2)
     {
         ui->widget_y->setVisible(false);
@@ -93,8 +99,16 @@ ui(new Ui::MainWindow)
         ui->label_m->setVisible(false);
         ui->label_s->setVisible(false);
     }
-    
+
     this->adjustSize();
+
+    // Solve an awkward problem by a super awkward solution
+    // See: https://www.qtcentre.org/threads/61310-Qt-application-won-t-repaint-until-first-resize?p=271316#post271316
+    QTimer::singleShot(10, [&]()
+                       {
+                           this->setGeometry(this->geometry().adjusted(+ 1, + 1, - 1, - 1));
+                           this->setGeometry(this->geometry().adjusted(- 1, - 1, + 1, + 1));
+                       });
 }
 
 MainWindow::~MainWindow()
@@ -104,7 +118,8 @@ MainWindow::~MainWindow()
 
 double MainWindow::obtainSliderPosition() const
 {
-    return static_cast<double>(ui->horizontalSlider->value() - ui->horizontalSlider->minimum()) / static_cast<double>(ui->horizontalSlider->maximum() - ui->horizontalSlider->minimum());
+    const QSlider* slider = ui->horizontalSlider;
+    return static_cast<double>(slider->value() - slider->minimum()) / static_cast<double>(slider->maximum() - slider->minimum());
 }
 
 void MainWindow::updateRawSliders()
@@ -119,14 +134,14 @@ void MainWindow::updateRawSliders()
 
 void MainWindow::on_actionClear_all_data_triggered()
 {
-    core.data.X     = MatrixXd::Constant(0, 0, 0.0);
+    core.data.X = MatrixXd::Constant(0, 0, 0.0);
     core.data.D.clear();
-    
+
     core.x_max = VectorXd::Constant(0, 0.0);
     core.y_max = NAN;
-    
+
     core.updateSliderEnds();
-    
+
     core.computeRegression();
     ui->widget_s->update();
     ui->widget_m->update();
@@ -137,26 +152,40 @@ void MainWindow::on_actionProceed_optimization_triggered()
 {
     // Proceed optimization step
     core.proceedOptimization();
-    
+
     // Damp data
     core.regressor->dampData(DirectoryUtility::getTemporaryDirectory());
-    
+
     // Reset slider position
     ui->horizontalSlider->setValue((ui->horizontalSlider->maximum() - ui->horizontalSlider->minimum()) / 2 + ui->horizontalSlider->minimum());
-    
+
     // Repaint evary widget
     ui->widget_s->repaint();
     ui->widget_m->repaint();
     ui->widget_e->repaint();
     ui->horizontalSlider->repaint();
-    ui->widget_preview->repaint();
+    enhancer_widget->repaint();
 }
 
 void MainWindow::on_horizontalSlider_valueChanged(int /*value*/)
 {
     ui->widget_y->update();
-    ui->widget_preview->update();
     updateRawSliders();
+
+    // Update the parameters for preview
+    const Eigen::VectorXd x = core.computeParametersFromSlider();
+    std::vector<double> parameters(6, 0.5);
+    if (core.dim == 2)
+    {
+        parameters[2] = x(0);
+        parameters[5] = x(1);
+    }
+    else
+    {
+        for (unsigned i = 0; i < 6; ++ i) { parameters[i] = x(i); }
+    }
+    enhancer_widget->setParameters(parameters);
+    enhancer_widget->update();
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -174,7 +203,7 @@ void MainWindow::on_actionExport_photos_on_slider_triggered()
     const std::string dir = DirectoryUtility::getTemporaryDirectory();
     const unsigned m = ui->horizontalSlider->minimum();
     const unsigned M = ui->horizontalSlider->maximum();
-    
+
     // Export photos based on the current slider space
     constexpr unsigned n = 10;
     constexpr unsigned w = 640;
@@ -182,16 +211,16 @@ void MainWindow::on_actionExport_photos_on_slider_triggered()
     {
         const unsigned val = m + (i - 1) * (M - m) / (n - 1);
         const Eigen::VectorXd x = core.computeParametersFromSlider(val, m, M);
-        const QImage enhanced = ImageModifier::modifyImage(ui->widget_preview->getImage(), x);
+        const QImage enhanced = ImageModifier::modifyImage(enhancer_widget->getImage(), x);
         enhanced.save(QString((dir + "/full_" + std::to_string(i) + ".png").c_str()));
         enhanced.scaledToWidth(w, Qt::SmoothTransformation).save(QString((dir + "/" + std::to_string(i) + ".png").c_str()));
     }
-    
+
     // Export the current best photo
     if (core.data.X.rows() != 0)
     {
         const Eigen::VectorXd x_best = core.regressor->find_arg_max();
-        const QImage enhanced = ImageModifier::modifyImage(ui->widget_preview->getImage(), x_best);
+        const QImage enhanced = ImageModifier::modifyImage(enhancer_widget->getImage(), x_best);
         enhanced.save(QString((dir + "/best.png").c_str()));
     }
 }

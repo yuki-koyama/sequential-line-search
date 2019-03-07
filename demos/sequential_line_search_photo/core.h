@@ -16,29 +16,29 @@ class Core
 {
 public:
     Core();
-    
+
     static Core& getInstance() {
         static Core core;
         return core;
     }
-    
+
     std::shared_ptr<sequential_line_search::PreferenceRegressor> regressor;
-    
+
     const unsigned dim;
-    
+
     MainWindow* mainWindow;
-    
+
     sequential_line_search::Data data;
-    
+
     // For optimization
     void proceedOptimization();
     Eigen::VectorXd findNextPoint() const;
     Eigen::VectorXd x_max;
     double          y_max;
-    
+
     // For regression
     void computeRegression();
-    
+
     // For slider management
     void updateSliderEnds();
     std::shared_ptr<sequential_line_search::Slider> slider;

@@ -101,6 +101,8 @@ if(SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS)
 	endif()
 
 	# enhancer
+	set(ENHANCER_USE_QT_FEATURES ON CACHE INTERNAL "" FORCE)
+	set(ENHANCER_BUILD_QT_TESTS OFF CACHE INTERNAL "" FORCE)
 	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/enhancer)
 
 	# parallel-util
