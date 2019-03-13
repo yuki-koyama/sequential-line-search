@@ -13,10 +13,10 @@ if(APPLE AND EXISTS /usr/local/opt/qt)
 	list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt")
 endif()
 
-set(SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS  ON  CACHE BOOL "")
-set(SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS   OFF CACHE BOOL "")
-set(SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS    OFF CACHE BOOL "")
-set(SEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING OFF CACHE BOOL "")
+option(SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS  "" ON )
+option(SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS   "" OFF)
+option(SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS    "" OFF)
+option(SEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING "" OFF)
 
 ###############################################
 # Handling external libraries
@@ -47,10 +47,12 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/nlopt-util)
 # rand-util
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/rand-util)
 
-# pybind11
-set(PYBIND11_INSTALL OFF CACHE INTERNAL "" FORCE)
-set(PYBIND11_TEST    OFF CACHE INTERNAL "" FORCE)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/pybind11)
+if(SEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING)
+	# pybind11
+	set(PYBIND11_INSTALL OFF CACHE INTERNAL "" FORCE)
+	set(PYBIND11_TEST    OFF CACHE INTERNAL "" FORCE)
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/pybind11)
+endif()
 
 ###############################################
 # Main library
