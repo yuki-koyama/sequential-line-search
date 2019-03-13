@@ -1,5 +1,7 @@
 # Sequential Line Search
 
+[![Build Status](https://travis-ci.com/yuki-koyama/sequential-line-search.svg?branch=master)](https://travis-ci.com/yuki-koyama/sequential-line-search)
+
 This repository contains a part of the source codes used in our research project on the **sequential line search** method (which is a variant of Bayesian optimization). The core algorithm is implemented in the source codes in the "sequential_line_search" folder. This repository also contains the following example applications:
 
 - **bayesian_optimization_1d**: A simple demo of the standard Bayesian optimization applied to a one-dimensional test function.
