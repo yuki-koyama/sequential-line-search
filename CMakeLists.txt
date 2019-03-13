@@ -47,7 +47,9 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/nlopt-util)
 # rand-util
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/rand-util)
 
-# pybind11 for python binding
+# pybind11
+set(PYBIND11_INSTALL OFF CACHE INTERNAL "" FORCE)
+set(PYBIND11_TEST    OFF CACHE INTERNAL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/pybind11)
 
 ###############################################

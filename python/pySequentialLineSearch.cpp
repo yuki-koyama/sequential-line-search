@@ -42,16 +42,13 @@ void clear()
 	y_max  = NAN;
 }
 
-std::vector<double> convertToSTL(Eigen::VectorXd vec_x_Eigen)
+std::vector<double> convertToSTL(const Eigen::VectorXd& vec_x_Eigen)
 {
-	std::vector<double> vec_x_STL;
-
-	for (int i = 0; i < vec_x_Eigen.rows(); i++)
+	std::vector<double> vec_x_STL(vec_x_Eigen.rows());
+	for (int i = 0; i < vec_x_Eigen.rows(); ++ i)
 	{
-		double value = vec_x_Eigen(i);
-		vec_x_STL.push_back(value);
+		vec_x_STL[i] = vec_x_Eigen(i);
 	}
-
 	return vec_x_STL;
 }
 

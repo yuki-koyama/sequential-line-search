@@ -9,6 +9,8 @@ This repository contains a part of the source codes used in our research project
 - **sequential_line_search_2d_gui**: A visual interactive demo of the sequential line search method applied to a two-dimensional test function.
 - **sequential_line_search_photo**: A visual interactive demo of the sequential line search method where a photograph is enhanced using six-dimensional parameters.
 
+Now this library has an _experimental_ [python binding](./python).
+
 ## Project Web Site
 
 <http://koyama.xyz/project/sequential_line_search/>
