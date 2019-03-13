@@ -13,10 +13,10 @@ if(APPLE AND EXISTS /usr/local/opt/qt)
 	list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt")
 endif()
 
-set(SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS  ON  CACHE BOOL "")
-set(SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS   OFF CACHE BOOL "")
-set(SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS    OFF CACHE BOOL "")
-set(SEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING OFF CACHE BOOL "")
+option(SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS  "" ON )
+option(SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS   "" OFF)
+option(SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS    "" OFF)
+option(SEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING "" OFF)
 
 ###############################################
 # Handling external libraries
@@ -47,10 +47,9 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/nlopt-util)
 # rand-util
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/rand-util)
 
-# pybind11
-set(PYBIND11_INSTALL OFF CACHE INTERNAL "" FORCE)
-set(PYBIND11_TEST    OFF CACHE INTERNAL "" FORCE)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/pybind11)
+if(SEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING)
+
+endif()
 
 ###############################################
 # Main library
@@ -82,12 +81,8 @@ install(TARGETS SequentialLineSearch ARCHIVE DESTINATION lib)
 ###############################################
 
 if(SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS)
-	# Demos
 	add_subdirectory(demos/bayesian_optimization_1d)
 	add_subdirectory(demos/sequential_line_search_nd)
-endif()
-if(SEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING)
-	add_subdirectory(python)
 endif()
 if(SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS)
 	# Qt
@@ -97,7 +92,6 @@ if(SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS)
 	set(TINYCOLORMAP_BUILD_TOOLS OFF CACHE INTERNAL "" FORCE)
 	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/tinycolormap)
 
-	# Demos
 	add_subdirectory(demos/bayesian_optimization_1d_gui)
 	add_subdirectory(demos/bayesian_optimization_2d_gui)
 	add_subdirectory(demos/sequential_line_search_2d_gui)
@@ -124,13 +118,22 @@ if(SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS)
 	set(PARALLELUTIL_BUILD_TESTS OFF CACHE INTERNAL "" FORCE)
 	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/parallel-util)
 
-	# Demos
 	add_subdirectory(demos/sequential_line_search_photo)
+endif()
+if(SEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING)
+	# pybind11
+	set(PYBIND11_INSTALL OFF CACHE INTERNAL "" FORCE)
+	set(PYBIND11_TEST    OFF CACHE INTERNAL "" FORCE)
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/pybind11)
+
+	add_subdirectory(python)
 endif()
 
 ###############################################
 # Tests
 ###############################################
 enable_testing()
-add_test(NAME bayesian_optimization_1d_test COMMAND $<TARGET_FILE:BayesianOptimization1d>)
-add_test(NAME sequential_line_search_nd_test COMMAND $<TARGET_FILE:SequentialLineSearchNd>)
+if(SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS)
+	add_test(NAME bayesian_optimization_1d_test COMMAND $<TARGET_FILE:BayesianOptimization1d>)
+	add_test(NAME sequential_line_search_nd_test COMMAND $<TARGET_FILE:SequentialLineSearchNd>)
+endif()
