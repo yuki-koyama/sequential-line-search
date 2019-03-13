@@ -63,6 +63,12 @@ file(GLOB
 	${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
 )
 add_library(SequentialLineSearch STATIC ${headers} ${sources})
+
+# for Windows
+IF (WIN32)
+	add_definitions(-D_USE_MATH_DEFINES)
+ENDIF()
+
 target_include_directories(SequentialLineSearch PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(SequentialLineSearch Eigen3::Eigen timer nlopt nlopt-util rand-util)
 
