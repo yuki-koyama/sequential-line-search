@@ -16,6 +16,7 @@ addons:
     packages:
     - cmake
     - qt5-default
+    - libqt5opengl5-dev
 before_script:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then git clone https://github.com/eigenteam/eigen-git-mirror.git; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mkdir build-eigen; fi
