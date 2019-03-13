@@ -6,7 +6,6 @@ os:
 - linux
 - osx
 dist: xenial
-python: 3.7
 addons:
   homebrew:
     packages:
