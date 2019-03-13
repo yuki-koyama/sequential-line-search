@@ -52,6 +52,12 @@ To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_D
 
 To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS` should be set `ON`. They require runtime environments to support OpenGL 3.2 Core Profile and GLSL 3.3.
 
+### Required for Experimental Python Binding
+
+- pybind11 <https://github.com/pybind/pybind11> (included via gitsubmodule)
+
+To enable python binding, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING` should be set `ON`.
+
 ## How to Compile and Run
 
 We use [cmake](https://cmake.org/) for managing the source codes. You can compile the core module and the demo applications at once by, for example,
@@ -68,7 +74,7 @@ Then you can run the applications by, for example,
 ./demos/sequential_line_search_nd/SequentialLineSearchNd
 ```
 
-We tested on macOS 10.13 only. We are aware that the visual demos cannot be built as it is in other OSs; some OpenGL paths etc. need to be resolved. Pull requiests welcome.
+We tested on macOS 10.13 only. We are aware that the visual demos cannot be built as it is in other OSs; some OpenGL paths etc. need to be resolved. Pull requests welcome.
 
 ## License
 
