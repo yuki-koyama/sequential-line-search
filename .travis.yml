@@ -19,10 +19,12 @@ addons:
     - libqt5opengl5-dev
     - libeigen3-dev
 before_script:
+- pyenv --help
 - pyenv version
 - pyenv versions
 - pyenv install --list
-- pyenv global 3.7.1
+- pyenv install 3.6.5
+- pyenv global 3.6.5
 - python --version
 script:
 - cmake -DSEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS=OFF -DSEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS=OFF -DSEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS=OFF -DSEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING=ON . && make
