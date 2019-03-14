@@ -24,6 +24,10 @@ option(SEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING "" OFF)
 
 # Eigen
 find_package(Eigen3 REQUIRED)
+if(NOT TARGET Eigen3::Eigen)
+	add_library(Eigen3::Eigen INTERFACE)
+	target_include_directories(Eigen3::Eigen INTERFACE ${EIGEN3_INCLUDE_DIR})
+endif()
 
 # timer
 set(TIMER_BUILD_TEST OFF CACHE INTERNAL "" FORCE)
