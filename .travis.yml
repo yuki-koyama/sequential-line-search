@@ -6,10 +6,6 @@ os:
 - linux
 - osx
 dist: xenial
-python:
-  - 3.4
-  - 3.5
-  - 3.6
 addons:
   homebrew:
     packages:
@@ -22,6 +18,11 @@ addons:
     - qt5-default
     - libqt5opengl5-dev
     - libeigen3-dev
+before_script:
+- pyenv version
+- pyenv versions
+- pyenv install 3.7.1
+- pyenv global 3.7.1
 script:
 - cmake -DSEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS=OFF -DSEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS=OFF -DSEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS=OFF -DSEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING=ON . && make
 - cmake -DSEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS=ON -DSEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS=ON -DSEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS=ON -DSEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING=OFF . && make
