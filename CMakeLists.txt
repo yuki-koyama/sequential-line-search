@@ -47,10 +47,6 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/nlopt-util)
 # rand-util
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/rand-util)
 
-if(SEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING)
-
-endif()
-
 ###############################################
 # Main library
 ###############################################
