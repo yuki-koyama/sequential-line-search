@@ -26,7 +26,7 @@ DOI: https://doi.org/10.1145/3072959.3073598
 
 ### Required for Core Algorithms
 
-- Eigen <http://eigen.tuxfamily.org/> (`brew install eigen`)
+- Eigen <http://eigen.tuxfamily.org/> (`brew install eigen` / `sudo apt install libeigen3-dev`)
 - NLopt <https://nlopt.readthedocs.io/> (included via gitsubmodule)
 - timer <https://github.com/yuki-koyama/timer> (included via gitsubmodule)
 - nlopt-util <https://github.com/yuki-koyama/nlopt-util> (included via gitsubmodule)
@@ -40,14 +40,14 @@ To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_
 
 ### Required for Visual Demos
 
-- Qt5 <http://doc.qt.io/qt-5/> (`brew install qt`)
+- Qt5 <http://doc.qt.io/qt-5/> (`brew install qt` / `sudo apt install qt5-default`)
 - tinycolormap <https://github.com/yuki-koyama/tinycolormap> (included via gitsubmodule)
 
 To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS` should be set `ON`.
 
 ### Required for Photo Enhancement Demos
 
-- Qt5 <http://doc.qt.io/qt-5/> (`brew install qt`)
+- Qt5 <http://doc.qt.io/qt-5/> (`brew install qt` / `sudo apt install qt5-default`)
 - enhancer <https://github.com/yuki-koyama/enhancer> (included via gitsubmodule)
 - parallel-util <https://github.com/yuki-koyama/parallel-util> (included via gitsubmodule)
 - tinycolormap <https://github.com/yuki-koyama/tinycolormap> (included via gitsubmodule)
