@@ -1,26 +1,25 @@
 #include "mainwindow.h"
+#include "core.h"
 #include "ui_mainwindow.h"
-#include <iostream>
-#include <random>
 #include <QDir>
 #include <QFileDialog>
-#include "core.h"
+#include <iostream>
+#include <random>
 #include <sequential-line-search/gaussianprocessregressor.h>
 
-using Eigen::VectorXd;
 using Eigen::MatrixXd;
+using Eigen::VectorXd;
 
-namespace{
-Core& core = Core::getInstance();
-std::random_device seed;
-std::default_random_engine gen(seed());
-std::normal_distribution<double> gauss_dist(0.0, 0.050);
-std::uniform_real_distribution<double> uniform_dist(0.0, 1.0);
-}
+namespace
+{
+    Core&                                  core = Core::getInstance();
+    std::random_device                     seed;
+    std::default_random_engine             gen(seed());
+    std::normal_distribution<double>       gauss_dist(0.0, 0.050);
+    std::uniform_real_distribution<double> uniform_dist(0.0, 1.0);
+} // namespace
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
@@ -33,15 +32,12 @@ MainWindow::MainWindow(QWidget *parent) :
     core.computeRegression();
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
+MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::on_actionBatch_visualization_triggered()
 {
-    core.X = MatrixXd::Constant(0, 0, 0.0);
-    core.y = VectorXd::Constant(0, 0.0);
+    core.X     = MatrixXd::Constant(0, 0, 0.0);
+    core.y     = VectorXd::Constant(0, 0.0);
     core.x_max = VectorXd::Constant(0, 0.0);
     core.y_max = NAN;
     core.computeRegression();
@@ -51,11 +47,12 @@ void MainWindow::on_actionBatch_visualization_triggered()
 
     const QString path = QFileDialog::getExistingDirectory(this) + "/";
 
-    for (unsigned i = 0; i < n_iterations; ++ i)
+    for (unsigned i = 0; i < n_iterations; ++i)
     {
         core.proceedOptimization();
         window()->update();
-        window()->grab().save(path + QString("window") + QString("%1").arg(core.y.rows(), 3, 10, QChar('0')) + QString(".png"));
+        window()->grab().save(path + QString("window") + QString("%1").arg(core.y.rows(), 3, 10, QChar('0')) +
+                              QString(".png"));
     }
 }
 

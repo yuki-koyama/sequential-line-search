@@ -1,11 +1,11 @@
-#include <sequential-line-search/utils.h>
+#include <Eigen/Core>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
-#include <Eigen/Core>
+#include <sequential-line-search/utils.h>
 
-using Eigen::VectorXd;
 using Eigen::MatrixXd;
+using Eigen::VectorXd;
 
 namespace sequential_line_search
 {
@@ -15,19 +15,20 @@ namespace sequential_line_search
         {
             return 0.5 * (Eigen::VectorXd::Random(n) + Eigen::VectorXd::Ones(n));
         }
-        
+
         void exportMatrixToCsv(const std::string& filePath, const Eigen::MatrixXd& X)
         {
-            std::ofstream file(filePath);
+            std::ofstream   file(filePath);
             Eigen::IOFormat format(Eigen::StreamPrecision, Eigen::DontAlignCols, ",");
             file << X.format(format);
         }
-        
+
         std::string getCurrentTimeInString()
         {
             const std::time_t t = std::time(nullptr);
-            std::stringstream s; s << std::put_time(std::localtime(&t), "%Y%m%d%H%M%S");
+            std::stringstream s;
+            s << std::put_time(std::localtime(&t), "%Y%m%d%H%M%S");
             return s.str();
         }
-    }
-}
+    } // namespace utils
+} // namespace sequential_line_search

@@ -1,29 +1,25 @@
 #include "mainwidget.h"
-#include <iostream>
-#include <QPainter>
-#include <QPaintEvent>
-#include <tinycolormap.hpp>
-#include <sequential-line-search/sequential-line-search.h>
 #include "core.h"
 #include "mainwindow.h"
+#include <QPaintEvent>
+#include <QPainter>
+#include <iostream>
+#include <sequential-line-search/sequential-line-search.h>
+#include <tinycolormap.hpp>
 
 using namespace sequential_line_search;
 using Eigen::VectorXd;
 
 namespace
 {
-Core& core = Core::getInstance();
+    Core& core = Core::getInstance();
 }
 
-MainWidget::MainWidget(QWidget *parent) :
-    QWidget(parent)
-{
-    setAutoFillBackground(true);
-}
+MainWidget::MainWidget(QWidget* parent) : QWidget(parent) { setAutoFillBackground(true); }
 
-void MainWidget::paintEvent(QPaintEvent *event)
+void MainWidget::paintEvent(QPaintEvent* event)
 {
-    QPainter painter(this);
+    QPainter     painter(this);
     const QRect& rect = event->rect();
     const int    w    = rect.width();
     const int    h    = rect.height();
@@ -50,15 +46,16 @@ void MainWidget::paintEvent(QPaintEvent *event)
     painter.fillRect(rect, backgroundBrush);
 
     Eigen::MatrixXd val = Eigen::MatrixXd::Zero(w, h);
-    for (int pix_x = 0; pix_x < w; ++ pix_x)
+    for (int pix_x = 0; pix_x < w; ++pix_x)
     {
-        for (int pix_y = 0; pix_y < h; ++ pix_y)
+        for (int pix_y = 0; pix_y < h; ++pix_y)
         {
-            const double x0 = static_cast<double>(pix_x) / static_cast<double>(w);
-            const double x1 = static_cast<double>(pix_y) / static_cast<double>(h);
+            const double          x0 = static_cast<double>(pix_x) / static_cast<double>(w);
+            const double          x1 = static_cast<double>(pix_y) / static_cast<double>(h);
             const Eigen::Vector2d x(x0, x1);
 
-            switch (content) {
+            switch (content)
+            {
             case Content::Objective:
                 val(pix_x, pix_y) = core.evaluateObjectiveFunction(x);
                 break;
@@ -69,7 +66,9 @@ void MainWidget::paintEvent(QPaintEvent *event)
                 val(pix_x, pix_y) = (core.regressor.get() != nullptr) ? core.regressor->estimate_s(x) : 0.0;
                 break;
             case Content::ExpectedImprovement:
-                val(pix_x, pix_y) = (core.regressor.get() != nullptr) ? acquisition_function::CalculateAcqusitionValue(*core.regressor, x) : 0.0;
+                val(pix_x, pix_y) = (core.regressor.get() != nullptr)
+                                        ? acquisition_function::CalculateAcqusitionValue(*core.regressor, x)
+                                        : 0.0;
                 break;
             default:
                 val(pix_x, pix_y) = 0.0;
@@ -82,9 +81,9 @@ void MainWidget::paintEvent(QPaintEvent *event)
         val = (val - Eigen::MatrixXd::Constant(w, h, val.minCoeff())) / (val.maxCoeff() - val.minCoeff());
     }
     QImage image(w, h, QImage::Format_ARGB32);
-    for (int pix_x = 0; pix_x < w; ++ pix_x)
+    for (int pix_x = 0; pix_x < w; ++pix_x)
     {
-        for (int pix_y = 0; pix_y < h; ++ pix_y)
+        for (int pix_y = 0; pix_y < h; ++pix_y)
         {
             const auto color = tinycolormap::GetJetColor(val(pix_x, pix_y));
             image.setPixel(pix_x, pix_y, qRgba(color[0] * 255, color[1] * 255, color[2] * 255, 255));
@@ -120,20 +119,20 @@ void MainWidget::paintEvent(QPaintEvent *event)
     if (draw_data_points)
     {
         unsigned N = core.data.X.cols();
-        for (unsigned i = 0; i < N; ++ i)
+        for (unsigned i = 0; i < N; ++i)
         {
-            const VectorXd x = core.data.X.col(i);
-            const double pix_x = x(0) * rect.width();
-            const double pix_y = x(1) * rect.height();
+            const VectorXd x     = core.data.X.col(i);
+            const double   pix_x = x(0) * rect.width();
+            const double   pix_y = x(1) * rect.height();
             painter.setPen(Qt::NoPen);
             painter.setBrush(dot_back_brush);
             painter.drawEllipse(QPointF(pix_x, pix_y), dot_back_radius, dot_back_radius);
         }
-        for (unsigned i = 0; i < N; ++ i)
+        for (unsigned i = 0; i < N; ++i)
         {
-            const VectorXd x = core.data.X.col(i);
-            const double pix_x = x(0) * rect.width();
-            const double pix_y = x(1) * rect.height();
+            const VectorXd x     = core.data.X.col(i);
+            const double   pix_x = x(0) * rect.width();
+            const double   pix_y = x(1) * rect.height();
             painter.setPen(Qt::NoPen);
             painter.setBrush(dataPointBrush);
             painter.drawEllipse(QPointF(pix_x, pix_y), dot_radius, dot_radius);
@@ -143,8 +142,8 @@ void MainWidget::paintEvent(QPaintEvent *event)
     // Maximum in data points
     if (draw_data_maximum && !std::isnan(core.y_max))
     {
-        const double   pix_x = core.x_max(0) * rect.width();
-        const double   pix_y = core.x_max(1) * rect.height();
+        const double pix_x = core.x_max(0) * rect.width();
+        const double pix_y = core.x_max(1) * rect.height();
         painter.setBrush(dot_back_brush);
         painter.drawEllipse(QPointF(pix_x, pix_y), dot_back_radius * dot_max_scale, dot_back_radius * dot_max_scale);
         painter.setBrush(maximumBrush);

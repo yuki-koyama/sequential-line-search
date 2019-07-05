@@ -1,21 +1,20 @@
 #include "mainwindow.h"
+#include "core.h"
 #include "ui_mainwindow.h"
-#include <iostream>
 #include <QDir>
 #include <QFileDialog>
-#include "core.h"
+#include <iostream>
 #include <sequential-line-search/gaussianprocessregressor.h>
 
-using Eigen::VectorXd;
 using Eigen::MatrixXd;
+using Eigen::VectorXd;
 
-namespace{
-Core& core = Core::getInstance();
+namespace
+{
+    Core& core = Core::getInstance();
 }
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
@@ -24,10 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     core.computeRegression();
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
+MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::on_actionBatch_visualization_triggered()
 {
@@ -42,7 +38,7 @@ void MainWindow::on_actionBatch_visualization_triggered()
 
     const QString path = QFileDialog::getExistingDirectory(this) + "/";
 
-    for (unsigned i = 0; i <= n_iterations; ++ i)
+    for (unsigned i = 0; i <= n_iterations; ++i)
     {
         ui->widget->grab().save(path + QString("%1").arg(core.y.rows(), 3, 10, QChar('0')) + QString(".png"));
         core.proceedOptimization();

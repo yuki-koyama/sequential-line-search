@@ -1,14 +1,14 @@
-#include <vector>
-#include <memory>
 #include <Eigen/Core>
+#include <memory>
 #include <sequential-line-search/sequential-line-search.h>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 // C API
 ///////////////////////////////////////////////////////////////////////////////
 
-void init(unsigned);
-void proceedOptimization(double);
+void                init(unsigned);
+void                proceedOptimization(double);
 std::vector<double> getParametersFromSlider(double);
 std::vector<double> getXmax();
 
@@ -24,7 +24,7 @@ namespace
 {
 
     std::shared_ptr<sequential_line_search::PreferenceRegressor> regressor;
-    std::shared_ptr<sequential_line_search::Slider> slider;
+    std::shared_ptr<sequential_line_search::Slider>              slider;
 
     sequential_line_search::Data data;
 
@@ -39,31 +39,29 @@ namespace
 
         data.X = MatrixXd::Zero(0, 0);
         data.D.clear();
-        x_max  = VectorXd::Zero(0);
-        y_max  = NAN;
+        x_max = VectorXd::Zero(0);
+        y_max = NAN;
     }
 
     std::vector<double> convertToSTL(const Eigen::VectorXd& vec_x_Eigen)
     {
         std::vector<double> vec_x_STL(vec_x_Eigen.rows());
-        for (int i = 0; i < vec_x_Eigen.rows(); ++ i)
+        for (int i = 0; i < vec_x_Eigen.rows(); ++i)
         {
             vec_x_STL[i] = vec_x_Eigen(i);
         }
         return vec_x_STL;
     }
 
-    void computeRegression()
-    {
-        regressor = std::make_shared<PreferenceRegressor>(data.X, data.D);
-    }
+    void computeRegression() { regressor = std::make_shared<PreferenceRegressor>(data.X, data.D); }
 
     void updateSliderEnds()
     {
         // If this is the first time...
         if (x_max.rows() == 0)
         {
-            slider = std::make_shared<Slider>(utils::generateRandomVector(dimension), utils::generateRandomVector(dimension), true);
+            slider = std::make_shared<Slider>(
+                utils::generateRandomVector(dimension), utils::generateRandomVector(dimension), true);
             return;
         }
 
@@ -75,10 +73,10 @@ namespace
 
     const VectorXd computeParametersFromSlider(double value)
     {
-        return slider->end_0 * (1.0 - value) + slider->end_1 *  value;
+        return slider->end_0 * (1.0 - value) + slider->end_1 * value;
     }
 
-}
+} // namespace
 
 ///////////////////////////////////////////////////////////////////////////////
 // C API
@@ -96,7 +94,7 @@ void proceedOptimization(double slider_position)
 {
     // Add new preference data
     const VectorXd x = computeParametersFromSlider(slider_position);
-    data.AddNewPoints(x, { slider->orig_0, slider->orig_1 });
+    data.AddNewPoints(x, {slider->orig_0, slider->orig_1});
 
     // Compute regression
     computeRegression();
@@ -115,10 +113,7 @@ std::vector<double> getParametersFromSlider(double value)
     return convertToSTL(slider->end_0 * (1.0 - value) + slider->end_1 * value);
 }
 
-std::vector<double> getXmax()
-{
-    return convertToSTL(x_max);
-}
+std::vector<double> getXmax() { return convertToSTL(x_max); }
 
 ///////////////////////////////////////////////////////////////////////////////
 // pybind11
@@ -128,7 +123,8 @@ std::vector<double> getXmax()
 #include <pybind11/stl.h>
 namespace py = pybind11;
 
-PYBIND11_MODULE(pySequentialLineSearch, m) {
+PYBIND11_MODULE(pySequentialLineSearch, m)
+{
     m.doc() = R"pbdoc(
     Sequential Line Search Plugin by Pybind11
     -----------------------------------------

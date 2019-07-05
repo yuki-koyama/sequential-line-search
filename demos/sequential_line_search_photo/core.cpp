@@ -1,8 +1,8 @@
 #include "core.h"
-#include <iostream>
-#include <cmath>
-#include <sequential-line-search/sequential-line-search.h>
 #include "mainwindow.h"
+#include <cmath>
+#include <iostream>
+#include <sequential-line-search/sequential-line-search.h>
 
 using namespace sequential_line_search;
 
@@ -20,38 +20,32 @@ Core::Core() : dim(PHOTO_DIM)
 {
     data.X = MatrixXd::Zero(0, 0);
     data.D.clear();
-    
+
     x_max = VectorXd::Zero(0);
     y_max = NAN;
 }
 
-VectorXd Core::findNextPoint() const
-{
-    return acquisition_function::FindNextPoint(*regressor);
-}
+VectorXd Core::findNextPoint() const { return acquisition_function::FindNextPoint(*regressor); }
 
 void Core::proceedOptimization()
 {
     // Add new preference data
     const VectorXd x = computeParametersFromSlider();
-    data.AddNewPoints(x, { slider->orig_0, slider->orig_1 });
-    
+    data.AddNewPoints(x, {slider->orig_0, slider->orig_1});
+
     // Compute regression
     computeRegression();
-    
+
     // Check the current best
     unsigned index;
     y_max = regressor->y.maxCoeff(&index);
     x_max = regressor->X.col(index);
-    
+
     // Update slider ends
     updateSliderEnds();
 }
 
-void Core::computeRegression()
-{
-    regressor = std::make_shared<PreferenceRegressor>(data.X, data.D);
-}
+void Core::computeRegression() { regressor = std::make_shared<PreferenceRegressor>(data.X, data.D); }
 
 void Core::updateSliderEnds()
 {
@@ -61,10 +55,10 @@ void Core::updateSliderEnds()
         slider = make_shared<Slider>(utils::generateRandomVector(dim), utils::generateRandomVector(dim), true);
         return;
     }
-    
+
     const VectorXd x_1 = regressor->find_arg_max();
     const VectorXd x_2 = findNextPoint();
-    
+
     slider = make_shared<Slider>(x_1, x_2, true);
 }
 
@@ -76,7 +70,7 @@ VectorXd Core::computeParametersFromSlider(int sliderValue, int minValue, int ma
 
 VectorXd Core::computeParametersFromSlider(double value) const
 {
-    return slider->end_0 * (1.0 - value) + slider->end_1 *  value;
+    return slider->end_0 * (1.0 - value) + slider->end_1 * value;
 }
 
 VectorXd Core::computeParametersFromSlider() const

@@ -1,27 +1,24 @@
 #include "widgetpreview.h"
-#include <QPainter>
-#include <QPaintEvent>
-#include <Eigen/Core>
-#include <tinycolormap.hpp>
 #include "core.h"
 #include "mainwindow.h"
+#include <Eigen/Core>
+#include <QPaintEvent>
+#include <QPainter>
+#include <tinycolormap.hpp>
 
-using Eigen::VectorXd;
 using Eigen::Vector3d;
+using Eigen::VectorXd;
 
 namespace
 {
-Core& core = Core::getInstance();
+    Core& core = Core::getInstance();
 }
 
-WidgetPreview::WidgetPreview(QWidget *parent) :
-    QWidget(parent)
-{
-}
+WidgetPreview::WidgetPreview(QWidget* parent) : QWidget(parent) {}
 
-void WidgetPreview::paintEvent(QPaintEvent *event)
+void WidgetPreview::paintEvent(QPaintEvent* event)
 {
-    QPainter painter(this);
+    QPainter     painter(this);
     const QRect& rect = event->rect();
 
     const VectorXd x = core.computeParametersFromSlider(core.mainWindow->obtainSliderPosition());
