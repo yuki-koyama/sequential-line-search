@@ -314,63 +314,11 @@ namespace sequential_line_search
 
     ///////////////////////////////////////////////////////////////////
 
-#if 0
-    namespace
-    {
-        
-        double objective_function(const std::vector<double> &x, std::vector<double>& grad, void* data)
-        {
-            const PreferenceRegressor* regressor = static_cast<PreferenceRegressor*>(data);
-            
-            const unsigned M = x.size();
-            
-            if (!grad.empty())
-            {
-                const VectorXd  x_vec = Eigen::Map<const VectorXd>(&x[0], M);
-                const MatrixXd& X     = regressor->X;
-                const MatrixXd& C_inv = regressor->C_inv;
-                const VectorXd& y     = regressor->y;
-                const unsigned  N     = y.rows();
-                const double    a     = regressor->a;
-                const double    l     = regressor->l;
-                
-                MatrixXd k_derivative(M, N);
-                
-                for (unsigned i = 0; i < N; ++ i)
-                {
-                    const double   tmp            = (- 0.5 / (l * l)) * (x_vec - X.col(i)).squaredNorm();
-                    const VectorXd k_i_derivative = a * std::exp(tmp) * (- 1.0 / (l * l) * (x_vec - X.col(i)));
-                    
-                    k_derivative.col(i) = k_i_derivative;
-                }
-                
-                const MatrixXd grad_vec = k_derivative * (C_inv * y);
-                Eigen::Map<VectorXd>(&grad[0], M) = grad_vec;
-            }
-            
-            return regressor->estimate_y(Eigen::Map<const VectorXd>(&x[0], M));
-        }
-        
-    }
-#endif
-
     VectorXd PreferenceRegressor::find_arg_max()
     {
-        const unsigned M = X.rows();
-
-        assert(M != 0);
-
         int i;
         y.maxCoeff(&i);
-#if 0
-        const VectorXd x_initial = X.col(i);
-        const VectorXd upper     = VectorXd::Constant(M, 1.0);
-        const VectorXd lower     = VectorXd::Constant(M, 0.0);
-        
-        return nloptutils::compute(x_initial, upper, lower, objective_function, static_cast<void*>(this), nlopt::LD_TNEWTON, 100);
-#else
         return X.col(i);
-#endif
     }
 
     void PreferenceRegressor::dampData(const std::string& dirPath) const
