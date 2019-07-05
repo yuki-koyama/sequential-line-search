@@ -1,20 +1,19 @@
 language: cpp
-compiler:
-- clang
-- gcc
-os:
-- linux
-- osx
+matrix:
+  include:
+    - compiler: gcc
+      os: linux
+    - compiler: clang
+      os: osx
 dist: xenial
 addons:
   homebrew:
+    update: true
     packages:
-    - cmake
     - eigen
     - qt
   apt:
     packages:
-    - cmake
     - qt5-default
     - libqt5opengl5-dev
     - libeigen3-dev
