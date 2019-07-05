@@ -2,7 +2,7 @@
 #include <cmath>
 #include <iostream>
 #include <nlopt-util.hpp>
-#include <sequential-line-search/gaussianprocessregressor.h>
+#include <sequential-line-search/gaussian-process-regressor.h>
 #include <sequential-line-search/utils.h>
 
 // #define NOISELESS

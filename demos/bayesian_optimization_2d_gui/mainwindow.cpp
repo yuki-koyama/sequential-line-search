@@ -5,7 +5,7 @@
 #include <QFileDialog>
 #include <iostream>
 #include <random>
-#include <sequential-line-search/gaussianprocessregressor.h>
+#include <sequential-line-search/gaussian-process-regressor.h>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;

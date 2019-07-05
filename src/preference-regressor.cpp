@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <nlopt-util.hpp>
-#include <sequential-line-search/preferenceregressor.h>
+#include <sequential-line-search/preference-regressor.h>
 #include <sequential-line-search/utils.h>
 
 using Eigen::MatrixXd;

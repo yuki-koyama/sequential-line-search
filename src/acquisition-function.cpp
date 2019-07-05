@@ -2,7 +2,7 @@
 #include <iostream>
 #include <nlopt-util.hpp>
 #include <sequential-line-search/acquisition-function.h>
-#include <sequential-line-search/gaussianprocessregressor.h>
+#include <sequential-line-search/gaussian-process-regressor.h>
 #include <utility>
 
 using Eigen::MatrixXd;
