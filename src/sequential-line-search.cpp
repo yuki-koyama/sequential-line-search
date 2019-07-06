@@ -68,7 +68,7 @@ double sequential_line_search::SequentialLineSearchOptimizer::getPreferenceValue
     return (m_regressor == nullptr) ? 0.0 : m_regressor->estimate_y(parameter);
 }
 
-double sequential_line_search::SequentialLineSearchOptimizer::getPreferenceValueVariance(const Eigen::VectorXd& parameter) const
+double sequential_line_search::SequentialLineSearchOptimizer::getPreferenceValueStandardDeviation(const Eigen::VectorXd& parameter) const
 {
     return (m_regressor == nullptr) ? 0.0 : m_regressor->estimate_s(parameter);
 }
