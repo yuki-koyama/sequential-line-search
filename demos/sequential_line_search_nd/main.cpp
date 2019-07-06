@@ -1,41 +1,43 @@
-#include "core.h"
 #include <iostream>
 #include <sequential-line-search/sequential-line-search.h>
-
-using namespace sequential_line_search;
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
 
 namespace
 {
     constexpr double a         = 0.500;
     constexpr double r         = 0.500;
-    constexpr double noise     = 0.001;
-    constexpr double btl_scale = 0.010;
+    constexpr double b         = 0.001;
     constexpr double variance  = 0.100;
-    constexpr bool   use_MAP   = true;
+    constexpr double btl_scale = 0.010;
+
+    constexpr bool use_slider_enlargement = true;
+    constexpr bool use_MAP                = true;
+
+    constexpr unsigned test_dimension = 8;
+
+    double evaluateObjectiveFunction(const Eigen::VectorXd& x)
+    {
+        assert(x.rows() == test_dimension);
+
+        auto lambda = [](const Eigen::VectorXd& x, const Eigen::VectorXd& mu, const double sigma) {
+            return std::exp(-(x - mu).squaredNorm() / (sigma * sigma));
+        };
+
+        return lambda(x, Eigen::VectorXd::Constant(test_dimension, 0.5), 1.0);
+    }
 } // namespace
 
 int main(int argc, char* argv[])
 {
-    Core core;
-
-    core.use_MAP_hyperparameters = use_MAP;
-
-    PreferenceRegressor::Params::getInstance().a         = a;
-    PreferenceRegressor::Params::getInstance().r         = r;
-    PreferenceRegressor::Params::getInstance().variance  = variance;
-    PreferenceRegressor::Params::getInstance().b         = noise;
-    PreferenceRegressor::Params::getInstance().btl_scale = btl_scale;
-
-    core.computeRegression();
-    core.updateSliderEnds();
-
     constexpr unsigned n_trials     = 3;
     constexpr unsigned n_iterations = 10;
 
     for (unsigned trial = 0; trial < n_trials; ++trial)
     {
+        sequential_line_search::SequentialLineSearchOptimizer optimizer(
+            test_dimension, use_slider_enlargement, use_MAP);
+
+        optimizer.setHyperparameters(a, r, b, variance, btl_scale);
+
         std::cout << "========================" << std::endl;
         std::cout << "Trial " << trial + 1 << std::endl;
         std::cout << "========================" << std::endl;
@@ -50,7 +52,7 @@ int main(int argc, char* argv[])
             double max_y               = -1e+10;
             for (double slider_position = 0.0; slider_position <= 1.0; slider_position += 0.0001)
             {
-                const double y = core.evaluateObjectiveFunction(core.computeParametersFromSlider(slider_position));
+                const double y = evaluateObjectiveFunction(optimizer.getParameters(slider_position));
                 if (y > max_y)
                 {
                     max_y               = y;
@@ -58,19 +60,14 @@ int main(int argc, char* argv[])
                 }
             }
 
-            std::cout << "x: " << core.computeParametersFromSlider(max_slider_position).transpose() << std::endl;
+            std::cout << "x: " << optimizer.getParameters(max_slider_position).transpose() << std::endl;
             std::cout << "y: " << max_y << std::endl;
 
-            core.proceedOptimization(max_slider_position);
+            optimizer.submit(max_slider_position);
         }
 
-        std::cout << std::endl << "Found maximizer: " << core.x_max.transpose() << std::endl;
-        std::cout << "Found maximum: " << core.evaluateObjectiveFunction(core.x_max) << std::endl << std::endl;
-
-        // Reset the optimization
-        core.clear();
-        core.computeRegression();
-        core.updateSliderEnds();
+        std::cout << std::endl << "Found maximizer: " << optimizer.getMaximizer().transpose() << std::endl;
+        std::cout << "Found maximum: " << evaluateObjectiveFunction(optimizer.getMaximizer()) << std::endl << std::endl;
     }
 
     return 0;
