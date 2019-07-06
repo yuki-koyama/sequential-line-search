@@ -55,12 +55,7 @@ Eigen::VectorXd sequential_line_search::SequentialLineSearchOptimizer::getParame
 
 Eigen::VectorXd sequential_line_search::SequentialLineSearchOptimizer::getMaximizer() const
 {
-    if (m_regressor == nullptr)
-    {
-        throw std::runtime_error("");
-    }
-
-    return m_regressor->find_arg_max();
+    return m_slider->orig_0; // m_regressor->find_arg_max();
 }
 
 double sequential_line_search::SequentialLineSearchOptimizer::getPreferenceValueMean(const Eigen::VectorXd& parameter) const
