@@ -13,11 +13,15 @@
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
+using sequential_line_search::SequentialLineSearchOptimizer;
 
 namespace
 {
     Core& core = Core::getInstance();
-}
+
+    constexpr bool use_slider_enlargement  = true;
+    constexpr bool use_MAP_hyperparameters = true;
+} // namespace
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -79,8 +83,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         ui->formLayout->addRow(new QLabel(QString(names[i].c_str()), this), sliders[i]);
     }
 
-    core.computeRegression();
-    core.updateSliderEnds();
+    core.optimizer =
+        std::make_shared<SequentialLineSearchOptimizer>(core.dim, use_slider_enlargement, use_MAP_hyperparameters);
+
     ui->horizontalSlider->setValue((ui->horizontalSlider->maximum() + ui->horizontalSlider->minimum()) / 2);
     updateRawSliders();
 
@@ -117,7 +122,7 @@ double MainWindow::obtainSliderPosition() const
 
 void MainWindow::updateRawSliders()
 {
-    const VectorXd x = core.computeParametersFromSlider();
+    const VectorXd x = core.optimizer->getParameters(obtainSliderPosition());
     for (unsigned i = 0; i < core.dim; ++i)
     {
         QSlider* slider = sliders[i];
@@ -127,15 +132,9 @@ void MainWindow::updateRawSliders()
 
 void MainWindow::on_actionClear_all_data_triggered()
 {
-    core.data.X = MatrixXd::Constant(0, 0, 0.0);
-    core.data.D.clear();
+    core.optimizer =
+        std::make_shared<SequentialLineSearchOptimizer>(core.dim, use_slider_enlargement, use_MAP_hyperparameters);
 
-    core.x_max = VectorXd::Constant(0, 0.0);
-    core.y_max = NAN;
-
-    core.updateSliderEnds();
-
-    core.computeRegression();
     ui->widget_s->update();
     ui->widget_m->update();
     ui->widget_e->update();
@@ -144,10 +143,10 @@ void MainWindow::on_actionClear_all_data_triggered()
 void MainWindow::on_actionProceed_optimization_triggered()
 {
     // Proceed optimization step
-    core.proceedOptimization();
+    core.optimizer->submit(obtainSliderPosition());
 
     // Damp data
-    core.regressor->dampData(DirectoryUtility::getTemporaryDirectory());
+    core.optimizer->dampData(DirectoryUtility::getTemporaryDirectory());
 
     // Reset slider position
     ui->horizontalSlider->setValue((ui->horizontalSlider->maximum() - ui->horizontalSlider->minimum()) / 2 +
@@ -167,8 +166,8 @@ void MainWindow::on_horizontalSlider_valueChanged(int /*value*/)
     updateRawSliders();
 
     // Update the parameters for preview
-    const Eigen::VectorXd x = core.computeParametersFromSlider();
-    std::vector<double>   parameters(6, 0.5);
+    const VectorXd      x = core.optimizer->getParameters(obtainSliderPosition());
+    std::vector<double> parameters(6, 0.5);
     if (core.dim == 2)
     {
         parameters[2] = x(0);
@@ -189,7 +188,7 @@ void MainWindow::on_pushButton_clicked() { on_actionProceed_optimization_trigger
 
 void MainWindow::on_actionPrint_current_best_triggered()
 {
-    std::cout << core.regressor->find_arg_max().transpose() << std::endl;
+    std::cout << core.optimizer->getMaximizer().transpose() << std::endl;
 }
 
 void MainWindow::on_actionExport_photos_on_slider_triggered()
@@ -203,18 +202,19 @@ void MainWindow::on_actionExport_photos_on_slider_triggered()
     constexpr unsigned w = 640;
     for (unsigned i = 1; i <= n; ++i)
     {
-        const unsigned        val      = m + (i - 1) * (M - m) / (n - 1);
-        const Eigen::VectorXd x        = core.computeParametersFromSlider(val, m, M);
-        const QImage          enhanced = ImageModifier::modifyImage(enhancer_widget->getImage(), x);
+        const unsigned        val             = m + (i - 1) * (M - m) / (n - 1);
+        const double          slider_position = static_cast<double>(val - m) / static_cast<double>(M - m);
+        const Eigen::VectorXd x               = core.optimizer->getParameters(slider_position);
+        const QImage          enhanced        = ImageModifier::modifyImage(enhancer_widget->getImage(), x);
         enhanced.save(QString((dir + "/full_" + std::to_string(i) + ".png").c_str()));
         enhanced.scaledToWidth(w, Qt::SmoothTransformation)
             .save(QString((dir + "/" + std::to_string(i) + ".png").c_str()));
     }
 
     // Export the current best photo
-    if (core.data.X.rows() != 0)
+    if (core.optimizer->getRawDataPoints().rows() != 0)
     {
-        const Eigen::VectorXd x_best   = core.regressor->find_arg_max();
+        const Eigen::VectorXd x_best   = core.optimizer->getMaximizer();
         const QImage          enhanced = ImageModifier::modifyImage(enhancer_widget->getImage(), x_best);
         enhanced.save(QString((dir + "/best.png").c_str()));
     }
