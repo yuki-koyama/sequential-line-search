@@ -45,7 +45,7 @@ void sequential_line_search::SequentialLineSearchOptimizer::submit(const double 
 
 std::pair<Eigen::VectorXd, Eigen::VectorXd> sequential_line_search::SequentialLineSearchOptimizer::getSliderEnds() const
 {
-    return {m_slider->orig_0, m_slider->orig_1};
+    return {m_slider->end_0, m_slider->end_1};
 }
 
 Eigen::VectorXd sequential_line_search::SequentialLineSearchOptimizer::getParameters(const double slider_position) const
