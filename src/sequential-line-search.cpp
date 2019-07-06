@@ -77,3 +77,8 @@ double sequential_line_search::SequentialLineSearchOptimizer::getExpectedImprove
 {
     return (m_regressor == nullptr) ? 0.0 : acquisition_function::CalculateAcqusitionValue(*m_regressor, parameter);
 }
+
+const Eigen::MatrixXd& sequential_line_search::SequentialLineSearchOptimizer::getRawDataPoints() const
+{
+    return m_data->X;
+}

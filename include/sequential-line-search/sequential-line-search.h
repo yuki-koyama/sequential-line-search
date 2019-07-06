@@ -32,6 +32,8 @@ namespace sequential_line_search
         double getPreferenceValueStandardDeviation(const Eigen::VectorXd& parameter) const;
         double getExpectedImprovementValue(const Eigen::VectorXd& parameter) const;
 
+        const Eigen::MatrixXd& getRawDataPoints() const;
+
     private:
         const int  m_dimension;
         const bool m_use_slider_enlargement;
