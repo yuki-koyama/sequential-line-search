@@ -7,7 +7,6 @@
 #include <sequential-line-search/sequential-line-search.h>
 #include <tinycolormap.hpp>
 
-using namespace sequential_line_search;
 using Eigen::VectorXd;
 
 namespace

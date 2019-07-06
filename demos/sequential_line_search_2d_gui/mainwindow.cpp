@@ -11,9 +11,9 @@
 #include <nlopt-util.hpp>
 #include <sequential-line-search/sequential-line-search.h>
 
-using namespace sequential_line_search;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
+using sequential_line_search::SequentialLineSearchOptimizer;
 
 namespace
 {
@@ -36,8 +36,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     core.mainWindow = this;
     ui->setupUi(this);
 
-    core.optimizer = std::make_shared<sequential_line_search::SequentialLineSearchOptimizer>(
-        dimension, use_slider_enlargement, use_MAP_hyperparameters);
+    core.optimizer =
+        std::make_shared<SequentialLineSearchOptimizer>(dimension, use_slider_enlargement, use_MAP_hyperparameters);
     core.optimizer->setHyperparameters(a, r, b, variance, btl_scale);
 
     // Setup widgets
@@ -164,8 +164,8 @@ void MainWindow::on_actionBatch_visualization_triggered()
 
 void MainWindow::on_actionClear_all_data_triggered()
 {
-    core.optimizer = std::make_shared<sequential_line_search::SequentialLineSearchOptimizer>(
-                                                                                             dimension, use_slider_enlargement, use_MAP_hyperparameters);
+    core.optimizer =
+        std::make_shared<SequentialLineSearchOptimizer>(dimension, use_slider_enlargement, use_MAP_hyperparameters);
     core.optimizer->setHyperparameters(a, r, b, variance, btl_scale);
 
     ui->widget_y->update();
