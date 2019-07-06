@@ -28,6 +28,10 @@ namespace sequential_line_search
 
         Eigen::VectorXd getMaximizer() const;
 
+        double getPreferenceValue(const Eigen::VectorXd& parameter) const;
+        double getPreferenceValueVariance(const Eigen::VectorXd& parameter) const;
+        double getExpectedImprovementValue(const Eigen::VectorXd& parameter) const;
+
     private:
         const int  m_dimension;
         const bool m_use_slider_enlargement;
