@@ -41,7 +41,7 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
 
     optimizer_class.def("get_raw_data_points", &SequentialLineSearchOptimizer::getRawDataPoints);
 
-    optimizer_class.def("damp_adata", &SequentialLineSearchOptimizer::dampData);
+    optimizer_class.def("damp_data", &SequentialLineSearchOptimizer::dampData);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;
