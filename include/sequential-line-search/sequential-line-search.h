@@ -28,7 +28,7 @@ namespace sequential_line_search
 
         Eigen::VectorXd getMaximizer() const;
 
-        double getPreferenceValue(const Eigen::VectorXd& parameter) const;
+        double getPreferenceValueMean(const Eigen::VectorXd& parameter) const;
         double getPreferenceValueStandardDeviation(const Eigen::VectorXd& parameter) const;
         double getExpectedImprovementValue(const Eigen::VectorXd& parameter) const;
 

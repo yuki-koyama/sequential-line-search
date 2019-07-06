@@ -63,7 +63,7 @@ Eigen::VectorXd sequential_line_search::SequentialLineSearchOptimizer::getMaximi
     return m_regressor->find_arg_max();
 }
 
-double sequential_line_search::SequentialLineSearchOptimizer::getPreferenceValue(const Eigen::VectorXd& parameter) const
+double sequential_line_search::SequentialLineSearchOptimizer::getPreferenceValueMean(const Eigen::VectorXd& parameter) const
 {
     return (m_regressor == nullptr) ? 0.0 : m_regressor->estimate_y(parameter);
 }
