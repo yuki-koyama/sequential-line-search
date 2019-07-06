@@ -44,6 +44,12 @@ namespace sequential_line_search
         std::shared_ptr<PreferenceRegressor> m_regressor;
         std::shared_ptr<Slider>              m_slider;
         std::shared_ptr<Data>                m_data;
+
+        double m_a;
+        double m_r;
+        double m_b;
+        double m_variance;
+        double m_btl_scale;
     };
 } // namespace sequential_line_search
 

@@ -24,40 +24,49 @@ namespace
     const double b_fixed = 1e-06;
 #endif
 
-    inline double
-    calc_grad_a(const VectorXd& y, const MatrixXd& C_inv, const MatrixXd& X, double a, double b, const VectorXd& r)
+    inline double calc_grad_a(const VectorXd& y,
+                              const MatrixXd& C_inv,
+                              const MatrixXd& X,
+                              const double    a,
+                              const double    b,
+                              const VectorXd& r,
+                              const double    a_prior_mean,
+                              const double    a_prior_variance)
     {
-        const double a_prior  = PreferenceRegressor::Params::getInstance().a;
-        const double variance = PreferenceRegressor::Params::getInstance().variance;
-
         const MatrixXd C_grad_a = Regressor::calc_C_grad_a(X, a, b, r);
         const double   log_p_f_theta_grad_a =
             0.5 * y.transpose() * C_inv * C_grad_a * C_inv * y - 0.5 * (C_inv * C_grad_a).trace();
-        const double log_prior = (std::log(a_prior) - variance - std::log(a)) / (variance * a);
+        const double log_prior = (std::log(a_prior_mean) - a_prior_variance - std::log(a)) / (a_prior_variance * a);
         return log_p_f_theta_grad_a + log_prior;
     }
 
 #ifndef NOISELESS
-    inline double
-    calc_grad_b(const VectorXd& y, const MatrixXd& C_inv, const MatrixXd& X, double a, double b, const VectorXd& r)
+    inline double calc_grad_b(const VectorXd& y,
+                              const MatrixXd& C_inv,
+                              const MatrixXd& X,
+                              const double    a,
+                              const double    b,
+                              const VectorXd& r,
+                              const double    b_prior_mean,
+                              const double    b_prior_variance)
     {
-        const double b_prior  = PreferenceRegressor::Params::getInstance().b;
-        const double variance = PreferenceRegressor::Params::getInstance().variance;
-
         const MatrixXd C_grad_b = Regressor::calc_C_grad_b(X, a, b, r);
         const double   log_p_f_theta_grad_b =
             0.5 * y.transpose() * C_inv * C_grad_b * C_inv * y - 0.5 * (C_inv * C_grad_b).trace();
-        const double log_prior = (std::log(b_prior) - variance - std::log(b)) / (variance * b);
+        const double log_prior = (std::log(b_prior_mean) - b_prior_variance - std::log(b)) / (b_prior_variance * b);
         return log_p_f_theta_grad_b + log_prior;
     }
 #endif
 
-    inline VectorXd
-    calc_grad_r(const VectorXd& y, const MatrixXd& C_inv, const MatrixXd& X, double a, double b, const VectorXd& r)
+    inline VectorXd calc_grad_r(const VectorXd& y,
+                                const MatrixXd& C_inv,
+                                const MatrixXd& X,
+                                const double    a,
+                                const double    b,
+                                const VectorXd& r,
+                                const double    r_prior_mean,
+                                const double    r_prior_variance)
     {
-        const double r_prior  = PreferenceRegressor::Params::getInstance().r;
-        const double variance = PreferenceRegressor::Params::getInstance().variance;
-
         VectorXd grad = VectorXd::Zero(r.rows());
         for (unsigned i = 0; i < r.rows(); ++i)
         {
@@ -68,7 +77,8 @@ namespace
         }
         for (unsigned i = 0; i < r.rows(); ++i)
         {
-            const double log_prior = (std::log(r_prior) - variance - std::log(r(i))) / (variance * r(i));
+            const double log_prior =
+                (std::log(r_prior_mean) - r_prior_variance - std::log(r(i))) / (r_prior_variance * r(i));
             grad(i) += log_prior;
         }
 
@@ -76,13 +86,13 @@ namespace
     }
 
     // log p(d_k | f)
-    inline double calc_log_likelihood(const Preference& p, const double w, const VectorXd& y)
+    inline double calc_log_likelihood(const Preference& p, const double w, const VectorXd& y, const double btl_scale)
     {
-        const double btl_scale = w * PreferenceRegressor::Params::getInstance().btl_scale;
-
         VectorXd tmp(p.size());
         for (unsigned i = 0; i < p.size(); ++i)
+        {
             tmp(i) = y(p[i]);
+        }
         return std::log(utils::BTL(tmp, btl_scale));
     }
 
@@ -97,22 +107,22 @@ namespace
         const unsigned                 M = X.cols();
         const VectorXd                 y = Eigen::Map<const VectorXd>(&x[0], M);
 
-        const double a = (regressor->use_MAP_hyperparameters) ? x[M + 0] : PreferenceRegressor::Params::getInstance().a;
+        const double a = (regressor->use_MAP_hyperparameters) ? x[M + 0] : regressor->m_default_a;
 #ifdef NOISELESS
         const double b = b_fixed;
 #else
-        const double b = (regressor->use_MAP_hyperparameters) ? x[M + 1] : PreferenceRegressor::Params::getInstance().b;
+        const double b = (regressor->use_MAP_hyperparameters) ? x[M + 1] : regressor->m_default_b;
 #endif
         const VectorXd r = (regressor->use_MAP_hyperparameters)
                                ? VectorXd(Eigen::Map<const VectorXd>(&x[M + 2], X.rows()))
-                               : VectorXd::Constant(X.rows(), PreferenceRegressor::Params::getInstance().r);
+                               : VectorXd::Constant(X.rows(), regressor->m_default_r);
 
         double obj = 0.0;
 
         // Log likelihood of data
         for (unsigned i = 0; i < D.size(); ++i)
         {
-            obj += calc_log_likelihood(D[i], w(i), y);
+            obj += calc_log_likelihood(D[i], w(i), y, regressor->m_btl_scale);
         }
 
         // Log likelihood of y distribution
@@ -127,12 +137,12 @@ namespace
         if (regressor->use_MAP_hyperparameters)
         {
             // Priors for GP parameters
-            const double a_prior = PreferenceRegressor::Params::getInstance().a;
+            const double a_prior = regressor->m_default_a;
 #ifndef NOISELESS
-            const double b_prior = PreferenceRegressor::Params::getInstance().b;
+            const double b_prior = regressor->m_default_b;
 #endif
-            const double r_prior  = PreferenceRegressor::Params::getInstance().r;
-            const double variance = PreferenceRegressor::Params::getInstance().variance;
+            const double r_prior  = regressor->m_default_r;
+            const double variance = regressor->m_variance;
 
             obj += std::log(utils::log_normal(a, std::log(a_prior), variance));
 #ifndef NOISELESS
@@ -150,17 +160,21 @@ namespace
             VectorXd grad_y = VectorXd::Zero(y.rows());
 
             // Accumulate per-data derivatives
-            const double btl_scale = PreferenceRegressor::Params::getInstance().btl_scale;
+            const double btl_scale = regressor->m_btl_scale;
             for (unsigned i = 0; i < D.size(); ++i)
             {
                 const Preference& p = D[i];
                 const double      s = btl_scale * w(i);
                 VectorXd          tmp1(p.size());
                 for (unsigned i = 0; i < p.size(); ++i)
+                {
                     tmp1(i) = y(p[i]);
+                }
                 const VectorXd tmp2 = utils::derivative_BTL(tmp1, s) / utils::BTL(tmp1, s);
                 for (unsigned i = 0; i < p.size(); ++i)
+                {
                     grad_y(p[i]) += tmp2(i);
+                }
             }
 
             // Add GP term
@@ -170,13 +184,13 @@ namespace
 
             if (regressor->use_MAP_hyperparameters)
             {
-                grad[M + 0] = calc_grad_a(y, C_inv, X, a, b, r);
+                grad[M + 0] = calc_grad_a(y, C_inv, X, a, b, r, regressor->m_default_a, regressor->m_variance);
 #ifdef NOISELESS
                 grad[M + 1] = 0.0;
 #else
-                grad[M + 1] = calc_grad_b(y, C_inv, X, a, b, r);
+                grad[M + 1] = calc_grad_b(y, C_inv, X, a, b, r, regressor->m_default_b, regressor->m_variance);
 #endif
-                VectorXd grad_r = calc_grad_r(y, C_inv, X, a, b, r);
+                VectorXd grad_r = calc_grad_r(y, C_inv, X, a, b, r, regressor->m_default_r, regressor->m_variance);
                 for (unsigned i = 0; i < grad_r.rows(); ++i)
                 {
                     grad[M + 2 + i] = grad_r(i);
@@ -199,46 +213,23 @@ namespace sequential_line_search
 {
     PreferenceRegressor::PreferenceRegressor(const MatrixXd&                X,
                                              const std::vector<Preference>& D,
-                                             bool                           use_MAP_hyperparameters)
-        : use_MAP_hyperparameters(use_MAP_hyperparameters), X(X), D(D)
-    {
-        if (X.cols() == 0 || D.size() == 0)
-            return;
-
-        w = Eigen::VectorXd::Ones(D.size());
-
-        compute_MAP();
-
-        C     = calc_C(X, a, b, r);
-        C_inv = C.inverse();
-    }
-
-    PreferenceRegressor::PreferenceRegressor(const MatrixXd&                X,
-                                             const std::vector<Preference>& D,
-                                             const Eigen::VectorXd&         w,
-                                             bool                           use_MAP_hyperparameters)
-        : use_MAP_hyperparameters(use_MAP_hyperparameters), X(X), D(D), w(w)
-    {
-        if (X.cols() == 0 || D.size() == 0)
-            return;
-
-        compute_MAP();
-
-        C     = calc_C(X, a, b, r);
-        C_inv = C.inverse();
-    }
-
-    PreferenceRegressor::PreferenceRegressor(const MatrixXd&                X,
-                                             const std::vector<Preference>& D,
                                              const Eigen::VectorXd&         w,
                                              bool                           use_MAP_hyperparameters,
-                                             const PreferenceRegressor*     previous)
-        : use_MAP_hyperparameters(use_MAP_hyperparameters), X(X), D(D), w(w)
+                                             const double                   default_a,
+                                             const double                   default_r,
+                                             const double                   default_b,
+                                             const double                   variance,
+                                             const double                   btl_scale)
+        : use_MAP_hyperparameters(use_MAP_hyperparameters), X(X), D(D),
+          w(w.size() == 0 ? Eigen::VectorXd::Ones(D.size()) : w), m_default_a(default_a), m_default_r(default_r),
+          m_default_b(default_b), m_variance(variance), m_btl_scale(btl_scale)
     {
         if (X.cols() == 0 || D.size() == 0)
+        {
             return;
+        }
 
-        compute_MAP(previous);
+        compute_MAP();
 
         C     = calc_C(X, a, b, r);
         C_inv = C.inverse();
@@ -265,9 +256,9 @@ namespace sequential_line_search
         VectorXd lower              = VectorXd::Constant(M + 2 + d, -1e+01);
         lower.block(M, 0, 2 + d, 1) = VectorXd::Constant(2 + d, 1e-05);
         VectorXd x_ini              = VectorXd::Constant(M + 2 + d, 0.0);
-        x_ini(M + 0)                = Params::getInstance().a;
-        x_ini(M + 1)                = Params::getInstance().b;
-        x_ini.block(M + 2, 0, d, 1) = VectorXd::Constant(d, Params::getInstance().r);
+        x_ini(M + 0)                = m_default_a;
+        x_ini(M + 1)                = m_default_b;
+        x_ini.block(M + 2, 0, d, 1) = VectorXd::Constant(d, m_default_r);
 
         // Use the MAP estimated values in previous regression as initial values
         if (previous != nullptr)
@@ -306,9 +297,9 @@ namespace sequential_line_search
         }
         else
         {
-            a = PreferenceRegressor::Params::getInstance().a;
-            b = PreferenceRegressor::Params::getInstance().b;
-            r = VectorXd::Constant(d, PreferenceRegressor::Params::getInstance().r);
+            a = m_default_a;
+            b = m_default_b;
+            r = VectorXd::Constant(d, m_default_r);
         }
     }
 

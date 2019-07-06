@@ -17,16 +17,13 @@ namespace sequential_line_search
     public:
         PreferenceRegressor(const Eigen::MatrixXd&         X,
                             const std::vector<Preference>& D,
-                            bool                           use_MAP_hyperparameters = false);
-        PreferenceRegressor(const Eigen::MatrixXd&         X,
-                            const std::vector<Preference>& D,
-                            const Eigen::VectorXd&         w,
-                            bool                           use_MAP_hyperparameters = false);
-        PreferenceRegressor(const Eigen::MatrixXd&         X,
-                            const std::vector<Preference>& D,
-                            const Eigen::VectorXd&         w,
-                            bool                           use_MAP_hyperparameters,
-                            const PreferenceRegressor*     previous);
+                            const Eigen::VectorXd&         w                       = Eigen::VectorXd(),
+                            const bool                     use_MAP_hyperparameters = false,
+                            const double                   default_a               = 0.500,
+                            const double                   default_r               = 0.500,
+                            const double                   default_b               = 0.005,
+                            const double                   variance                = 0.250,
+                            const double                   btl_scale               = 0.010);
 
         double estimate_y(const Eigen::VectorXd& x) const override;
         double estimate_s(const Eigen::VectorXd& x) const override;
@@ -62,20 +59,16 @@ namespace sequential_line_search
         double                 getb() const override { return b; }
         const Eigen::VectorXd& getr() const override { return r; }
 
-        struct Params
-        {
-            Params() {}
-            double         a         = 0.500;
-            double         r         = 0.500;
-            double         b         = 0.005;
-            double         variance  = 0.250; ///< Used when hyperparameters are estimated via MAP
-            double         btl_scale = 0.010;
-            static Params& getInstance()
-            {
-                static Params p;
-                return p;
-            }
-        };
+        // Default hyperparameters; when MAP is enabled, they are used as initial guesses.
+        const double m_default_a;
+        const double m_default_r;
+        const double m_default_b;
+
+        /// \brief Variance of the prior distribution. Used only when MAP is enabled.
+        const double m_variance;
+
+        /// \brief Scale parameter in the BTL model
+        const double m_btl_scale;
 
     private:
         void compute_MAP(const PreferenceRegressor* = nullptr);
