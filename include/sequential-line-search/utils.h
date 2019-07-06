@@ -184,12 +184,6 @@ namespace sequential_line_search
         ////////////////////////////////////////////////
 
         void exportMatrixToCsv(const std::string& filePath, const Eigen::MatrixXd& X);
-
-        ////////////////////////////////////////////////
-        // Clock
-        ////////////////////////////////////////////////
-
-        std::string getCurrentTimeInString();
     } // namespace utils
 } // namespace sequential_line_search
 

@@ -1,7 +1,5 @@
 #include <Eigen/Core>
-#include <ctime>
 #include <fstream>
-#include <iomanip>
 #include <sequential-line-search/utils.h>
 
 using Eigen::MatrixXd;
@@ -21,14 +19,6 @@ namespace sequential_line_search
             std::ofstream   file(filePath);
             Eigen::IOFormat format(Eigen::StreamPrecision, Eigen::DontAlignCols, ",");
             file << X.format(format);
-        }
-
-        std::string getCurrentTimeInString()
-        {
-            const std::time_t t = std::time(nullptr);
-            std::stringstream s;
-            s << std::put_time(std::localtime(&t), "%Y%m%d%H%M%S");
-            return s.str();
         }
     } // namespace utils
 } // namespace sequential_line_search
