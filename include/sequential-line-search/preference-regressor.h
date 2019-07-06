@@ -1,5 +1,5 @@
-#ifndef PREFERENCEREGRESSOR_H
-#define PREFERENCEREGRESSOR_H
+#ifndef PREFERENCE_REGRESSOR_H
+#define PREFERENCE_REGRESSOR_H
 
 #include <Eigen/Core>
 #include <sequential-line-search/preference.h>
@@ -82,4 +82,4 @@ namespace sequential_line_search
     };
 } // namespace sequential_line_search
 
-#endif // PREFERENCEREGRESSOR_H
+#endif // PREFERENCE_REGRESSOR_H
