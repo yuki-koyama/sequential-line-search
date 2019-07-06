@@ -77,3 +77,10 @@ const Eigen::MatrixXd& sequential_line_search::SequentialLineSearchOptimizer::ge
 {
     return m_data->X;
 }
+
+void sequential_line_search::SequentialLineSearchOptimizer::dampData(const std::string& directory_path) const
+{
+    if (m_regressor == nullptr) { return; }
+
+    m_regressor->dampData(directory_path);
+}

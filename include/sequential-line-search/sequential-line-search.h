@@ -34,6 +34,8 @@ namespace sequential_line_search
 
         const Eigen::MatrixXd& getRawDataPoints() const;
 
+        void dampData(const std::string& directory_path) const;
+
     private:
         const int  m_dimension;
         const bool m_use_slider_enlargement;
