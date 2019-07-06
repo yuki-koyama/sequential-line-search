@@ -21,11 +21,14 @@ namespace
 
     constexpr double a         = 0.500;
     constexpr double r         = 0.500;
-    constexpr double noise     = 0.001;
+    constexpr double b         = 0.001;
     constexpr double btl_scale = 0.010;
     constexpr double variance  = 0.100;
 
-    constexpr bool use_MAP = true;
+    constexpr int dimension = 2;
+
+    constexpr bool use_slider_enlargement  = true;
+    constexpr bool use_MAP_hyperparameters = true;
 } // namespace
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -33,13 +36,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     core.mainWindow = this;
     ui->setupUi(this);
 
-    core.use_MAP_hyperparameters = use_MAP;
-
-    PreferenceRegressor::Params::getInstance().a         = a;
-    PreferenceRegressor::Params::getInstance().r         = r;
-    PreferenceRegressor::Params::getInstance().variance  = variance;
-    PreferenceRegressor::Params::getInstance().b         = noise;
-    PreferenceRegressor::Params::getInstance().btl_scale = btl_scale;
+    core.optimizer = std::make_shared<sequential_line_search::SequentialLineSearchOptimizer>(
+        dimension, use_slider_enlargement, use_MAP_hyperparameters);
+    core.optimizer->setHyperparameters(a, r, b, variance, btl_scale);
 
     // Setup widgets
     ui->widget_y->content = MainWidget::Content::Objective;
@@ -66,8 +65,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->widget_m->setFixedSize(s, s);
     ui->widget_e->setFixedSize(s, s);
 
-    core.computeRegression();
-    core.updateSliderEnds();
     ui->horizontalSlider->setValue((ui->horizontalSlider->maximum() + ui->horizontalSlider->minimum()) / 2);
 }
 
@@ -91,9 +88,6 @@ namespace
 
 void MainWindow::on_actionBatch_visualization_triggered()
 {
-    core.clear();
-    core.updateSliderEnds();
-
     constexpr unsigned n_iterations = 10;
 
     const unsigned orig_min = ui->horizontalSlider->minimum();
@@ -128,8 +122,7 @@ void MainWindow::on_actionBatch_visualization_triggered()
             for (int j = ui->horizontalSlider->minimum(); j < ui->horizontalSlider->maximum(); ++j)
             {
                 ui->horizontalSlider->setValue(j);
-                const double y = core.evaluateObjectiveFunction(core.computeParametersFromSlider(
-                    j, ui->horizontalSlider->minimum(), ui->horizontalSlider->maximum()));
+                const double y = core.evaluateObjectiveFunction(core.optimizer->getParameters(obtainSliderPosition()));
                 if (y > max_y)
                 {
                     max_y      = y;
@@ -137,7 +130,7 @@ void MainWindow::on_actionBatch_visualization_triggered()
                 }
             }
 
-            ofs << i << "," << (core.slider->orig_0 - x_opt).norm() << std::endl;
+            ofs << i << "," << (core.optimizer->getMaximizer() - x_opt).norm() << std::endl;
 
             ui->horizontalSlider->setValue(max_slider);
             window()->grab().save(path + QString("window") + QString("%1").arg(i, 3, 10, QChar('0')) + QString(".png"));
@@ -154,7 +147,7 @@ void MainWindow::on_actionBatch_visualization_triggered()
             ui->widget_y->grab().save(path + QString("_y") + QString("%1").arg(i, 3, 10, QChar('0')) + QString(".png"));
             ui->widget_y->draw_slider_tick = true;
 
-            core.proceedOptimization();
+            core.optimizer->submit(obtainSliderPosition());
         }
     };
 
@@ -171,13 +164,10 @@ void MainWindow::on_actionBatch_visualization_triggered()
 
 void MainWindow::on_actionClear_all_data_triggered()
 {
-    core.data.X = MatrixXd::Constant(0, 0, 0.0);
-    core.data.D.clear();
+    core.optimizer = std::make_shared<sequential_line_search::SequentialLineSearchOptimizer>(
+                                                                                             dimension, use_slider_enlargement, use_MAP_hyperparameters);
+    core.optimizer->setHyperparameters(a, r, b, variance, btl_scale);
 
-    core.x_max = VectorXd::Constant(0, 0.0);
-    core.y_max = NAN;
-
-    core.computeRegression();
     ui->widget_y->update();
     ui->widget_s->update();
     ui->widget_m->update();
@@ -186,7 +176,8 @@ void MainWindow::on_actionClear_all_data_triggered()
 
 void MainWindow::on_actionProceed_optimization_triggered()
 {
-    core.proceedOptimization();
+    core.optimizer->submit(obtainSliderPosition());
+
     ui->widget_y->update();
     ui->widget_s->update();
     ui->widget_m->update();
@@ -201,7 +192,8 @@ void MainWindow::on_horizontalSlider_valueChanged(int /*value*/)
 
 void MainWindow::on_pushButton_clicked()
 {
-    core.proceedOptimization();
+    core.optimizer->submit(obtainSliderPosition());
+
     ui->horizontalSlider->setValue((ui->horizontalSlider->maximum() + ui->horizontalSlider->minimum()) / 2);
     ui->widget_y->update();
     ui->widget_s->update();
@@ -211,5 +203,5 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::on_actionPrint_current_best_triggered()
 {
-    std::cout << core.regressor->find_arg_max().transpose() << std::endl;
+    std::cout << core.optimizer->getMaximizer().transpose() << std::endl;
 }

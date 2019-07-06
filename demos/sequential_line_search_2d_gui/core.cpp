@@ -1,39 +1,5 @@
 #include "core.h"
-#include "mainwindow.h"
 #include <cmath>
-#include <iostream>
-#include <sequential-line-search/sequential-line-search.h>
-
-using namespace sequential_line_search;
-
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
-
-Core::Core() : use_MAP_hyperparameters(false)
-{
-    data.X = MatrixXd::Zero(0, 0);
-    data.D.clear();
-
-    x_max = VectorXd::Zero(0);
-    y_max = NAN;
-}
-
-void Core::proceedOptimization()
-{
-    // Add new preference data
-    const VectorXd x = computeParametersFromSlider(mainWindow->obtainSliderPosition());
-    data.AddNewPoints(x, {slider->orig_0, slider->orig_1});
-
-    // Compute regression
-    computeRegression();
-
-    // Check the current best
-    x_max = regressor->find_arg_max();
-    y_max = regressor->estimate_y(x_max);
-
-    // Update slider ends
-    updateSliderEnds();
-}
 
 double Core::evaluateObjectiveFunction(const Eigen::VectorXd& x) const
 {
@@ -64,42 +30,4 @@ double Core::evaluateObjectiveFunction(const Eigen::VectorXd& x) const
 
     return lambda(x, Eigen::Vector2d(0.5, 0.5), 0.5);
 #endif
-}
-
-void Core::computeRegression()
-{
-    regressor = std::make_shared<PreferenceRegressor>(data.X, data.D, use_MAP_hyperparameters);
-}
-
-void Core::updateSliderEnds()
-{
-    // If this is the first time...
-    if (slider.get() == nullptr)
-    {
-#if 0
-        slider = std::make_shared<Slider>(Utility::generateRandomVector(2), Utility::generateRandomVector(2), false);
-#else
-        const Eigen::Vector2d x0(0.1, 0.9);
-        const Eigen::Vector2d x1(0.4, 0.1);
-        slider = std::make_shared<Slider>(x0, x1, false);
-#endif
-        return;
-    }
-
-    const VectorXd x_1 = regressor->find_arg_max();
-    const VectorXd x_2 = acquisition_function::FindNextPoint(*regressor);
-
-    slider = std::make_shared<Slider>(x_1, x_2, true);
-}
-
-VectorXd Core::computeParametersFromSlider(int sliderValue, int minValue, int maxValue) const
-{
-    const double t = static_cast<double>(sliderValue - minValue) / static_cast<double>(maxValue - minValue);
-    return computeParametersFromSlider(t);
-}
-
-VectorXd Core::computeParametersFromSlider(double value) const
-{
-    assert(slider.get() != nullptr);
-    return slider->getValue(value);
 }
