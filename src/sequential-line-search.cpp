@@ -37,7 +37,7 @@ void sequential_line_search::SequentialLineSearchOptimizer::submit(const double 
 
     m_regressor = std::make_shared<PreferenceRegressor>(m_data->X, m_data->D, m_use_MAP_hyperparameters);
 
-    const auto x_max = getMaximizer();
+    const auto x_max = m_regressor->find_arg_max();
     const auto x_ei  = acquisition_function::FindNextPoint(*m_regressor);
 
     m_slider = std::make_shared<Slider>(x_max, x_ei, m_use_slider_enlargement);
@@ -55,7 +55,7 @@ Eigen::VectorXd sequential_line_search::SequentialLineSearchOptimizer::getParame
 
 Eigen::VectorXd sequential_line_search::SequentialLineSearchOptimizer::getMaximizer() const
 {
-    return m_slider->orig_0; // m_regressor->find_arg_max();
+    return m_slider->orig_0;
 }
 
 double sequential_line_search::SequentialLineSearchOptimizer::getPreferenceValueMean(const Eigen::VectorXd& parameter) const
