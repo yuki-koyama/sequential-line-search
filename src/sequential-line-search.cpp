@@ -31,10 +31,11 @@ void sequential_line_search::SequentialLineSearchOptimizer::setHyperparameters(
 
 void sequential_line_search::SequentialLineSearchOptimizer::submit(const double slider_position)
 {
-    const auto x_chosen       = getParameters(slider_position);
-    const auto xs_slider_ends = getSliderEnds();
+    const auto  x_chosen   = getParameters(slider_position);
+    const auto& x_prev_max = m_slider->orig_0;
+    const auto& x_prev_ei  = m_slider->orig_1;
 
-    m_data->AddNewPoints(x_chosen, {xs_slider_ends.first, xs_slider_ends.second}, true);
+    m_data->AddNewPoints(x_chosen, {x_prev_max, x_prev_ei}, true);
 
     m_regressor = std::make_shared<PreferenceRegressor>(
         m_data->X, m_data->D, Eigen::VectorXd(), m_use_MAP_hyperparameters, m_a, m_r, m_b, m_variance, m_btl_scale);
