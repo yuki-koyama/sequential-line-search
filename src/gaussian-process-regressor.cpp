@@ -5,7 +5,7 @@
 #include <sequential-line-search/gaussian-process-regressor.h>
 #include <sequential-line-search/utils.h>
 
-// #define NOISELESS
+#define NOISELESS
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -180,7 +180,9 @@ namespace sequential_line_search
         this->y = y;
 
         if (X.rows() == 0)
+        {
             return;
+        }
 
         compute_MAP();
 
@@ -196,6 +198,11 @@ namespace sequential_line_search
         this->a = a;
         this->b = b;
         this->r = r;
+
+        if (X.rows() == 0)
+        {
+            return;
+        }
 
         C     = calc_C(X, a, b, r);
         C_inv = C.inverse();
