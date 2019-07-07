@@ -2,6 +2,7 @@
 #include <cmath>
 #include <iostream>
 #include <random>
+#include <sequential-line-search/utils.h>
 #include <sequential-line-search/acquisition-function.h>
 #include <sequential-line-search/gaussian-process-regressor.h>
 
@@ -20,7 +21,7 @@ Core::Core() : show_slider_value(false)
 
 void Core::proceedOptimization()
 {
-    const VectorXd x = (X.cols() == 0) ? VectorXd::Constant(1, 0.49) : acquisition_function::FindNextPoint(*regressor);
+    const VectorXd x = (X.cols() == 0) ? utils::generateRandomVector(1) : acquisition_function::FindNextPoint(*regressor);
     const double   y = evaluateObjectiveFunction(x);
 
     std::cout << y << std::endl;
