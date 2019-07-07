@@ -1,42 +1,39 @@
 #include "mainwidget.h"
-#include <iostream>
-#include <QPainter>
-#include <QPaintEvent>
-#include <sequential-line-search/sequential-line-search.h>
 #include "core.h"
+#include <QPaintEvent>
+#include <QPainter>
+#include <iostream>
+#include <sequential-line-search/acquisition-function.h>
+#include <sequential-line-search/gaussian-process-regressor.h>
 
 using namespace sequential_line_search;
 using Eigen::VectorXd;
 
 namespace
 {
-Core& core = Core::getInstance();
+    Core& core = Core::getInstance();
 
-// Default : [- 1.0, + 1.0]
-const double offset_y = - 1.3;
-const double scale_y  = + 0.4;
+    // Default : [- 1.0, + 1.0]
+    const double offset_y = -1.3;
+    const double scale_y  = +0.4;
 
-inline double val2pix_y(const double val_y, const int height)
+    inline double val2pix_y(const double val_y, const int height)
+    {
+        return scale_y * (height - 0.5 * height * (val_y + offset_y));
+    }
+
+    inline double sd2pix_h(const double val_s, const int height)
+    {
+        // 1.96 * SD means 95% confidence interval
+        return scale_y * 1.96 * 0.5 * height * val_s;
+    }
+} // namespace
+
+MainWidget::MainWidget(QWidget* parent) : QWidget(parent) { setAutoFillBackground(true); }
+
+void MainWidget::paintEvent(QPaintEvent* event)
 {
-    return scale_y * (height - 0.5 * height * (val_y + offset_y));
-}
-
-inline double sd2pix_h(const double val_s, const int height)
-{
-    // 1.96 * SD means 95% confidence interval
-    return scale_y * 1.96 * 0.5 * height * val_s;
-}
-}
-
-MainWidget::MainWidget(QWidget *parent) :
-    QWidget(parent)
-{
-    setAutoFillBackground(true);
-}
-
-void MainWidget::paintEvent(QPaintEvent *event)
-{
-    QPainter painter(this);
+    QPainter     painter(this);
     const QRect& rect = event->rect();
 
     // Draw setting
@@ -58,7 +55,7 @@ void MainWidget::paintEvent(QPaintEvent *event)
         // Variance and mean
         std::vector<QPointF> variancePolygon;
         std::vector<QPointF> mainPolyline;
-        for (int pix_x = 0; pix_x <= rect.width(); ++ pix_x)
+        for (int pix_x = 0; pix_x <= rect.width(); ++pix_x)
         {
             const double x = static_cast<double>(pix_x) / static_cast<double>(rect.width());
 
@@ -71,7 +68,7 @@ void MainWidget::paintEvent(QPaintEvent *event)
             variancePolygon.push_back(QPointF(pix_x, pix_y + pix_s));
             mainPolyline.push_back(QPointF(pix_x, pix_y));
         }
-        for (int pix_x = rect.width(); pix_x >= 0; -- pix_x)
+        for (int pix_x = rect.width(); pix_x >= 0; --pix_x)
         {
             const double x = static_cast<double>(pix_x) / static_cast<double>(rect.width());
 
@@ -92,24 +89,24 @@ void MainWidget::paintEvent(QPaintEvent *event)
         // Expected Improvement
         std::vector<QPointF> EIPolyline;
         std::vector<QPointF> EIPolygon;
-        VectorXd EIs(rect.width() + 1);
-        for (int pix_x = 0; pix_x <= rect.width(); ++ pix_x)
+        VectorXd             EIs(rect.width() + 1);
+        for (int pix_x = 0; pix_x <= rect.width(); ++pix_x)
         {
             const double x  = static_cast<double>(pix_x) / static_cast<double>(rect.width());
             const double EI = acquisition_function::CalculateAcqusitionValue(*core.regressor, VectorXd::Constant(1, x));
-            EIs(pix_x) = EI;
+            EIs(pix_x)      = EI;
         }
         EIs /= EIs.maxCoeff();
         EIs *= 0.12;
-        for (int pix_x = 0; pix_x <= rect.width(); ++ pix_x)
+        for (int pix_x = 0; pix_x <= rect.width(); ++pix_x)
         {
-            const double offset = - 2.0;
-            const double pix_y = offset + rect.height() - 2.0 * (rect.height() * EIs(pix_x));
+            const double offset = -2.0;
+            const double pix_y  = offset + rect.height() - 2.0 * (rect.height() * EIs(pix_x));
             EIPolyline.push_back(QPointF(pix_x, pix_y));
             EIPolygon.push_back(QPointF(pix_x, pix_y));
         }
         EIPolygon.push_back(QPointF(rect.width(), rect.height()));
-        EIPolygon.push_back(QPointF(         0.0, rect.height()));
+        EIPolygon.push_back(QPointF(0.0, rect.height()));
         painter.setPen(EILinePen);
         painter.drawPolyline(&EIPolyline[0], EIPolyline.size());
         painter.setPen(QPen(Qt::NoPen));
@@ -119,7 +116,7 @@ void MainWidget::paintEvent(QPaintEvent *event)
 
     // Function
     std::vector<QPointF> functionPolyline;
-    for (int pix_x = 0; pix_x <= rect.width(); ++ pix_x)
+    for (int pix_x = 0; pix_x <= rect.width(); ++pix_x)
     {
         const double x     = static_cast<double>(pix_x) / static_cast<double>(rect.width());
         const double y     = core.evaluateObjectiveFunction(VectorXd::Constant(1, x));
@@ -132,7 +129,7 @@ void MainWidget::paintEvent(QPaintEvent *event)
 
     // Data points
     unsigned N = core.X.cols();
-    for (unsigned i = 0; i < N; ++ i)
+    for (unsigned i = 0; i < N; ++i)
     {
         const double x = core.X(0, i);
         const double y = core.y(i);

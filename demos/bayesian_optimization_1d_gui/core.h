@@ -1,8 +1,8 @@
 #ifndef CORE_H
 #define CORE_H
 
-#include <memory>
 #include <Eigen/Core>
+#include <memory>
 
 namespace sequential_line_search
 {
@@ -14,7 +14,8 @@ class Core
 public:
     Core();
 
-    static Core& getInstance() {
+    static Core& getInstance()
+    {
         static Core core;
         return core;
     }
@@ -24,14 +25,14 @@ public:
     Eigen::MatrixXd X;
     Eigen::VectorXd y;
 
-    double evaluateObjectiveFunction(const Eigen::VectorXd &x) const;
+    double evaluateObjectiveFunction(const Eigen::VectorXd& x) const;
 
     bool   show_slider_value;
     double x_slider;
     double y_slider;
 
     // For optimization
-    void proceedOptimization();
+    void            proceedOptimization();
     Eigen::VectorXd x_max;
     double          y_max;
 

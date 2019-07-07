@@ -1,13 +1,56 @@
 #ifndef sequential_line_search_h
 #define sequential_line_search_h
 
-#include <sequential-line-search/gaussianprocessregressor.h>
-#include <sequential-line-search/utils.h>
-#include <sequential-line-search/gaussianprocessregressor.h>
-#include <sequential-line-search/preferenceregressor.h>
-#include <sequential-line-search/acquisition-function.h>
-#include <sequential-line-search/preference.h>
-#include <sequential-line-search/slider.h>
-#include <sequential-line-search/data.h>
+#include <Eigen/Core>
+#include <memory>
+#include <utility>
+
+namespace sequential_line_search
+{
+    class PreferenceRegressor;
+    class Slider;
+    class Data;
+
+    class SequentialLineSearchOptimizer
+    {
+    public:
+        SequentialLineSearchOptimizer(const int  dimension,
+                                      const bool use_slider_enlargement  = true,
+                                      const bool use_MAP_hyperparameters = true);
+
+        void setHyperparameters(
+            const double a, const double r, const double b, const double variance, const double btl_scale);
+
+        void submit(const double slider_position);
+
+        std::pair<Eigen::VectorXd, Eigen::VectorXd> getSliderEnds() const;
+        Eigen::VectorXd                             getParameters(const double slider_position) const;
+
+        Eigen::VectorXd getMaximizer() const;
+
+        double getPreferenceValueMean(const Eigen::VectorXd& parameter) const;
+        double getPreferenceValueStandardDeviation(const Eigen::VectorXd& parameter) const;
+        double getExpectedImprovementValue(const Eigen::VectorXd& parameter) const;
+
+        const Eigen::MatrixXd& getRawDataPoints() const;
+
+        void dampData(const std::string& directory_path) const;
+
+    private:
+        const int  m_dimension;
+        const bool m_use_slider_enlargement;
+        const bool m_use_MAP_hyperparameters;
+
+        std::shared_ptr<PreferenceRegressor> m_regressor;
+        std::shared_ptr<Slider>              m_slider;
+        std::shared_ptr<Data>                m_data;
+
+        double m_a;
+        double m_r;
+        double m_b;
+        double m_variance;
+        double m_btl_scale;
+    };
+} // namespace sequential_line_search
 
 #endif // sequential_line_search_h

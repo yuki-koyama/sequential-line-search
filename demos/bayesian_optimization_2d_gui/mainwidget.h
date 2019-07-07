@@ -7,7 +7,7 @@ class MainWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit MainWidget(QWidget *parent = 0);
+    explicit MainWidget(QWidget* parent = 0);
 
     enum class Content : long
     {
@@ -21,12 +21,11 @@ public:
     Content content = Content::None;
 
 protected:
-    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
+    void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
 
 signals:
 
 public slots:
-
 };
 
 #endif // MAINWIDGET_H

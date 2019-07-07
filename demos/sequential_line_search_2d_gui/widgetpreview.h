@@ -7,15 +7,14 @@ class WidgetPreview : public QWidget
 {
     Q_OBJECT
 public:
-    explicit WidgetPreview(QWidget *parent = 0);
+    explicit WidgetPreview(QWidget* parent = 0);
 
 protected:
-    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
+    void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
 
 signals:
 
 public slots:
-
 };
 
 #endif // WIDGETPREVIEW_H

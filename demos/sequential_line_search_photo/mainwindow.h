@@ -4,21 +4,27 @@
 #include <QMainWindow>
 
 class QSlider;
-namespace Ui { class MainWindow; }
-namespace enhancer { class EnhancerWidget; }
+namespace Ui
+{
+    class MainWindow;
+}
+namespace enhancer
+{
+    class EnhancerWidget;
+}
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget* parent = 0);
     ~MainWindow();
 
     std::vector<QSlider*> sliders;
 
     double obtainSliderPosition() const;
-    void updateRawSliders();
+    void   updateRawSliders();
 
 private slots:
     void on_actionClear_all_data_triggered();
@@ -29,7 +35,7 @@ private slots:
     void on_actionExport_photos_on_slider_triggered();
 
 private:
-    Ui::MainWindow* ui;
+    Ui::MainWindow*           ui;
     enhancer::EnhancerWidget* enhancer_widget;
 };
 

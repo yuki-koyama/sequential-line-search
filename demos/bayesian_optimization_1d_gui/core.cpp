@@ -1,8 +1,9 @@
 #include "core.h"
-#include <iostream>
 #include <cmath>
+#include <iostream>
 #include <random>
-#include <sequential-line-search/sequential-line-search.h>
+#include <sequential-line-search/acquisition-function.h>
+#include <sequential-line-search/gaussian-process-regressor.h>
 
 using namespace sequential_line_search;
 using Eigen::MatrixXd;
@@ -34,7 +35,7 @@ void Core::proceedOptimization()
     return;
 }
 
-void Core::addData(const VectorXd &x, double y)
+void Core::addData(const VectorXd& x, double y)
 {
     std::cout << "addData: x = " << x << ", y = " << y << std::endl;
 
@@ -50,8 +51,8 @@ void Core::addData(const VectorXd &x, double y)
 
     MatrixXd newX(D, N + 1);
     newX.block(0, 0, D, N) = X;
-    newX.col(N) = x;
-    this->X = newX;
+    newX.col(N)            = x;
+    this->X                = newX;
 
     VectorXd newY(this->y.rows() + 1);
     newY << this->y, y;
@@ -63,7 +64,4 @@ double Core::evaluateObjectiveFunction(const Eigen::VectorXd& x) const
     return 1.0 - 1.5 * x(0) * std::sin(x(0) * 13.0);
 }
 
-void Core::computeRegression()
-{
-    regressor = std::make_shared<GaussianProcessRegressor>(X, y);
-}
+void Core::computeRegression() { regressor = std::make_shared<GaussianProcessRegressor>(X, y); }

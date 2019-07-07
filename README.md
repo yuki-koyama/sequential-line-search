@@ -11,7 +11,7 @@ This repository contains a part of the source codes used in our research project
 - **sequential_line_search_2d_gui**: A visual interactive demo of the sequential line search method applied to a two-dimensional test function.
 - **sequential_line_search_photo**: A visual interactive demo of the sequential line search method where a photograph is enhanced using six-dimensional parameters.
 
-Now this library has an _experimental_ [python binding](./python).
+Now this library has an experimental [python binding](./python).
 
 ## Project Web Site
 
@@ -76,12 +76,90 @@ Then you can run the applications by, for example,
 ./demos/sequential_line_search_nd/SequentialLineSearchNd
 ```
 
-We tested on macOS 10.13 only. We are aware that the visual demos cannot be built as it is in other OSs; some OpenGL paths etc. need to be resolved. Pull requests welcome.
+We tested on macOS (10.13 and 10.14) only. We are aware that the visual demos cannot be built as it is in other OSs; some OpenGL paths etc. need to be resolved. Pull requests welcome.
+
+## Examples
+
+Note: User interaction part is omitted from these examples.
+
+### C++
+
+```c++
+#include <iostream>
+#include <sequential-line-search/sequential-line-search.h>
+
+using Eigen::VectorXd;
+using sequential_line_search::SequentialLineSearchOptimizer;
+
+double askHumanForSliderManipulation(const std::pair<VectorXd, VectorXd>& slider_ends)
+{
+    // ...
+    // ...
+
+    return slider_position
+}
+
+int main()
+{
+    // Instantiate an optimizer
+    constexpr int dimension = 6;
+    SequentialLineSearchOptimizer optimizer(dimension);
+
+    // Iterate optimization steps
+    constexpr int n_iterations = 15;
+    for (int i = 0; i < n_iterations; ++i)
+    {
+        // Retrieve a slider space
+        const std::pair<VectorXd, VectorXd> slider_ends = optimizer.getSliderEnds();
+
+        // Query slider manipulation
+        const double slider_position = askHumanForSliderManipulation(slider_ends);
+
+        // Feed the slider manipulation result to the optimizer
+        optimizer.submit(slider_position);
+    }
+
+    // Display the found solution
+    std::cout << optimizer.getMaximizer() << std::endl;
+
+    return 0;
+}
+```
+
+### Python
+
+```python
+import pySequentialLineSearch
+import numpy
+
+def ask_human_for_slider_manipulation(slider_ends):
+    # ...
+    # ...
+
+    return slider_position
+
+def main():
+    optimizer = pySequentialLineSearch.sequential_line_search_optimizer(6)
+
+    for i in range(15):
+        slider_ends = optimizer.get_slider_ends()
+        slider_position = ask_human_for_slider_manipulation(slider_ends)
+        optimizer.submit(slider_position)
+
+    print(optimizer.get_maximizer())
+
+if __name__ == '__main__':
+    main()
+```
 
 ## License
 
 MIT License.
 
-## Contact and Feedback
+## Contributing
+
+Issue reports, suggestions, requests, and PRs are highly welcomed.
+
+## Contact
 
 Yuki Koyama (<yuki@koyama.xyz>)
