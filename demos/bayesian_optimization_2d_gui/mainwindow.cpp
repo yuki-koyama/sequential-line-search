@@ -3,8 +3,6 @@
 #include "ui_mainwindow.h"
 #include <QDir>
 #include <QFileDialog>
-#include <iostream>
-#include <random>
 #include <sequential-line-search/gaussian-process-regressor.h>
 
 using Eigen::MatrixXd;
@@ -12,11 +10,7 @@ using Eigen::VectorXd;
 
 namespace
 {
-    Core&                                  core = Core::getInstance();
-    std::random_device                     seed;
-    std::default_random_engine             gen(seed());
-    std::normal_distribution<double>       gauss_dist(0.0, 0.050);
-    std::uniform_real_distribution<double> uniform_dist(0.0, 1.0);
+    Core& core = Core::getInstance();
 } // namespace
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
