@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sequential-line-search/sequential-line-search.h>
+#include <sequential-line-search/utils.h>
 
 namespace
 {
@@ -14,6 +15,7 @@ namespace
 
     constexpr unsigned test_dimension = 8;
 
+    // Define a test function
     double evaluateObjectiveFunction(const Eigen::VectorXd& x)
     {
         assert(x.rows() == test_dimension);
@@ -24,12 +26,19 @@ namespace
 
         return lambda(x, Eigen::VectorXd::Constant(test_dimension, 0.5), 1.0);
     }
+
+    // Define an analytic solution of the test function
+    const Eigen::VectorXd analytic_solution = Eigen::VectorXd::Constant(test_dimension, 0.5);
 } // namespace
 
 int main(int argc, char* argv[])
 {
     constexpr unsigned n_trials     = 3;
     constexpr unsigned n_iterations = 10;
+
+    // Storage for performance reports
+    Eigen::MatrixXd objective_values(n_iterations, n_trials);
+    Eigen::MatrixXd residual_norms(n_iterations, n_trials);
 
     for (unsigned trial = 0; trial < n_trials; ++trial)
     {
@@ -63,12 +72,19 @@ int main(int argc, char* argv[])
             std::cout << "x: " << optimizer.getParameters(max_slider_position).transpose() << std::endl;
             std::cout << "y: " << max_y << std::endl;
 
+            objective_values(i, trial) = max_y;
+            residual_norms(i, trial)  = (optimizer.getParameters(max_slider_position) - analytic_solution).norm();
+
             optimizer.submit(max_slider_position);
         }
 
         std::cout << std::endl << "Found maximizer: " << optimizer.getMaximizer().transpose() << std::endl;
         std::cout << "Found maximum: " << evaluateObjectiveFunction(optimizer.getMaximizer()) << std::endl << std::endl;
     }
+
+    // Export a report as a CSV file
+    sequential_line_search::utils::exportMatrixToCsv("objective_values.csv", objective_values);
+    sequential_line_search::utils::exportMatrixToCsv("residual_norms.csv", residual_norms);
 
     return 0;
 }
