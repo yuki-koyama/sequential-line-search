@@ -217,7 +217,7 @@ namespace sequential_line_search
     double GaussianProcessRegressor::estimate_s(const VectorXd& x) const
     {
         const VectorXd k = calc_k(x, X, a, b, r);
-        return std::sqrt(a + b - k.transpose() * C_inv * k);
+        return std::sqrt(a - k.transpose() * C_inv * k);
     }
 
     void GaussianProcessRegressor::compute_MAP()

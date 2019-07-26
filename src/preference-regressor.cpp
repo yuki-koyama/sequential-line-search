@@ -244,7 +244,7 @@ namespace sequential_line_search
     double PreferenceRegressor::estimate_s(const VectorXd& x) const
     {
         const VectorXd k = Regressor::calc_k(x, X, a, b, r);
-        return std::sqrt(a + b - k.transpose() * C_inv * k);
+        return std::sqrt(a - k.transpose() * C_inv * k);
     }
 
     void PreferenceRegressor::compute_MAP(const PreferenceRegressor* previous)
