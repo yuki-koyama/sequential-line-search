@@ -28,8 +28,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->widget_e->content = MainWidget::Content::ExpectedImprovement;
     ui->widget_m->content = MainWidget::Content::Mean;
     ui->widget_s->content = MainWidget::Content::StandardDeviation;
-
-    core.computeRegression();
 }
 
 MainWindow::~MainWindow() { delete ui; }

@@ -20,7 +20,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->widget->setFixedHeight(600);
     ui->widget->setFixedWidth(1200);
-    core.computeRegression();
 }
 
 MainWindow::~MainWindow() { delete ui; }

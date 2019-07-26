@@ -8,8 +8,6 @@ int main(int argc, char* argv[])
 {
     Core core;
 
-    core.computeRegression();
-
     constexpr unsigned n_trials     = 5;
     constexpr unsigned n_iterations = 15;
 
