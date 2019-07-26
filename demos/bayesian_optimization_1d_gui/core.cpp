@@ -2,9 +2,9 @@
 #include <cmath>
 #include <iostream>
 #include <random>
-#include <sequential-line-search/utils.h>
 #include <sequential-line-search/acquisition-function.h>
 #include <sequential-line-search/gaussian-process-regressor.h>
+#include <sequential-line-search/utils.h>
 
 using namespace sequential_line_search;
 using Eigen::MatrixXd;
@@ -21,8 +21,9 @@ Core::Core() : show_slider_value(false)
 
 void Core::proceedOptimization()
 {
-    const VectorXd x = (X.cols() == 0) ? utils::generateRandomVector(1) : acquisition_function::FindNextPoint(*regressor);
-    const double   y = evaluateObjectiveFunction(x);
+    const VectorXd x =
+        (X.cols() == 0) ? utils::generateRandomVector(1) : acquisition_function::FindNextPoint(*regressor);
+    const double y = evaluateObjectiveFunction(x);
 
     std::cout << y << std::endl;
     if (std::isnan(y_max) || y > y_max)

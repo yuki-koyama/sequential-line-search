@@ -2,9 +2,9 @@
 #include <cmath>
 #include <iostream>
 #include <random>
-#include <sequential-line-search/utils.h>
 #include <sequential-line-search/acquisition-function.h>
 #include <sequential-line-search/gaussian-process-regressor.h>
+#include <sequential-line-search/utils.h>
 
 using namespace sequential_line_search;
 

@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
             std::cout << "y: " << max_y << std::endl;
 
             objective_values(i, trial) = max_y;
-            residual_norms(i, trial)  = (optimizer.getParameters(max_slider_position) - analytic_solution).norm();
+            residual_norms(i, trial)   = (optimizer.getParameters(max_slider_position) - analytic_solution).norm();
 
             optimizer.submit(max_slider_position);
         }
