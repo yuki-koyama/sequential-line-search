@@ -1,20 +1,13 @@
 #include "core.h"
 #include <cmath>
 #include <iostream>
-#include <random>
+#include <rand-util.hpp>
 #include <sequential-line-search/acquisition-function.h>
 #include <sequential-line-search/gaussian-process-regressor.h>
 
 using namespace sequential_line_search;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
-
-namespace
-{
-    std::random_device                     seed;
-    std::default_random_engine             gen(seed());
-    std::uniform_real_distribution<double> uniform_dist(0.0, 1.0);
-} // namespace
 
 Core::Core() : show_slider_value(false)
 {
@@ -33,7 +26,7 @@ void Core::proceedOptimization()
         if (X.cols() == 0)
         {
             VectorXd x(2);
-            x << 0.05 + 0.90 * uniform_dist(gen), 0.05 + 0.90 * uniform_dist(gen);
+            x << 0.05 + 0.90 * randutil::GenNumFromUniformDist(), 0.05 + 0.90 * randutil::GenNumFromUniformDist();
             return x;
         }
         return findNextPoint();
@@ -79,22 +72,12 @@ void Core::addData(const VectorXd& x, double y)
 double Core::evaluateObjectiveFunction(Eigen::VectorXd x) const
 {
     assert(x.rows() == 2);
-#if 0
-    return 0.4 * std::max(0.0, std::sin(x(0)) + x(0) / 3.0 + std::sin(x(0) * 12.0) + std::sin(x(1)) + x(1) / 3.0 + std::sin(x(1) * 12.0) - 1.0);
-#elif 1
+
     auto lambda = [](const Eigen::VectorXd& x, const Eigen::VectorXd& mu, const double sigma) {
         return std::exp(-(x - mu).squaredNorm() / (sigma * sigma));
     };
 
     return lambda(x, Eigen::Vector2d(0.3, 0.3), 0.3) + 1.5 * lambda(x, Eigen::Vector2d(0.7, 0.7), 0.4);
-#else
-    double sum = 0.0;
-    for (unsigned i = 0; i < x.rows(); ++i)
-    {
-        sum += std::sin(x(i)) + x(i) / 3.0 + std::sin(12.0 * x(i));
-    }
-    return sum;
-#endif
 }
 
 void Core::computeRegression() { regressor = std::make_shared<GaussianProcessRegressor>(X, y); }
