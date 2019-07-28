@@ -79,7 +79,7 @@ IF (WIN32)
 ENDIF()
 
 target_include_directories(SequentialLineSearch PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(SequentialLineSearch Eigen3::Eigen timer mathtoolbox nlopt nlopt-util rand-util)
+target_link_libraries(SequentialLineSearch Eigen3::Eigen mathtoolbox nlopt nlopt-util rand-util timer)
 
 install(FILES ${headers} DESTINATION include/SequentialLineSearch)
 install(TARGETS SequentialLineSearch ARCHIVE DESTINATION lib)
