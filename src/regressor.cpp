@@ -1,8 +1,19 @@
+#include <mathtoolbox/kernel-functions.hpp>
 #include <sequential-line-search/regressor.h>
 #include <sequential-line-search/utils.h>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
+
+inline VectorXd concat(const double a, const VectorXd& b)
+{
+    VectorXd result(b.size() + 1);
+
+    result(0)                   = a;
+    result.segment(1, b.size()) = b;
+
+    return result;
+}
 
 namespace sequential_line_search
 {
@@ -15,9 +26,10 @@ namespace sequential_line_search
         {
             for (unsigned j = i; j < N; ++j)
             {
-                const double value = utils::ARD_squared_exponential_kernel(X.col(i), X.col(j), a, r);
-                C(i, j)            = value;
-                C(j, i)            = value;
+                const double value = mathtoolbox::GetArdSquaredExpKernel(X.col(i), X.col(j), concat(a, r));
+
+                C(i, j) = value;
+                C(j, i) = value;
             }
         }
 
@@ -33,9 +45,11 @@ namespace sequential_line_search
         {
             for (unsigned j = i; j < N; ++j)
             {
-                const double value = utils::ARD_squared_exponential_kernel_derivative_a(X.col(i), X.col(j), a, r);
-                C_grad_a(i, j)     = value;
-                C_grad_a(j, i)     = value;
+                const double value =
+                    mathtoolbox::GetArdSquaredExpKernelThetaIDerivative(X.col(i), X.col(j), concat(a, r), 0);
+
+                C_grad_a(i, j) = value;
+                C_grad_a(j, i) = value;
             }
         }
 
@@ -58,9 +72,11 @@ namespace sequential_line_search
         {
             for (unsigned j = i; j < N; ++j)
             {
-                const VectorXd value = utils::ARD_squared_exponential_kernel_derivative_r(X.col(i), X.col(j), a, r);
-                C_grad_r(i, j)       = value(index);
-                C_grad_r(j, i)       = value(index);
+                const double value =
+                    mathtoolbox::GetArdSquaredExpKernelThetaIDerivative(X.col(i), X.col(j), concat(a, r), index);
+
+                C_grad_r(i, j) = value;
+                C_grad_r(j, i) = value;
             }
         }
 
@@ -75,7 +91,7 @@ namespace sequential_line_search
         VectorXd k(N);
         for (unsigned i = 0; i < N; ++i)
         {
-            k(i) = utils::ARD_squared_exponential_kernel(x, X.col(i), a, r);
+            k(i) = mathtoolbox::GetArdSquaredExpKernel(x, X.col(i), concat(a, r));
         }
 
         return k;

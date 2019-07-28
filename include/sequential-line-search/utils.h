@@ -49,56 +49,6 @@ namespace sequential_line_search
         }
 
         ////////////////////////////////////////////////
-        // Gaussian Processes
-        ////////////////////////////////////////////////
-
-        inline double ARD_squared_exponential_kernel(const Eigen::VectorXd& x1,
-                                                     const Eigen::VectorXd& x2,
-                                                     const double           a,
-                                                     const Eigen::VectorXd& r)
-        {
-            const unsigned D = x1.rows();
-
-            double sum = 0.0;
-            for (unsigned i = 0; i < D; ++i)
-            {
-                sum += (x1(i) - x2(i)) * (x1(i) - x2(i)) / (r(i) * r(i));
-            }
-
-            return a * std::exp(-0.5 * sum);
-        }
-
-        inline double ARD_squared_exponential_kernel_derivative_a(const Eigen::VectorXd& x1,
-                                                                  const Eigen::VectorXd& x2,
-                                                                  const double /*a*/,
-                                                                  const Eigen::VectorXd& r)
-        {
-            const unsigned D = x1.rows();
-
-            double sum = 0.0;
-            for (unsigned i = 0; i < D; ++i)
-            {
-                sum += (x1(i) - x2(i)) * (x1(i) - x2(i)) / (r(i) * r(i));
-            }
-
-            return std::exp(-0.5 * sum);
-        }
-
-        inline Eigen::VectorXd ARD_squared_exponential_kernel_derivative_r(const Eigen::VectorXd& x1,
-                                                                           const Eigen::VectorXd& x2,
-                                                                           const double           a,
-                                                                           const Eigen::VectorXd& r)
-        {
-            Eigen::VectorXd deriv(r.rows());
-            for (unsigned i = 0; i < r.rows(); ++i)
-            {
-                deriv(i) = (x1(i) - x2(i)) * (x1(i) - x2(i)) / (r(i) * r(i) * r(i));
-            }
-            deriv *= ARD_squared_exponential_kernel(x1, x2, a, r);
-            return deriv;
-        }
-
-        ////////////////////////////////////////////////
         // Bradley-Terry Model
         ////////////////////////////////////////////////
 
