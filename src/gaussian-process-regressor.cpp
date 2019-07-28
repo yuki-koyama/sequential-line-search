@@ -1,6 +1,7 @@
 #include <Eigen/LU>
 #include <cmath>
 #include <iostream>
+#include <mathtoolbox/probability-distributions.hpp>
 #include <nlopt-util.hpp>
 #include <sequential-line-search/gaussian-process-regressor.h>
 #include <sequential-line-search/utils.h>
@@ -43,15 +44,21 @@ namespace
         return (r_prior_mu - r_prior_sigma_squared - std::log(r(index))) / (r_prior_sigma_squared * r(index));
     }
 
-    double calc_a_prior(const double a) { return std::log(utils::log_normal(a, a_prior_mu, a_prior_sigma_squared)); }
+    double calc_a_prior(const double a)
+    {
+        return mathtoolbox::GetLogOfLogNormalDist(a, a_prior_mu, a_prior_sigma_squared);
+    }
 
 #ifndef NOISELESS
-    double calc_b_prior(const double b) { return std::log(utils::log_normal(b, b_prior_mu, b_prior_sigma_squared)); }
+    double calc_b_prior(const double b)
+    {
+        return mathtoolbox::GetLogOfLogNormalDist(b, b_prior_mu, b_prior_sigma_squared);
+    }
 #endif
 
     double calc_r_i_prior(const Eigen::VectorXd& r, const int index)
     {
-        return std::log(utils::log_normal(r(index), r_prior_mu, r_prior_sigma_squared));
+        return mathtoolbox::GetLogOfLogNormalDist(r(index), r_prior_mu, r_prior_sigma_squared);
     }
 
     double calc_grad_a(

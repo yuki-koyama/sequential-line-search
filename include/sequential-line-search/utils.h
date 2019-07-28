@@ -166,20 +166,6 @@ namespace sequential_line_search
         }
 
         ////////////////////////////////////////////////
-        // Log-normal distribution
-        ////////////////////////////////////////////////
-
-        // LN(x; mu, sigma^2)
-        inline double log_normal(double x, double mu, double sigma_squared)
-        {
-            assert(x > 0);
-            const double log_x    = std::log(x);
-            const double log_x_mu = log_x - mu;
-            return 1.0 / (x * std::sqrt(2.0 * M_PI * sigma_squared)) *
-                   std::exp(-log_x_mu * log_x_mu / (2.0 * sigma_squared));
-        }
-
-        ////////////////////////////////////////////////
         // File IO
         ////////////////////////////////////////////////
 

@@ -2,6 +2,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <mathtoolbox/probability-distributions.hpp>
 #include <nlopt-util.hpp>
 #include <sequential-line-search/preference-regressor.h>
 #include <sequential-line-search/utils.h>
@@ -144,13 +145,13 @@ namespace
             const double r_prior  = regressor->m_default_r;
             const double variance = regressor->m_variance;
 
-            obj += std::log(utils::log_normal(a, std::log(a_prior), variance));
+            obj += mathtoolbox::GetLogOfLogNormalDist(a, std::log(a_prior), variance);
 #ifndef NOISELESS
-            obj += std::log(utils::log_normal(b, std::log(b_prior), variance));
+            obj += mathtoolbox::GetLogOfLogNormalDist(b, std::log(b_prior), variance);
 #endif
             for (unsigned i = 0; i < r.rows(); ++i)
             {
-                obj += std::log(utils::log_normal(r(i), std::log(r_prior), variance));
+                obj += mathtoolbox::GetLogOfLogNormalDist(r(i), std::log(r_prior), variance);
             }
         }
 
