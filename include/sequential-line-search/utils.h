@@ -154,18 +154,6 @@ namespace sequential_line_search
         }
 
         ////////////////////////////////////////////////
-        // Normal distribution
-        ////////////////////////////////////////////////
-
-        // N(x; mu, sigma^2)
-        inline double normal(double x, double mu, double sigma_squared)
-        {
-            const double x_mu            = x - mu;
-            const double sigma_squared_2 = sigma_squared * 2.0;
-            return (1.0 / std::sqrt(M_PI * sigma_squared_2)) * std::exp(-(x_mu * x_mu) / sigma_squared_2);
-        }
-
-        ////////////////////////////////////////////////
         // File IO
         ////////////////////////////////////////////////
 
