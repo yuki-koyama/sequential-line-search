@@ -35,6 +35,11 @@ endif()
 set(TIMER_BUILD_TEST OFF CACHE INTERNAL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/timer)
 
+# mathtoolbox
+set(MATHTOOLBOX_BUILD_EXAMPLES  OFF CACHE INTERNAL "" FORCE)
+set(MATHTOOLBOX_PYTHON_BINDINGS OFF CACHE INTERNAL "" FORCE)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/mathtoolbox)
+
 # nlopt
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "" FORCE)
 set(NLOPT_GUILE       OFF CACHE INTERNAL "" FORCE)
@@ -74,7 +79,7 @@ IF (WIN32)
 ENDIF()
 
 target_include_directories(SequentialLineSearch PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(SequentialLineSearch Eigen3::Eigen timer nlopt nlopt-util rand-util)
+target_link_libraries(SequentialLineSearch Eigen3::Eigen timer mathtoolbox nlopt nlopt-util rand-util)
 
 install(FILES ${headers} DESTINATION include/SequentialLineSearch)
 install(TARGETS SequentialLineSearch ARCHIVE DESTINATION lib)
