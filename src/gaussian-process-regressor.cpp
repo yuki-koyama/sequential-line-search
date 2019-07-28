@@ -15,7 +15,7 @@ namespace
 {
     using namespace sequential_line_search;
 
-    const bool   useLogNormalPrior     = true;
+    const bool   use_log_normal_prior  = true;
     const double a_prior_mu            = std::log(0.500);
     const double a_prior_sigma_squared = 0.10;
 #ifdef NOISELESS
@@ -29,19 +29,19 @@ namespace
 
     double calc_grad_a_prior(const double a)
     {
-        return (a_prior_mu - a_prior_sigma_squared - std::log(a)) / (a_prior_sigma_squared * a);
+        return mathtoolbox::GetLogOfLogNormalDistDerivative(a, a_prior_mu, a_prior_sigma_squared);
     }
 
 #ifndef NOISELESS
     double calc_grad_b_prior(const double b)
     {
-        return (b_prior_mu - b_prior_sigma_squared - std::log(b)) / (b_prior_sigma_squared * b);
+        return mathtoolbox::GetLogOfLogNormalDistDerivative(b, b_prior_mu, b_prior_sigma_squared);
     }
 #endif
 
     double calc_grad_r_i_prior(const Eigen::VectorXd& r, const int index)
     {
-        return (r_prior_mu - r_prior_sigma_squared - std::log(r(index))) / (r_prior_sigma_squared * r(index));
+        return mathtoolbox::GetLogOfLogNormalDistDerivative(r(index), r_prior_mu, r_prior_sigma_squared);
     }
 
     double calc_a_prior(const double a)
@@ -67,7 +67,7 @@ namespace
         const MatrixXd C_grad_a = Regressor::calc_C_grad_a(X, a, b, r);
         const double   term1    = +0.5 * y.transpose() * C_inv * C_grad_a * C_inv * y;
         const double   term2    = -0.5 * (C_inv * C_grad_a).trace();
-        return term1 + term2 + (useLogNormalPrior ? calc_grad_a_prior(a) : 0.0);
+        return term1 + term2 + (use_log_normal_prior ? calc_grad_a_prior(a) : 0.0);
     }
 
 #ifndef NOISELESS
@@ -92,7 +92,7 @@ namespace
         const MatrixXd C_grad_r_i = Regressor::calc_C_grad_r_i(X, a, b, r, index);
         const double   term1      = +0.5 * y.transpose() * C_inv * C_grad_r_i * C_inv * y;
         const double   term2      = -0.5 * (C_inv * C_grad_r_i).trace();
-        return term1 + term2 + (useLogNormalPrior ? calc_grad_r_i_prior(r, index) : 0.0);
+        return term1 + term2 + (use_log_normal_prior ? calc_grad_r_i_prior(r, index) : 0.0);
     }
 
     VectorXd calc_grad(
@@ -111,7 +111,8 @@ namespace
         for (unsigned i = 2; i < D + 2; ++i)
         {
             const unsigned index = i - 2;
-            grad(i)              = calc_grad_r_i(X, C_inv, y, a, b, r, index);
+
+            grad(i) = calc_grad_r_i(X, C_inv, y, a, b, r, index);
         }
 
         return grad;
@@ -153,7 +154,9 @@ namespace
         {
             const VectorXd g = calc_grad(X, C_inv, y, a, b, r);
             for (unsigned i = 0; i < g.rows(); ++i)
+            {
                 grad[i] = g(i);
+            }
         }
 
         const double term1 = -0.5 * y.transpose() * C_inv * y;
@@ -170,10 +173,12 @@ namespace
         const double r_prior = [&r]() {
             double sum = 0.0;
             for (unsigned i = 0; i < r.rows(); ++i)
+            {
                 sum += calc_r_i_prior(r, i);
+            }
             return sum;
         }();
-        const double regularization = useLogNormalPrior ? (a_prior + b_prior + r_prior) : 0.0;
+        const double regularization = use_log_normal_prior ? (a_prior + b_prior + r_prior) : 0.0;
 
         return term1 + term2 + term3 + regularization;
     }
