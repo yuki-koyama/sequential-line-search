@@ -22,7 +22,7 @@ namespace
     const double b_fixed = 1e-06;
 #else
     const double b_prior_mu            = std::log(1e-06);
-    const double b_prior_sigma_squared = 0.05;
+    const double b_prior_sigma_squared = 0.25;
 #endif
     const double r_prior_mu            = std::log(0.500);
     const double r_prior_sigma_squared = 0.50;

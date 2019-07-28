@@ -1,10 +1,12 @@
 #include "core.h"
 #include <cmath>
 #include <iostream>
-#include <random>
 #include <sequential-line-search/acquisition-function.h>
 #include <sequential-line-search/gaussian-process-regressor.h>
 #include <sequential-line-search/utils.h>
+#include <rand-util.hpp>
+
+// #define NOISY
 
 using namespace sequential_line_search;
 using Eigen::MatrixXd;
@@ -23,7 +25,12 @@ void Core::proceedOptimization()
 {
     const VectorXd x =
         (X.cols() == 0) ? utils::generateRandomVector(1) : acquisition_function::FindNextPoint(*regressor);
+
+#ifdef NOISY
+    const double y = evaluateObjectiveFunction(x) + 0.1 * randutil::GenNumFromNormalDist();
+#else
     const double y = evaluateObjectiveFunction(x);
+#endif
 
     std::cout << y << std::endl;
     if (std::isnan(y_max) || y > y_max)
