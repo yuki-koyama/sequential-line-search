@@ -1,6 +1,7 @@
 #include <Eigen/LU>
 #include <cmath>
 #include <iostream>
+#include <mathtoolbox/probability-distributions.hpp>
 #include <nlopt-util.hpp>
 #include <sequential-line-search/gaussian-process-regressor.h>
 #include <sequential-line-search/utils.h>
@@ -14,44 +15,50 @@ namespace
 {
     using namespace sequential_line_search;
 
-    const bool   useLogNormalPrior     = true;
+    const bool   use_log_normal_prior  = true;
     const double a_prior_mu            = std::log(0.500);
-    const double a_prior_sigma_squared = 0.10;
+    const double a_prior_sigma_squared = 0.50;
 #ifdef NOISELESS
     const double b_fixed = 1e-06;
 #else
-    const double b_prior_mu            = std::log(0.001);
-    const double b_prior_sigma_squared = 0.10;
+    const double b_prior_mu            = std::log(1e-06);
+    const double b_prior_sigma_squared = 0.25;
 #endif
     const double r_prior_mu            = std::log(0.500);
-    const double r_prior_sigma_squared = 0.10;
+    const double r_prior_sigma_squared = 0.50;
 
     double calc_grad_a_prior(const double a)
     {
-        return (a_prior_mu - a_prior_sigma_squared - std::log(a)) / (a_prior_sigma_squared * a);
+        return mathtoolbox::GetLogOfLogNormalDistDerivative(a, a_prior_mu, a_prior_sigma_squared);
     }
 
 #ifndef NOISELESS
     double calc_grad_b_prior(const double b)
     {
-        return (b_prior_mu - b_prior_sigma_squared - std::log(b)) / (b_prior_sigma_squared * b);
+        return mathtoolbox::GetLogOfLogNormalDistDerivative(b, b_prior_mu, b_prior_sigma_squared);
     }
 #endif
 
     double calc_grad_r_i_prior(const Eigen::VectorXd& r, const int index)
     {
-        return (r_prior_mu - r_prior_sigma_squared - std::log(r(index))) / (r_prior_sigma_squared * r(index));
+        return mathtoolbox::GetLogOfLogNormalDistDerivative(r(index), r_prior_mu, r_prior_sigma_squared);
     }
 
-    double calc_a_prior(const double a) { return std::log(utils::log_normal(a, a_prior_mu, a_prior_sigma_squared)); }
+    double calc_a_prior(const double a)
+    {
+        return mathtoolbox::GetLogOfLogNormalDist(a, a_prior_mu, a_prior_sigma_squared);
+    }
 
 #ifndef NOISELESS
-    double calc_b_prior(const double b) { return std::log(utils::log_normal(b, b_prior_mu, b_prior_sigma_squared)); }
+    double calc_b_prior(const double b)
+    {
+        return mathtoolbox::GetLogOfLogNormalDist(b, b_prior_mu, b_prior_sigma_squared);
+    }
 #endif
 
     double calc_r_i_prior(const Eigen::VectorXd& r, const int index)
     {
-        return std::log(utils::log_normal(r(index), r_prior_mu, r_prior_sigma_squared));
+        return mathtoolbox::GetLogOfLogNormalDist(r(index), r_prior_mu, r_prior_sigma_squared);
     }
 
     double calc_grad_a(
@@ -60,7 +67,7 @@ namespace
         const MatrixXd C_grad_a = Regressor::calc_C_grad_a(X, a, b, r);
         const double   term1    = +0.5 * y.transpose() * C_inv * C_grad_a * C_inv * y;
         const double   term2    = -0.5 * (C_inv * C_grad_a).trace();
-        return term1 + term2 + (useLogNormalPrior ? calc_grad_a_prior(a) : 0.0);
+        return term1 + term2 + (use_log_normal_prior ? calc_grad_a_prior(a) : 0.0);
     }
 
 #ifndef NOISELESS
@@ -70,7 +77,7 @@ namespace
         const MatrixXd C_grad_b = Regressor::calc_C_grad_b(X, a, b, r);
         const double   term1    = +0.5 * y.transpose() * C_inv * C_grad_b * C_inv * y;
         const double   term2    = -0.5 * (C_inv * C_grad_b).trace();
-        return term1 + term2 + (useLogNormalPrior ? calc_grad_b_prior(b) : 0.0);
+        return term1 + term2 + (use_log_normal_prior ? calc_grad_b_prior(b) : 0.0);
     }
 #endif
 
@@ -85,7 +92,7 @@ namespace
         const MatrixXd C_grad_r_i = Regressor::calc_C_grad_r_i(X, a, b, r, index);
         const double   term1      = +0.5 * y.transpose() * C_inv * C_grad_r_i * C_inv * y;
         const double   term2      = -0.5 * (C_inv * C_grad_r_i).trace();
-        return term1 + term2 + (useLogNormalPrior ? calc_grad_r_i_prior(r, index) : 0.0);
+        return term1 + term2 + (use_log_normal_prior ? calc_grad_r_i_prior(r, index) : 0.0);
     }
 
     VectorXd calc_grad(
@@ -98,13 +105,14 @@ namespace
 #ifdef NOISELESS
         grad(1) = 0.0;
 #else
-        grad(1)              = calc_grad_b(X, C_inv, y, a, b, r);
+        grad(1) = calc_grad_b(X, C_inv, y, a, b, r);
 #endif
 
         for (unsigned i = 2; i < D + 2; ++i)
         {
             const unsigned index = i - 2;
-            grad(i)              = calc_grad_r_i(X, C_inv, y, a, b, r, index);
+
+            grad(i) = calc_grad_r_i(X, C_inv, y, a, b, r, index);
         }
 
         return grad;
@@ -134,7 +142,7 @@ namespace
 #ifdef NOISELESS
         const double b = b_fixed;
 #else
-        const double b       = x[1];
+        const double b = x[1];
 #endif
         const VectorXd r = Eigen::Map<const VectorXd>(&x[2], x.size() - 2);
 
@@ -146,7 +154,9 @@ namespace
         {
             const VectorXd g = calc_grad(X, C_inv, y, a, b, r);
             for (unsigned i = 0; i < g.rows(); ++i)
+            {
                 grad[i] = g(i);
+            }
         }
 
         const double term1 = -0.5 * y.transpose() * C_inv * y;
@@ -163,10 +173,12 @@ namespace
         const double r_prior = [&r]() {
             double sum = 0.0;
             for (unsigned i = 0; i < r.rows(); ++i)
+            {
                 sum += calc_r_i_prior(r, i);
+            }
             return sum;
         }();
-        const double regularization = useLogNormalPrior ? (a_prior + b_prior + r_prior) : 0.0;
+        const double regularization = use_log_normal_prior ? (a_prior + b_prior + r_prior) : 0.0;
 
         return term1 + term2 + term3 + regularization;
     }
@@ -226,7 +238,20 @@ namespace sequential_line_search
 
         Data data{X, y};
 
-        const VectorXd x_ini = VectorXd::Constant(D + 2, 1e+00);
+        const VectorXd x_ini = [&]() {
+            VectorXd x(D + 2);
+
+            x(0)            = std::exp(a_prior_mu);
+#ifdef NOISELESS
+            x(1)            = b_fixed;
+#else
+            x(1)            = std::exp(b_prior_mu);
+#endif
+            x.segment(2, D) = VectorXd::Constant(D, std::exp(r_prior_mu));
+
+            return x;
+        }();
+
         const VectorXd upper = VectorXd::Constant(D + 2, 5e+01);
         const VectorXd lower = VectorXd::Constant(D + 2, 1e-08);
 

@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.1)
 
 project(SequentialLineSearch CXX)
+if(SEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING)
+	set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif()
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_BUILD_TYPE Release)
@@ -34,6 +37,11 @@ endif()
 # timer
 set(TIMER_BUILD_TEST OFF CACHE INTERNAL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/timer)
+
+# mathtoolbox
+set(MATHTOOLBOX_BUILD_EXAMPLES  OFF CACHE INTERNAL "" FORCE)
+set(MATHTOOLBOX_PYTHON_BINDINGS OFF CACHE INTERNAL "" FORCE)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/mathtoolbox)
 
 # nlopt
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "" FORCE)
@@ -74,7 +82,7 @@ IF (WIN32)
 ENDIF()
 
 target_include_directories(SequentialLineSearch PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(SequentialLineSearch Eigen3::Eigen timer nlopt nlopt-util rand-util)
+target_link_libraries(SequentialLineSearch Eigen3::Eigen mathtoolbox nlopt nlopt-util rand-util timer)
 
 install(FILES ${headers} DESTINATION include/SequentialLineSearch)
 install(TARGETS SequentialLineSearch ARCHIVE DESTINATION lib)

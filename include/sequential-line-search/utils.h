@@ -49,56 +49,6 @@ namespace sequential_line_search
         }
 
         ////////////////////////////////////////////////
-        // Gaussian Processes
-        ////////////////////////////////////////////////
-
-        inline double ARD_squared_exponential_kernel(const Eigen::VectorXd& x1,
-                                                     const Eigen::VectorXd& x2,
-                                                     const double           a,
-                                                     const Eigen::VectorXd& r)
-        {
-            const unsigned D = x1.rows();
-
-            double sum = 0.0;
-            for (unsigned i = 0; i < D; ++i)
-            {
-                sum += (x1(i) - x2(i)) * (x1(i) - x2(i)) / (r(i) * r(i));
-            }
-
-            return a * std::exp(-0.5 * sum);
-        }
-
-        inline double ARD_squared_exponential_kernel_derivative_a(const Eigen::VectorXd& x1,
-                                                                  const Eigen::VectorXd& x2,
-                                                                  const double /*a*/,
-                                                                  const Eigen::VectorXd& r)
-        {
-            const unsigned D = x1.rows();
-
-            double sum = 0.0;
-            for (unsigned i = 0; i < D; ++i)
-            {
-                sum += (x1(i) - x2(i)) * (x1(i) - x2(i)) / (r(i) * r(i));
-            }
-
-            return std::exp(-0.5 * sum);
-        }
-
-        inline Eigen::VectorXd ARD_squared_exponential_kernel_derivative_r(const Eigen::VectorXd& x1,
-                                                                           const Eigen::VectorXd& x2,
-                                                                           const double           a,
-                                                                           const Eigen::VectorXd& r)
-        {
-            Eigen::VectorXd deriv(r.rows());
-            for (unsigned i = 0; i < r.rows(); ++i)
-            {
-                deriv(i) = (x1(i) - x2(i)) * (x1(i) - x2(i)) / (r(i) * r(i) * r(i));
-            }
-            deriv *= ARD_squared_exponential_kernel(x1, x2, a, r);
-            return deriv;
-        }
-
-        ////////////////////////////////////////////////
         // Bradley-Terry Model
         ////////////////////////////////////////////////
 
@@ -151,32 +101,6 @@ namespace sequential_line_search
             }
 
             return tmp * d;
-        }
-
-        ////////////////////////////////////////////////
-        // Normal distribution
-        ////////////////////////////////////////////////
-
-        // N(x; mu, sigma^2)
-        inline double normal(double x, double mu, double sigma_squared)
-        {
-            const double x_mu            = x - mu;
-            const double sigma_squared_2 = sigma_squared * 2.0;
-            return (1.0 / std::sqrt(M_PI * sigma_squared_2)) * std::exp(-(x_mu * x_mu) / sigma_squared_2);
-        }
-
-        ////////////////////////////////////////////////
-        // Log-normal distribution
-        ////////////////////////////////////////////////
-
-        // LN(x; mu, sigma^2)
-        inline double log_normal(double x, double mu, double sigma_squared)
-        {
-            assert(x > 0);
-            const double log_x    = std::log(x);
-            const double log_x_mu = log_x - mu;
-            return 1.0 / (x * std::sqrt(2.0 * M_PI * sigma_squared)) *
-                   std::exp(-log_x_mu * log_x_mu / (2.0 * sigma_squared));
         }
 
         ////////////////////////////////////////////////
