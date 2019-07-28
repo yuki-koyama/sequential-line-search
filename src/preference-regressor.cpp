@@ -37,7 +37,9 @@ namespace
         const MatrixXd C_grad_a = Regressor::calc_C_grad_a(X, a, b, r);
         const double   log_p_f_theta_grad_a =
             0.5 * y.transpose() * C_inv * C_grad_a * C_inv * y - 0.5 * (C_inv * C_grad_a).trace();
-        const double log_prior = (std::log(a_prior_mean) - a_prior_variance - std::log(a)) / (a_prior_variance * a);
+        const double log_prior =
+            mathtoolbox::GetLogOfLogNormalDistDerivative(a, std::log(a_prior_mean), a_prior_variance);
+
         return log_p_f_theta_grad_a + log_prior;
     }
 
@@ -54,7 +56,9 @@ namespace
         const MatrixXd C_grad_b = Regressor::calc_C_grad_b(X, a, b, r);
         const double   log_p_f_theta_grad_b =
             0.5 * y.transpose() * C_inv * C_grad_b * C_inv * y - 0.5 * (C_inv * C_grad_b).trace();
-        const double log_prior = (std::log(b_prior_mean) - b_prior_variance - std::log(b)) / (b_prior_variance * b);
+        const double log_prior =
+            mathtoolbox::GetLogOfLogNormalDistDerivative(b, std::log(b_prior_mean), b_prior_variance);
+
         return log_p_f_theta_grad_b + log_prior;
     }
 #endif
@@ -79,7 +83,7 @@ namespace
         for (unsigned i = 0; i < r.rows(); ++i)
         {
             const double log_prior =
-                (std::log(r_prior_mean) - r_prior_variance - std::log(r(i))) / (r_prior_variance * r(i));
+                mathtoolbox::GetLogOfLogNormalDistDerivative(r(i), std::log(r_prior_mean), r_prior_variance);
             grad(i) += log_prior;
         }
 
