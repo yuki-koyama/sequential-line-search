@@ -17,15 +17,15 @@ namespace
 
     const bool   use_log_normal_prior  = true;
     const double a_prior_mu            = std::log(0.500);
-    const double a_prior_sigma_squared = 0.10;
+    const double a_prior_sigma_squared = 0.50;
 #ifdef NOISELESS
     const double b_fixed = 1e-06;
 #else
-    const double b_prior_mu            = std::log(0.001);
-    const double b_prior_sigma_squared = 0.10;
+    const double b_prior_mu            = std::log(1e-06);
+    const double b_prior_sigma_squared = 0.05;
 #endif
     const double r_prior_mu            = std::log(0.500);
-    const double r_prior_sigma_squared = 0.10;
+    const double r_prior_sigma_squared = 0.50;
 
     double calc_grad_a_prior(const double a)
     {
@@ -77,7 +77,7 @@ namespace
         const MatrixXd C_grad_b = Regressor::calc_C_grad_b(X, a, b, r);
         const double   term1    = +0.5 * y.transpose() * C_inv * C_grad_b * C_inv * y;
         const double   term2    = -0.5 * (C_inv * C_grad_b).trace();
-        return term1 + term2 + (useLogNormalPrior ? calc_grad_b_prior(b) : 0.0);
+        return term1 + term2 + (use_log_normal_prior ? calc_grad_b_prior(b) : 0.0);
     }
 #endif
 
@@ -105,7 +105,7 @@ namespace
 #ifdef NOISELESS
         grad(1) = 0.0;
 #else
-        grad(1)              = calc_grad_b(X, C_inv, y, a, b, r);
+        grad(1) = calc_grad_b(X, C_inv, y, a, b, r);
 #endif
 
         for (unsigned i = 2; i < D + 2; ++i)
@@ -142,7 +142,7 @@ namespace
 #ifdef NOISELESS
         const double b = b_fixed;
 #else
-        const double b       = x[1];
+        const double b = x[1];
 #endif
         const VectorXd r = Eigen::Map<const VectorXd>(&x[2], x.size() - 2);
 
@@ -238,7 +238,20 @@ namespace sequential_line_search
 
         Data data{X, y};
 
-        const VectorXd x_ini = VectorXd::Constant(D + 2, 1e+00);
+        const VectorXd x_ini = [&]() {
+            VectorXd x(D + 2);
+
+            x(0)            = std::exp(a_prior_mu);
+#ifdef NOISELESS
+            x(1)            = b_fixed;
+#else
+            x(1)            = std::exp(b_prior_mu);
+#endif
+            x.segment(2, D) = VectorXd::Constant(D, std::exp(r_prior_mu));
+
+            return x;
+        }();
+
         const VectorXd upper = VectorXd::Constant(D + 2, 5e+01);
         const VectorXd lower = VectorXd::Constant(D + 2, 1e-08);
 
