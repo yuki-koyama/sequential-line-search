@@ -73,7 +73,7 @@ namespace sequential_line_search
             for (unsigned j = i; j < N; ++j)
             {
                 const double value =
-                    mathtoolbox::GetArdSquaredExpKernelThetaIDerivative(X.col(i), X.col(j), concat(a, r), index);
+                    mathtoolbox::GetArdSquaredExpKernelThetaIDerivative(X.col(i), X.col(j), concat(a, r), index + 1);
 
                 C_grad_r(i, j) = value;
                 C_grad_r(j, i) = value;
