@@ -17,6 +17,9 @@ inline VectorXd concat(const double a, const VectorXd& b)
 
 namespace sequential_line_search
 {
+    constexpr auto kernel                    = mathtoolbox::GetArdMatern52Kernel;
+    constexpr auto kernel_theta_i_derivative = mathtoolbox::GetArdMatern52KernelThetaIDerivative;
+
     MatrixXd Regressor::calc_C(const MatrixXd& X, const double a, const double b, const VectorXd& r)
     {
         const unsigned N = X.cols();
@@ -26,7 +29,7 @@ namespace sequential_line_search
         {
             for (unsigned j = i; j < N; ++j)
             {
-                const double value = mathtoolbox::GetArdSquaredExpKernel(X.col(i), X.col(j), concat(a, r));
+                const double value = kernel(X.col(i), X.col(j), concat(a, r));
 
                 C(i, j) = value;
                 C(j, i) = value;
@@ -45,8 +48,7 @@ namespace sequential_line_search
         {
             for (unsigned j = i; j < N; ++j)
             {
-                const double value =
-                    mathtoolbox::GetArdSquaredExpKernelThetaIDerivative(X.col(i), X.col(j), concat(a, r), 0);
+                const double value = kernel_theta_i_derivative(X.col(i), X.col(j), concat(a, r), 0);
 
                 C_grad_a(i, j) = value;
                 C_grad_a(j, i) = value;
@@ -72,8 +74,7 @@ namespace sequential_line_search
         {
             for (unsigned j = i; j < N; ++j)
             {
-                const double value =
-                    mathtoolbox::GetArdSquaredExpKernelThetaIDerivative(X.col(i), X.col(j), concat(a, r), index + 1);
+                const double value = kernel_theta_i_derivative(X.col(i), X.col(j), concat(a, r), index + 1);
 
                 C_grad_r(i, j) = value;
                 C_grad_r(j, i) = value;
@@ -91,7 +92,7 @@ namespace sequential_line_search
         VectorXd k(N);
         for (unsigned i = 0; i < N; ++i)
         {
-            k(i) = mathtoolbox::GetArdSquaredExpKernel(x, X.col(i), concat(a, r));
+            k(i) = kernel(x, X.col(i), concat(a, r));
         }
 
         return k;
