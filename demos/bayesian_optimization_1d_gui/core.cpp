@@ -33,15 +33,21 @@ void Core::proceedOptimization()
 #endif
 
     std::cout << y << std::endl;
-    if (std::isnan(y_max) || y > y_max)
-    {
-        x_max = x;
-        y_max = y;
-    }
 
     addData(x, y);
     computeRegression();
-    return;
+
+    const int num_data_points = X.cols();
+
+    VectorXd f(num_data_points);
+    for (int i = 0; i < X.cols(); ++ i)
+    {
+        f(i) = regressor->estimate_y(X.col(i));
+
+        int best_index;
+        y_max = f.maxCoeff(&best_index);
+        x_max = X.col(best_index);
+    }
 }
 
 void Core::addData(const VectorXd& x, double y)

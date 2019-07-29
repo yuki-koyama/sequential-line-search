@@ -33,8 +33,17 @@ namespace
 
         const Eigen::VectorXd x_best = [&]()
         {
+            const int num_data_points = origRegressor->getX().cols();
+
+            Eigen::VectorXd f(num_data_points);
+            for (int i = 0; i < num_data_points; ++ i)
+            {
+                f(i) = origRegressor->estimate_y(origRegressor->getX().col(i));
+            }
+
             int best_index;
-            origRegressor->gety().maxCoeff(&best_index);
+            f.maxCoeff(&best_index);
+
             return origRegressor->getX().col(best_index);
         }();
 
@@ -61,8 +70,17 @@ namespace sequential_line_search
 
             const Eigen::VectorXd x_best = [&]()
             {
+                const int num_data_points = regressor.getX().cols();
+
+                Eigen::VectorXd f(num_data_points);
+                for (int i = 0; i < num_data_points; ++ i)
+                {
+                    f(i) = regressor.estimate_y(regressor.getX().col(i));
+                }
+
                 int best_index;
-                regressor.gety().maxCoeff(&best_index);
+                f.maxCoeff(&best_index);
+                
                 return regressor.getX().col(best_index);
             }();
 
