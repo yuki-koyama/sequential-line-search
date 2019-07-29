@@ -59,8 +59,8 @@ void MainWidget::paintEvent(QPaintEvent* event)
         {
             const double x = static_cast<double>(pix_x) / static_cast<double>(rect.width());
 
-            const double y = core.regressor->estimate_y(VectorXd::Constant(1, x));
-            const double s = core.regressor->estimate_s(VectorXd::Constant(1, x));
+            const double y = core.regressor->PredictMu(VectorXd::Constant(1, x));
+            const double s = core.regressor->PredictSigma(VectorXd::Constant(1, x));
 
             const double pix_y = val2pix_y(y, rect.height());
             const double pix_s = sd2pix_h(s, rect.height());
@@ -72,8 +72,8 @@ void MainWidget::paintEvent(QPaintEvent* event)
         {
             const double x = static_cast<double>(pix_x) / static_cast<double>(rect.width());
 
-            const double y = core.regressor->estimate_y(VectorXd::Constant(1, x));
-            const double s = core.regressor->estimate_s(VectorXd::Constant(1, x));
+            const double y = core.regressor->PredictMu(VectorXd::Constant(1, x));
+            const double s = core.regressor->PredictSigma(VectorXd::Constant(1, x));
 
             const double pix_y = val2pix_y(y, rect.height());
             const double pix_s = sd2pix_h(s, rect.height());

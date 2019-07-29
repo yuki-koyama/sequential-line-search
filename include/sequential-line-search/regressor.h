@@ -10,8 +10,8 @@ namespace sequential_line_search
     public:
         virtual ~Regressor() {}
 
-        virtual double estimate_y(const Eigen::VectorXd& x) const = 0;
-        virtual double estimate_s(const Eigen::VectorXd& x) const = 0;
+        virtual double PredictMu(const Eigen::VectorXd& x) const    = 0;
+        virtual double PredictSigma(const Eigen::VectorXd& x) const = 0;
 
         virtual const Eigen::MatrixXd& getX() const = 0;
         virtual const Eigen::VectorXd& gety() const = 0;

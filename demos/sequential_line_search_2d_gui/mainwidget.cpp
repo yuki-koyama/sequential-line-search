@@ -59,13 +59,13 @@ void MainWidget::paintEvent(QPaintEvent* event)
                 val(pix_x, pix_y) = core.evaluateObjectiveFunction(x);
                 break;
             case Content::Mean:
-                val(pix_x, pix_y) = core.optimizer->getPreferenceValueMean(x);
+                val(pix_x, pix_y) = core.optimizer->GetPreferenceValueMean(x);
                 break;
             case Content::StandardDeviation:
-                val(pix_x, pix_y) = core.optimizer->getPreferenceValueStandardDeviation(x);
+                val(pix_x, pix_y) = core.optimizer->GetPreferenceValueStandardDeviation(x);
                 break;
             case Content::ExpectedImprovement:
-                val(pix_x, pix_y) = core.optimizer->getExpectedImprovementValue(x);
+                val(pix_x, pix_y) = core.optimizer->GetExpectedImprovementValue(x);
                 break;
             default:
                 val(pix_x, pix_y) = 0.0;
@@ -91,10 +91,10 @@ void MainWidget::paintEvent(QPaintEvent* event)
     // Draw slider space
     if (draw_slider_space)
     {
-        const double a0 = core.optimizer->getSliderEnds().first(0) * w;
-        const double a1 = core.optimizer->getSliderEnds().first(1) * h;
-        const double b0 = core.optimizer->getSliderEnds().second(0) * w;
-        const double b1 = core.optimizer->getSliderEnds().second(1) * h;
+        const double a0 = core.optimizer->GetSliderEnds().first(0) * w;
+        const double a1 = core.optimizer->GetSliderEnds().first(1) * h;
+        const double b0 = core.optimizer->GetSliderEnds().second(0) * w;
+        const double b1 = core.optimizer->GetSliderEnds().second(1) * h;
         painter.setPen(slider_back_pen);
         painter.drawLine(QPointF(a0, a1), QPointF(b0, b1));
         painter.setPen(sliderPen);
@@ -104,7 +104,7 @@ void MainWidget::paintEvent(QPaintEvent* event)
     // Draw slider tick position
     if (draw_slider_tick)
     {
-        const VectorXd x = core.optimizer->getParameters(core.mainWindow->obtainSliderPosition());
+        const VectorXd x = core.optimizer->GetParameters(core.mainWindow->obtainSliderPosition());
         painter.setPen(slider_back_pen);
         painter.drawEllipse(QPointF(x(0) * w, x(1) * h), knob_back_radius, knob_back_radius);
         painter.setPen(sliderPen);
@@ -112,7 +112,7 @@ void MainWidget::paintEvent(QPaintEvent* event)
         painter.drawEllipse(QPointF(x(0) * w, x(1) * h), knob_radius, knob_radius);
     }
 
-    const Eigen::MatrixXd& X = core.optimizer->getRawDataPoints();
+    const Eigen::MatrixXd& X = core.optimizer->GetRawDataPoints();
 
     // Data points
     if (draw_data_points)
@@ -141,8 +141,8 @@ void MainWidget::paintEvent(QPaintEvent* event)
     // Maximum in data points
     if (draw_data_maximum && X.cols() != 0)
     {
-        const double pix_x = core.optimizer->getMaximizer()(0) * rect.width();
-        const double pix_y = core.optimizer->getMaximizer()(1) * rect.height();
+        const double pix_x = core.optimizer->GetMaximizer()(0) * rect.width();
+        const double pix_y = core.optimizer->GetMaximizer()(1) * rect.height();
         painter.setBrush(dot_back_brush);
         painter.drawEllipse(QPointF(pix_x, pix_y), dot_back_radius * dot_max_scale, dot_back_radius * dot_max_scale);
         painter.setBrush(maximumBrush);

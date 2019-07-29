@@ -22,7 +22,7 @@ void WidgetPreview::paintEvent(QPaintEvent* event)
     QPainter     painter(this);
     const QRect& rect = event->rect();
 
-    const VectorXd x = core.optimizer->getParameters(core.mainWindow->obtainSliderPosition());
+    const VectorXd x = core.optimizer->GetParameters(core.mainWindow->obtainSliderPosition());
     const double   y = core.evaluateObjectiveFunction(x);
     const auto     c = tinycolormap::GetJetColor(y);
 

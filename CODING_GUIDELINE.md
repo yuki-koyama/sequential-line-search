@@ -66,8 +66,10 @@ The current source codes in this repository are really messy; they follow many i
 
 ## Abbreviations
 
-- `num_XXX`: the number of XXX
+- `num`: the number of
 - `dim`: the number of dimensions
 - `inv`: inverse
 - `grad`: gradient
 - `calc`: calculate
+- `iter`: iteration
+- `dir`: directory

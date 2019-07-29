@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
         sequential_line_search::SequentialLineSearchOptimizer optimizer(
             test_dimension, use_slider_enlargement, use_MAP);
 
-        optimizer.setHyperparameters(a, r, b, variance, btl_scale);
+        optimizer.SetHyperparameters(a, r, b, variance, btl_scale);
 
         std::cout << "========================" << std::endl;
         std::cout << "Trial " << trial + 1 << std::endl;
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
             double max_y               = -1e+10;
             for (double slider_position = 0.0; slider_position <= 1.0; slider_position += 0.0001)
             {
-                const double y = evaluateObjectiveFunction(optimizer.getParameters(slider_position));
+                const double y = evaluateObjectiveFunction(optimizer.GetParameters(slider_position));
                 if (y > max_y)
                 {
                     max_y               = y;
@@ -69,17 +69,17 @@ int main(int argc, char* argv[])
                 }
             }
 
-            std::cout << "x: " << optimizer.getParameters(max_slider_position).transpose() << std::endl;
+            std::cout << "x: " << optimizer.GetParameters(max_slider_position).transpose() << std::endl;
             std::cout << "y: " << max_y << std::endl;
 
             objective_values(i, trial) = max_y;
-            residual_norms(i, trial)   = (optimizer.getParameters(max_slider_position) - analytic_solution).norm();
+            residual_norms(i, trial)   = (optimizer.GetParameters(max_slider_position) - analytic_solution).norm();
 
-            optimizer.submit(max_slider_position);
+            optimizer.SubmitLineSearchResult(max_slider_position);
         }
 
-        std::cout << std::endl << "Found maximizer: " << optimizer.getMaximizer().transpose() << std::endl;
-        std::cout << "Found maximum: " << evaluateObjectiveFunction(optimizer.getMaximizer()) << std::endl << std::endl;
+        std::cout << std::endl << "Found maximizer: " << optimizer.GetMaximizer().transpose() << std::endl;
+        std::cout << "Found maximum: " << evaluateObjectiveFunction(optimizer.GetMaximizer()) << std::endl << std::endl;
     }
 
     // Export a report as a CSV file

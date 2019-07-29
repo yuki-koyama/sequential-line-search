@@ -112,13 +112,13 @@ namespace
         const unsigned                 M = X.cols();
         const VectorXd                 y = Eigen::Map<const VectorXd>(&x[0], M);
 
-        const double a = (regressor->use_MAP_hyperparameters) ? x[M + 0] : regressor->m_default_a;
+        const double a = (regressor->m_use_map_hyperparameters) ? x[M + 0] : regressor->m_default_a;
 #ifdef NOISELESS
         const double b = b_fixed;
 #else
-        const double b = (regressor->use_MAP_hyperparameters) ? x[M + 1] : regressor->m_default_b;
+        const double b = (regressor->m_use_map_hyperparameters) ? x[M + 1] : regressor->m_default_b;
 #endif
-        const VectorXd r = (regressor->use_MAP_hyperparameters)
+        const VectorXd r = (regressor->m_use_map_hyperparameters)
                                ? VectorXd(Eigen::Map<const VectorXd>(&x[M + 2], X.rows()))
                                : VectorXd::Constant(X.rows(), regressor->m_default_r);
 
@@ -139,7 +139,7 @@ namespace
         const double   term3 = -0.5 * M * std::log(2.0 * M_PI);
         obj += term1 + term2 + term3;
 
-        if (regressor->use_MAP_hyperparameters)
+        if (regressor->m_use_map_hyperparameters)
         {
             // Priors for GP parameters
             const double a_prior = regressor->m_default_a;
@@ -187,7 +187,7 @@ namespace
 
             Eigen::Map<VectorXd>(&grad[0], grad_y.rows()) = grad_y;
 
-            if (regressor->use_MAP_hyperparameters)
+            if (regressor->m_use_map_hyperparameters)
             {
                 grad[M + 0] = calc_grad_a(y, C_inv, X, a, b, r, regressor->m_default_a, regressor->m_variance);
 #ifdef NOISELESS
@@ -211,7 +211,6 @@ namespace
 
         return obj;
     }
-
 } // namespace
 
 namespace sequential_line_search
@@ -219,13 +218,13 @@ namespace sequential_line_search
     PreferenceRegressor::PreferenceRegressor(const MatrixXd&                X,
                                              const std::vector<Preference>& D,
                                              const Eigen::VectorXd&         w,
-                                             bool                           use_MAP_hyperparameters,
+                                             bool                           use_map_hyperparameters,
                                              const double                   default_a,
                                              const double                   default_r,
                                              const double                   default_b,
                                              const double                   variance,
                                              const double                   btl_scale)
-        : use_MAP_hyperparameters(use_MAP_hyperparameters), X(X), D(D),
+        : m_use_map_hyperparameters(use_map_hyperparameters), X(X), D(D),
           w(w.size() == 0 ? Eigen::VectorXd::Ones(D.size()) : w), m_default_a(default_a), m_default_r(default_r),
           m_default_b(default_b), m_variance(variance), m_btl_scale(btl_scale)
     {
@@ -234,25 +233,25 @@ namespace sequential_line_search
             return;
         }
 
-        compute_MAP();
+        PerformMapEstimation();
 
-        C     = calc_C(X, a, b, r);
+        C     = Regressor::calc_C(X, a, b, r);
         C_inv = C.inverse();
     }
 
-    double PreferenceRegressor::estimate_y(const VectorXd& x) const
+    double PreferenceRegressor::PredictMu(const VectorXd& x) const
     {
         const VectorXd k = Regressor::calc_k(x, X, a, b, r);
         return k.transpose() * C_inv * y;
     }
 
-    double PreferenceRegressor::estimate_s(const VectorXd& x) const
+    double PreferenceRegressor::PredictSigma(const VectorXd& x) const
     {
         const VectorXd k = Regressor::calc_k(x, X, a, b, r);
         return std::sqrt(a - k.transpose() * C_inv * k);
     }
 
-    void PreferenceRegressor::compute_MAP(const PreferenceRegressor* previous)
+    void PreferenceRegressor::PerformMapEstimation(const PreferenceRegressor* previous_iter_regressor)
     {
         const unsigned M = X.cols();
         const unsigned d = X.rows();
@@ -266,15 +265,15 @@ namespace sequential_line_search
         x_ini.block(M + 2, 0, d, 1) = VectorXd::Constant(d, m_default_r);
 
         // Use the MAP estimated values in previous regression as initial values
-        if (previous != nullptr)
+        if (previous_iter_regressor != nullptr)
         {
             for (unsigned i = 0; i < M; ++i)
             {
-                x_ini(i) = previous->estimate_y(X.col(i));
+                x_ini(i) = previous_iter_regressor->PredictMu(X.col(i));
             }
-            x_ini(M + 0)                = previous->a;
-            x_ini(M + 1)                = previous->b;
-            x_ini.block(M + 2, 0, d, 1) = previous->r;
+            x_ini(M + 0)                = previous_iter_regressor->a;
+            x_ini(M + 1)                = previous_iter_regressor->b;
+            x_ini.block(M + 2, 0, d, 1) = previous_iter_regressor->r;
         }
 
 #ifdef VERBOSE
@@ -285,7 +284,7 @@ namespace sequential_line_search
 
         y = x_opt.block(0, 0, M, 1);
 
-        if (use_MAP_hyperparameters)
+        if (m_use_map_hyperparameters)
         {
             a = x_opt(M + 0);
 #ifdef NOISELESS
@@ -310,20 +309,20 @@ namespace sequential_line_search
 
     ///////////////////////////////////////////////////////////////////
 
-    VectorXd PreferenceRegressor::find_arg_max()
+    VectorXd PreferenceRegressor::FindArgMax()
     {
         int i;
         y.maxCoeff(&i);
         return X.col(i);
     }
 
-    void PreferenceRegressor::dampData(const std::string& dirPath) const
+    void PreferenceRegressor::DampData(const std::string& dir_path) const
     {
         // Export X using CSV
-        utils::exportMatrixToCsv(dirPath + "/X.csv", X);
+        utils::exportMatrixToCsv(dir_path + "/X.csv", X);
 
         // Export D using CSV
-        std::ofstream ofs_D(dirPath + "/D.csv");
+        std::ofstream ofs_D(dir_path + "/D.csv");
         for (unsigned i = 0; i < D.size(); ++i)
         {
             for (unsigned j = 0; j < D[i].size(); ++j)

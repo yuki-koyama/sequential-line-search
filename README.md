@@ -93,36 +93,36 @@ Note: User interaction part is omitted from these examples.
 using Eigen::VectorXd;
 using sequential_line_search::SequentialLineSearchOptimizer;
 
-double askHumanForSliderManipulation(const std::pair<VectorXd, VectorXd>& slider_ends)
+double AskHumanForSliderManipulation(const std::pair<VectorXd, VectorXd>& slider_ends)
 {
     // ...
     // ...
 
-    return slider_position
+    return slider_position;
 }
 
 int main()
 {
     // Instantiate an optimizer
-    constexpr int dimension = 6;
-    SequentialLineSearchOptimizer optimizer(dimension);
+    constexpr int dim = 6;
+    SequentialLineSearchOptimizer optimizer(dim);
 
     // Iterate optimization steps
-    constexpr int n_iterations = 15;
-    for (int i = 0; i < n_iterations; ++i)
+    constexpr int num_iters = 15;
+    for (int i = 0; i < num_iters; ++i)
     {
         // Retrieve a slider space
-        const std::pair<VectorXd, VectorXd> slider_ends = optimizer.getSliderEnds();
+        const std::pair<VectorXd, VectorXd> slider_ends = optimizer.GetSliderEnds();
 
         // Query slider manipulation
-        const double slider_position = askHumanForSliderManipulation(slider_ends);
+        const double slider_position = AskHumanForSliderManipulation(slider_ends);
 
         // Feed the slider manipulation result to the optimizer
-        optimizer.submit(slider_position);
+        optimizer.SubmitLineSearchResult(slider_position);
     }
 
     // Display the found solution
-    std::cout << optimizer.getMaximizer() << std::endl;
+    std::cout << optimizer.GetMaximizer() << std::endl;
 
     return 0;
 }
@@ -146,7 +146,7 @@ def main():
     for i in range(15):
         slider_ends = optimizer.get_slider_ends()
         slider_position = ask_human_for_slider_manipulation(slider_ends)
-        optimizer.submit(slider_position)
+        optimizer.submit_line_search_result(slider_position)
 
     print(optimizer.get_maximizer())
 

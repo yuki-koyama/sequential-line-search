@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     core.optimizer =
         std::make_shared<SequentialLineSearchOptimizer>(dimension, use_slider_enlargement, use_MAP_hyperparameters);
-    core.optimizer->setHyperparameters(a, r, b, variance, btl_scale);
+    core.optimizer->SetHyperparameters(a, r, b, variance, btl_scale);
 
     // Setup widgets
     ui->widget_y->content = MainWidget::Content::Objective;
@@ -122,7 +122,7 @@ void MainWindow::on_actionBatch_visualization_triggered()
             for (int j = ui->horizontalSlider->minimum(); j < ui->horizontalSlider->maximum(); ++j)
             {
                 ui->horizontalSlider->setValue(j);
-                const double y = core.evaluateObjectiveFunction(core.optimizer->getParameters(obtainSliderPosition()));
+                const double y = core.evaluateObjectiveFunction(core.optimizer->GetParameters(obtainSliderPosition()));
                 if (y > max_y)
                 {
                     max_y      = y;
@@ -130,7 +130,7 @@ void MainWindow::on_actionBatch_visualization_triggered()
                 }
             }
 
-            ofs << i << "," << (core.optimizer->getMaximizer() - x_opt).norm() << std::endl;
+            ofs << i << "," << (core.optimizer->GetMaximizer() - x_opt).norm() << std::endl;
 
             ui->horizontalSlider->setValue(max_slider);
             window()->grab().save(path + QString("window") + QString("%1").arg(i, 3, 10, QChar('0')) + QString(".png"));
@@ -147,7 +147,7 @@ void MainWindow::on_actionBatch_visualization_triggered()
             ui->widget_y->grab().save(path + QString("_y") + QString("%1").arg(i, 3, 10, QChar('0')) + QString(".png"));
             ui->widget_y->draw_slider_tick = true;
 
-            core.optimizer->submit(obtainSliderPosition());
+            core.optimizer->SubmitLineSearchResult(obtainSliderPosition());
         }
     };
 
@@ -166,7 +166,7 @@ void MainWindow::on_actionClear_all_data_triggered()
 {
     core.optimizer =
         std::make_shared<SequentialLineSearchOptimizer>(dimension, use_slider_enlargement, use_MAP_hyperparameters);
-    core.optimizer->setHyperparameters(a, r, b, variance, btl_scale);
+    core.optimizer->SetHyperparameters(a, r, b, variance, btl_scale);
 
     ui->widget_y->update();
     ui->widget_s->update();
@@ -176,7 +176,7 @@ void MainWindow::on_actionClear_all_data_triggered()
 
 void MainWindow::on_actionProceed_optimization_triggered()
 {
-    core.optimizer->submit(obtainSliderPosition());
+    core.optimizer->SubmitLineSearchResult(obtainSliderPosition());
 
     ui->widget_y->update();
     ui->widget_s->update();
@@ -192,7 +192,7 @@ void MainWindow::on_horizontalSlider_valueChanged(int /*value*/)
 
 void MainWindow::on_pushButton_clicked()
 {
-    core.optimizer->submit(obtainSliderPosition());
+    core.optimizer->SubmitLineSearchResult(obtainSliderPosition());
 
     ui->horizontalSlider->setValue((ui->horizontalSlider->maximum() + ui->horizontalSlider->minimum()) / 2);
     ui->widget_y->update();
@@ -203,5 +203,5 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::on_actionPrint_current_best_triggered()
 {
-    std::cout << core.optimizer->getMaximizer().transpose() << std::endl;
+    std::cout << core.optimizer->GetMaximizer().transpose() << std::endl;
 }

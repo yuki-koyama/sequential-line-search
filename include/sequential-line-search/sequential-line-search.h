@@ -16,30 +16,30 @@ namespace sequential_line_search
     public:
         SequentialLineSearchOptimizer(const int  dimension,
                                       const bool use_slider_enlargement  = true,
-                                      const bool use_MAP_hyperparameters = true);
+                                      const bool use_map_hyperparameters = true);
 
-        void setHyperparameters(
+        void SetHyperparameters(
             const double a, const double r, const double b, const double variance, const double btl_scale);
 
-        void submit(const double slider_position);
+        void SubmitLineSearchResult(const double slider_position);
 
-        std::pair<Eigen::VectorXd, Eigen::VectorXd> getSliderEnds() const;
-        Eigen::VectorXd                             getParameters(const double slider_position) const;
+        std::pair<Eigen::VectorXd, Eigen::VectorXd> GetSliderEnds() const;
+        Eigen::VectorXd                             GetParameters(const double slider_position) const;
 
-        Eigen::VectorXd getMaximizer() const;
+        Eigen::VectorXd GetMaximizer() const;
 
-        double getPreferenceValueMean(const Eigen::VectorXd& parameter) const;
-        double getPreferenceValueStandardDeviation(const Eigen::VectorXd& parameter) const;
-        double getExpectedImprovementValue(const Eigen::VectorXd& parameter) const;
+        double GetPreferenceValueMean(const Eigen::VectorXd& parameter) const;
+        double GetPreferenceValueStandardDeviation(const Eigen::VectorXd& parameter) const;
+        double GetExpectedImprovementValue(const Eigen::VectorXd& parameter) const;
 
-        const Eigen::MatrixXd& getRawDataPoints() const;
+        const Eigen::MatrixXd& GetRawDataPoints() const;
 
-        void dampData(const std::string& directory_path) const;
+        void DampData(const std::string& directory_path) const;
 
     private:
         const int  m_dimension;
         const bool m_use_slider_enlargement;
-        const bool m_use_MAP_hyperparameters;
+        const bool m_use_map_hyperparameters;
 
         std::shared_ptr<PreferenceRegressor> m_regressor;
         std::shared_ptr<Slider>              m_slider;

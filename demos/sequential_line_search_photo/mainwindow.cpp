@@ -122,7 +122,7 @@ double MainWindow::obtainSliderPosition() const
 
 void MainWindow::updateRawSliders()
 {
-    const VectorXd x = core.optimizer->getParameters(obtainSliderPosition());
+    const VectorXd x = core.optimizer->GetParameters(obtainSliderPosition());
     for (unsigned i = 0; i < core.dim; ++i)
     {
         QSlider* slider = sliders[i];
@@ -143,10 +143,10 @@ void MainWindow::on_actionClear_all_data_triggered()
 void MainWindow::on_actionProceed_optimization_triggered()
 {
     // Proceed optimization step
-    core.optimizer->submit(obtainSliderPosition());
+    core.optimizer->SubmitLineSearchResult(obtainSliderPosition());
 
     // Damp data
-    core.optimizer->dampData(DirectoryUtility::getTemporaryDirectory());
+    core.optimizer->DampData(DirectoryUtility::getTemporaryDirectory());
 
     // Reset slider position
     ui->horizontalSlider->setValue((ui->horizontalSlider->maximum() - ui->horizontalSlider->minimum()) / 2 +
@@ -166,7 +166,7 @@ void MainWindow::on_horizontalSlider_valueChanged(int /*value*/)
     updateRawSliders();
 
     // Update the parameters for preview
-    const VectorXd      x = core.optimizer->getParameters(obtainSliderPosition());
+    const VectorXd      x = core.optimizer->GetParameters(obtainSliderPosition());
     std::vector<double> parameters(6, 0.5);
     if (core.dim == 2)
     {
@@ -188,7 +188,7 @@ void MainWindow::on_pushButton_clicked() { on_actionProceed_optimization_trigger
 
 void MainWindow::on_actionPrint_current_best_triggered()
 {
-    std::cout << core.optimizer->getMaximizer().transpose() << std::endl;
+    std::cout << core.optimizer->GetMaximizer().transpose() << std::endl;
 }
 
 void MainWindow::on_actionExport_photos_on_slider_triggered()
@@ -204,7 +204,7 @@ void MainWindow::on_actionExport_photos_on_slider_triggered()
     {
         const unsigned        val             = m + (i - 1) * (M - m) / (n - 1);
         const double          slider_position = static_cast<double>(val - m) / static_cast<double>(M - m);
-        const Eigen::VectorXd x               = core.optimizer->getParameters(slider_position);
+        const Eigen::VectorXd x               = core.optimizer->GetParameters(slider_position);
         const QImage          enhanced        = ImageModifier::modifyImage(enhancer_widget->getImage(), x);
         enhanced.save(QString((dir + "/full_" + std::to_string(i) + ".png").c_str()));
         enhanced.scaledToWidth(w, Qt::SmoothTransformation)
@@ -212,9 +212,9 @@ void MainWindow::on_actionExport_photos_on_slider_triggered()
     }
 
     // Export the current best photo
-    if (core.optimizer->getRawDataPoints().rows() != 0)
+    if (core.optimizer->GetRawDataPoints().rows() != 0)
     {
-        const Eigen::VectorXd x_best   = core.optimizer->getMaximizer();
+        const Eigen::VectorXd x_best   = core.optimizer->GetMaximizer();
         const QImage          enhanced = ImageModifier::modifyImage(enhancer_widget->getImage(), x_best);
         enhanced.save(QString((dir + "/best.png").c_str()));
     }

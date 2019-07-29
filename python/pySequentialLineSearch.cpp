@@ -25,37 +25,37 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
     optimizer_class.def(py::init<const int, const bool, const bool>(),
                         "dimension"_a,
                         "use_slider_enlargement"_a = true,
-                        "use_MAP_parameters"_a     = true);
+                        "use_map_parameters"_a     = true);
 
     optimizer_class.def("set_hyperparameters",
-                        &SequentialLineSearchOptimizer::setHyperparameters,
+                        &SequentialLineSearchOptimizer::SetHyperparameters,
                         "a"_a,
                         "r"_a,
                         "b"_a,
                         "variance"_a,
                         "btl_scale"_a);
 
-    optimizer_class.def("submit", &SequentialLineSearchOptimizer::submit, "slider_position"_a);
+    optimizer_class.def("submit_line_search_result", &SequentialLineSearchOptimizer::SubmitLineSearchResult, "slider_position"_a);
 
-    optimizer_class.def("get_slider_ends", &SequentialLineSearchOptimizer::getSliderEnds);
+    optimizer_class.def("get_slider_ends", &SequentialLineSearchOptimizer::GetSliderEnds);
 
-    optimizer_class.def("get_parameters", &SequentialLineSearchOptimizer::getParameters, "slider_position"_a);
+    optimizer_class.def("get_parameters", &SequentialLineSearchOptimizer::GetParameters, "slider_position"_a);
 
-    optimizer_class.def("get_maximizer", &SequentialLineSearchOptimizer::getMaximizer);
+    optimizer_class.def("get_maximizer", &SequentialLineSearchOptimizer::GetMaximizer);
 
     optimizer_class.def(
-        "get_preference_value_mean", &SequentialLineSearchOptimizer::getPreferenceValueMean, "parameter"_a);
+        "get_preference_value_mean", &SequentialLineSearchOptimizer::GetPreferenceValueMean, "parameter"_a);
 
     optimizer_class.def("get_preference_value_standard_deviation",
-                        &SequentialLineSearchOptimizer::getPreferenceValueStandardDeviation,
+                        &SequentialLineSearchOptimizer::GetPreferenceValueStandardDeviation,
                         "parameter"_a);
 
     optimizer_class.def(
-        "get_expected_improvement_value", &SequentialLineSearchOptimizer::getExpectedImprovementValue, "parameter"_a);
+        "get_expected_improvement_value", &SequentialLineSearchOptimizer::GetExpectedImprovementValue, "parameter"_a);
 
-    optimizer_class.def("get_raw_data_points", &SequentialLineSearchOptimizer::getRawDataPoints);
+    optimizer_class.def("get_raw_data_points", &SequentialLineSearchOptimizer::GetRawDataPoints);
 
-    optimizer_class.def("damp_data", &SequentialLineSearchOptimizer::dampData, "directory_path"_a);
+    optimizer_class.def("damp_data", &SequentialLineSearchOptimizer::DampData, "directory_path"_a);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;

@@ -42,7 +42,7 @@ void Core::proceedOptimization()
     VectorXd f(num_data_points);
     for (int i = 0; i < X.cols(); ++ i)
     {
-        f(i) = regressor->estimate_y(X.col(i));
+        f(i) = regressor->PredictMu(X.col(i));
 
         int best_index;
         y_max = f.maxCoeff(&best_index);

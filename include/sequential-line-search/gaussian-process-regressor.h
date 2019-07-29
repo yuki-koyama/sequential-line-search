@@ -16,8 +16,8 @@ namespace sequential_line_search
         GaussianProcessRegressor(
             const Eigen::MatrixXd& X, const Eigen::VectorXd& y, double a, double b, const Eigen::VectorXd& r);
 
-        double estimate_y(const Eigen::VectorXd& x) const override;
-        double estimate_s(const Eigen::VectorXd& x) const override;
+        double PredictMu(const Eigen::VectorXd& x) const override;
+        double PredictSigma(const Eigen::VectorXd& x) const override;
 
         /// \brief Data points.
         Eigen::MatrixXd X;

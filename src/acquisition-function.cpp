@@ -1,10 +1,10 @@
 #include <cmath>
 #include <iostream>
+#include <mathtoolbox/acquisition-functions.hpp>
 #include <nlopt-util.hpp>
 #include <sequential-line-search/acquisition-function.h>
 #include <sequential-line-search/gaussian-process-regressor.h>
 #include <utility>
-#include <mathtoolbox/acquisition-functions.hpp>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -31,14 +31,13 @@ namespace
 
         const VectorXd eigen_x = Eigen::Map<const VectorXd>(&x[0], x.size());
 
-        const Eigen::VectorXd x_best = [&]()
-        {
+        const Eigen::VectorXd x_best = [&]() {
             const int num_data_points = origRegressor->getX().cols();
 
             Eigen::VectorXd f(num_data_points);
-            for (int i = 0; i < num_data_points; ++ i)
+            for (int i = 0; i < num_data_points; ++i)
             {
-                f(i) = origRegressor->estimate_y(origRegressor->getX().col(i));
+                f(i) = origRegressor->PredictMu(origRegressor->getX().col(i));
             }
 
             int best_index;
@@ -47,8 +46,8 @@ namespace
             return origRegressor->getX().col(best_index);
         }();
 
-        const auto mu    = [&](const Eigen::VectorXd& x) { return origRegressor->estimate_y(x); };
-        const auto sigma = [&](const Eigen::VectorXd& x) { return updatedRegressor->estimate_s(x); };
+        const auto mu    = [&](const Eigen::VectorXd& x) { return origRegressor->PredictMu(x); };
+        const auto sigma = [&](const Eigen::VectorXd& x) { return updatedRegressor->PredictSigma(x); };
 
         return mathtoolbox::GetExpectedImprovement(eigen_x, mu, sigma, x_best);
     }
@@ -68,24 +67,23 @@ namespace sequential_line_search
                 return 0.0;
             }
 
-            const Eigen::VectorXd x_best = [&]()
-            {
+            const Eigen::VectorXd x_best = [&]() {
                 const int num_data_points = regressor.getX().cols();
 
                 Eigen::VectorXd f(num_data_points);
-                for (int i = 0; i < num_data_points; ++ i)
+                for (int i = 0; i < num_data_points; ++i)
                 {
-                    f(i) = regressor.estimate_y(regressor.getX().col(i));
+                    f(i) = regressor.PredictMu(regressor.getX().col(i));
                 }
 
                 int best_index;
                 f.maxCoeff(&best_index);
-                
+
                 return regressor.getX().col(best_index);
             }();
 
-            const auto mu    = [&](const Eigen::VectorXd& x) { return regressor.estimate_y(x); };
-            const auto sigma = [&](const Eigen::VectorXd& x) { return regressor.estimate_s(x); };
+            const auto mu    = [&](const Eigen::VectorXd& x) { return regressor.PredictMu(x); };
+            const auto sigma = [&](const Eigen::VectorXd& x) { return regressor.PredictSigma(x); };
 
             return mathtoolbox::GetExpectedImprovement(x, mu, sigma, x_best);
         }
@@ -145,7 +143,7 @@ namespace sequential_line_search
                 newX.col(N)            = x_star_local;
 
                 VectorXd newY(reg.gety().rows() + 1);
-                newY << reg.gety(), reg.estimate_y(x_star_local);
+                newY << reg.gety(), reg.PredictMu(x_star_local);
 
                 reg = GaussianProcessRegressor(newX, newY, regressor.geta(), regressor.getb(), regressor.getr());
             }

@@ -18,20 +18,20 @@ namespace sequential_line_search
         PreferenceRegressor(const Eigen::MatrixXd&         X,
                             const std::vector<Preference>& D,
                             const Eigen::VectorXd&         w                       = Eigen::VectorXd(),
-                            const bool                     use_MAP_hyperparameters = false,
+                            const bool                     use_map_hyperparameters = false,
                             const double                   default_a               = 0.500,
                             const double                   default_r               = 0.500,
                             const double                   default_b               = 0.005,
                             const double                   variance                = 0.250,
                             const double                   btl_scale               = 0.010);
 
-        double estimate_y(const Eigen::VectorXd& x) const override;
-        double estimate_s(const Eigen::VectorXd& x) const override;
+        double PredictMu(const Eigen::VectorXd& x) const override;
+        double PredictSigma(const Eigen::VectorXd& x) const override;
 
-        const bool use_MAP_hyperparameters;
+        const bool m_use_map_hyperparameters;
 
         /// \brief Find the data point that is likely to have the largest value from the so-far observed data points.
-        Eigen::VectorXd find_arg_max();
+        Eigen::VectorXd FindArgMax();
 
         // Data
         Eigen::MatrixXd         X;
@@ -50,7 +50,7 @@ namespace sequential_line_search
         Eigen::MatrixXd C_inv;
 
         // IO
-        void dampData(const std::string& dirPath) const;
+        void DampData(const std::string& dir_path) const;
 
         // Getter
         const Eigen::MatrixXd& getX() const override { return X; }
@@ -71,7 +71,7 @@ namespace sequential_line_search
         const double m_btl_scale;
 
     private:
-        void compute_MAP(const PreferenceRegressor* = nullptr);
+        void PerformMapEstimation(const PreferenceRegressor* previous_iter_regressor = nullptr);
     };
 } // namespace sequential_line_search
 

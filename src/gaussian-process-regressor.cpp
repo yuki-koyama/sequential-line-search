@@ -105,7 +105,7 @@ namespace
 #ifdef NOISELESS
         grad(1) = 0.0;
 #else
-        grad(1) = calc_grad_b(X, C_inv, y, a, b, r);
+        grad(1)              = calc_grad_b(X, C_inv, y, a, b, r);
 #endif
 
         for (unsigned i = 2; i < D + 2; ++i)
@@ -142,7 +142,7 @@ namespace
 #ifdef NOISELESS
         const double b = b_fixed;
 #else
-        const double b = x[1];
+        const double b       = x[1];
 #endif
         const VectorXd r = Eigen::Map<const VectorXd>(&x[2], x.size() - 2);
 
@@ -220,13 +220,13 @@ namespace sequential_line_search
         C_inv = C.inverse();
     }
 
-    double GaussianProcessRegressor::estimate_y(const VectorXd& x) const
+    double GaussianProcessRegressor::PredictMu(const VectorXd& x) const
     {
         const VectorXd k = calc_k(x, X, a, b, r);
         return k.transpose() * C_inv * y;
     }
 
-    double GaussianProcessRegressor::estimate_s(const VectorXd& x) const
+    double GaussianProcessRegressor::PredictSigma(const VectorXd& x) const
     {
         const VectorXd k = calc_k(x, X, a, b, r);
         return std::sqrt(a - k.transpose() * C_inv * k);
@@ -241,11 +241,11 @@ namespace sequential_line_search
         const VectorXd x_ini = [&]() {
             VectorXd x(D + 2);
 
-            x(0)            = std::exp(a_prior_mu);
+            x(0) = std::exp(a_prior_mu);
 #ifdef NOISELESS
-            x(1)            = b_fixed;
+            x(1) = b_fixed;
 #else
-            x(1)            = std::exp(b_prior_mu);
+            x(1) = std::exp(b_prior_mu);
 #endif
             x.segment(2, D) = VectorXd::Constant(D, std::exp(r_prior_mu));
 
