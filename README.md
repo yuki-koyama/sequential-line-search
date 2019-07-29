@@ -1,8 +1,9 @@
 # Sequential Line Search
 
 [![Build Status](https://travis-ci.com/yuki-koyama/sequential-line-search.svg?branch=master)](https://travis-ci.com/yuki-koyama/sequential-line-search)
+![GitHub](https://img.shields.io/github/license/yuki-koyama/sequential-line-search)
 
-This repository contains a part of the source codes used in our research project on the **sequential line search** method (which is a variant of Bayesian optimization). The core algorithm is implemented in the source codes in the "sequential_line_search" folder. This repository also contains the following example applications:
+This repository provides a C++ library to perform the **sequential line search** method (which is a variant of **Bayesian optimization**). The core algorithm is implemented in `include/sequential-line-search/*.h` and `/src/*.cpp`. This repository also contains the following example applications:
 
 - **bayesian_optimization_1d**: A simple demo of the standard Bayesian optimization applied to a one-dimensional test function.
 - **sequential_line_search_nd**: A simple demo of the sequential line search method applied to a multi-dimensional test function.
@@ -11,7 +12,7 @@ This repository contains a part of the source codes used in our research project
 - **sequential_line_search_2d_gui**: A visual interactive demo of the sequential line search method applied to a two-dimensional test function.
 - **sequential_line_search_photo**: A visual interactive demo of the sequential line search method where a photograph is enhanced using six-dimensional parameters.
 
-Now this library has an experimental [python binding](./python).
+Now this library has a [python binding](./python).
 
 ## Project Web Site
 
@@ -29,6 +30,7 @@ DOI: https://doi.org/10.1145/3072959.3073598
 - Eigen <http://eigen.tuxfamily.org/> (`brew install eigen` / `sudo apt install libeigen3-dev`)
 - NLopt <https://nlopt.readthedocs.io/> (included via gitsubmodule)
 - timer <https://github.com/yuki-koyama/timer> (included via gitsubmodule)
+- mathtoolbox <https://github.com/yuki-koyama/mathtoolbox> (included via gitsubmodule)
 - nlopt-util <https://github.com/yuki-koyama/nlopt-util> (included via gitsubmodule)
 - rand-util <https://github.com/yuki-koyama/rand-util> (included via gitsubmodule)
 
