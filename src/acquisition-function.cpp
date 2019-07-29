@@ -4,6 +4,7 @@
 #include <sequential-line-search/acquisition-function.h>
 #include <sequential-line-search/gaussian-process-regressor.h>
 #include <utility>
+#include <mathtoolbox/acquisition-functions.hpp>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -28,16 +29,19 @@ namespace
         const GaussianProcessRegressor* updatedRegressor =
             static_cast<pair<const Regressor*, const GaussianProcessRegressor*>*>(data)->second;
 
-        const VectorXd _x = Eigen::Map<const VectorXd>(&x[0], x.size());
+        const VectorXd eigen_x = Eigen::Map<const VectorXd>(&x[0], x.size());
 
-        const double y_best = origRegressor->gety().maxCoeff();
-        const double s_x    = updatedRegressor->estimate_s(_x);
-        const double u      = (origRegressor->estimate_y(_x) - y_best) / s_x;
-        const double Phi    = 0.5 * std::erf(u / std::sqrt(2.0)) + 0.5;
-        const double phi    = (1.0 / std::sqrt(2.0 * M_PI)) * std::exp(-u * u / 2.0);
-        const double EI     = s_x * (u * Phi + phi);
+        const Eigen::VectorXd x_best = [&]()
+        {
+            int best_index;
+            origRegressor->gety().maxCoeff(&best_index);
+            return origRegressor->getX().col(best_index);
+        }();
 
-        return (s_x < 1e-08 || std::isnan(EI)) ? 0.0 : EI;
+        const auto mu    = [&](const Eigen::VectorXd& x) { return origRegressor->estimate_y(x); };
+        const auto sigma = [&](const Eigen::VectorXd& x) { return updatedRegressor->estimate_s(x); };
+
+        return mathtoolbox::GetExpectedImprovement(eigen_x, mu, sigma, x_best);
     }
 } // namespace
 
@@ -55,14 +59,17 @@ namespace sequential_line_search
                 return 0.0;
             }
 
-            const double y_best = regressor.gety().maxCoeff();
-            const double s_x    = regressor.estimate_s(x);
-            const double u      = (regressor.estimate_y(x) - y_best) / s_x;
-            const double Phi    = 0.5 * std::erf(u / std::sqrt(2.0)) + 0.5;
-            const double phi    = (1.0 / std::sqrt(2.0 * M_PI)) * std::exp(-u * u / 2.0);
-            const double EI     = (regressor.estimate_y(x) - y_best) * Phi + s_x * phi;
+            const Eigen::VectorXd x_best = [&]()
+            {
+                int best_index;
+                regressor.gety().maxCoeff(&best_index);
+                return regressor.getX().col(best_index);
+            }();
 
-            return (s_x < 1e-10 || std::isnan(EI)) ? 0.0 : EI;
+            const auto mu    = [&](const Eigen::VectorXd& x) { return regressor.estimate_y(x); };
+            const auto sigma = [&](const Eigen::VectorXd& x) { return regressor.estimate_s(x); };
+
+            return mathtoolbox::GetExpectedImprovement(x, mu, sigma, x_best);
         }
 
         Eigen::VectorXd FindNextPoint(Regressor& regressor, const FunctionType function_type)
