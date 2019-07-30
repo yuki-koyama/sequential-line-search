@@ -22,6 +22,8 @@ namespace sequential_line_search
         virtual double                 getb() const = 0;
         virtual const Eigen::VectorXd& getr() const = 0;
 
+        Eigen::VectorXd PredictMaximumPointFromData() const;
+
         static Eigen::MatrixXd
         calc_C(const Eigen::MatrixXd& X, const double a, const double b, const Eigen::VectorXd& r);
         static Eigen::MatrixXd

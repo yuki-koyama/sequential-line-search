@@ -21,6 +21,22 @@ namespace sequential_line_search
     constexpr auto kernel_theta_i_derivative   = mathtoolbox::GetArdMatern52KernelThetaIDerivative;
     constexpr auto kernel_first_arg_derivative = mathtoolbox::GetArdMatern52KernelFirstArgDerivative;
 
+    VectorXd Regressor::PredictMaximumPointFromData() const
+    {
+        const int num_data_points = getX().cols();
+
+        VectorXd f(num_data_points);
+        for (int i = 0; i < num_data_points; ++i)
+        {
+            f(i) = PredictMu(getX().col(i));
+        }
+
+        int best_index;
+        f.maxCoeff(&best_index);
+
+        return getX().col(best_index);
+    }
+
     MatrixXd Regressor::calc_C(const MatrixXd& X, const double a, const double b, const VectorXd& r)
     {
         const unsigned N = X.cols();
