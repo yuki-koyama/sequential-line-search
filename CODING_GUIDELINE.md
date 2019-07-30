@@ -56,6 +56,9 @@ The current source codes in this repository are really messy; they follow many i
 
 `has_something`, `is_valid`, etc.
 
+- In case that the boolean is associated with an instance of a class or a struct, use the third-person singular form (e.g., `has_something`, `is_valid`, etc.)
+- In case of boolean function arguments, use base forms for verbs (`merge_data_points`, `use_some_option`, etc.) instead of third-person singular forms.
+
 ### Lambda
 
 `calculate_value`, `f`, etc.
@@ -76,9 +79,9 @@ The current source codes in this repository are really messy; they follow many i
 
 ## Coding Style
 
-### Unnest Namespace
+### Namespace unnesting
 
-```
+```c++
 namespace my_library_namespace
 {
     void CalculateValue();
