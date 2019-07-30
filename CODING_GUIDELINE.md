@@ -70,6 +70,7 @@ The current source codes in this repository are really messy; they follow many i
 ## Abbreviations
 
 - `num`: the number of
+- `arg`: argument
 - `dim`: the number of dimensions
 - `inv`: inverse
 - `grad`: gradient
