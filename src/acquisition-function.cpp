@@ -154,8 +154,6 @@ namespace sequential_line_search
             const VectorXd upper = VectorXd::Constant(D, 1.0);
             const VectorXd lower = VectorXd::Constant(D, 0.0);
 
-#define MULTISTART
-#ifdef MULTISTART
             constexpr int num_trials = 20;
 
             Eigen::MatrixXd x_stars(D, num_trials);
@@ -180,16 +178,6 @@ namespace sequential_line_search
             }();
 
             return x_stars.col(best_index);
-#else
-            const VectorXd x_ini = VectorXd::Constant(D, 0.5);
-
-            const VectorXd x_star_global =
-                nloptutil::solve(x_ini, upper, lower, objective, nlopt::GN_DIRECT, &regressor, true, 800);
-            const VectorXd x_star_local =
-                nloptutil::solve(x_star_global, upper, lower, objective, nlopt::LN_COBYLA, &regressor, true, 200);
-
-            return x_star_local;
-#endif
         }
 
         vector<VectorXd> FindNextPoints(const Regressor& regressor, const unsigned n, const FunctionType function_type)
@@ -203,30 +191,29 @@ namespace sequential_line_search
 
             vector<VectorXd> points;
 
-            GaussianProcessRegressor reg(
+            GaussianProcessRegressor temporary_regressor(
                 regressor.getX(), regressor.gety(), regressor.geta(), regressor.getb(), regressor.getr());
+
+            const Eigen::VectorXd x_best = [&]() {
+                const int num_data_points = regressor.getX().cols();
+
+                Eigen::VectorXd f(num_data_points);
+                for (int i = 0; i < num_data_points; ++i)
+                {
+                    f(i) = regressor.PredictMu(regressor.getX().col(i));
+                }
+
+                int best_index;
+                f.maxCoeff(&best_index);
+
+                return regressor.getX().col(best_index);
+            }();
 
             for (unsigned i = 0; i < n; ++i)
             {
-                pair<const Regressor*, const GaussianProcessRegressor*> data(&regressor, &reg);
+                pair<const Regressor*, const GaussianProcessRegressor*> data(&regressor, &temporary_regressor);
 
                 const VectorXd x_star = [&]() {
-#ifdef MULTISTART
-                    const Eigen::VectorXd x_best = [&]() {
-                        const int num_data_points = regressor.getX().cols();
-
-                        Eigen::VectorXd f(num_data_points);
-                        for (int i = 0; i < num_data_points; ++i)
-                        {
-                            f(i) = regressor.PredictMu(regressor.getX().col(i));
-                        }
-
-                        int best_index;
-                        f.maxCoeff(&best_index);
-
-                        return regressor.getX().col(best_index);
-                    }();
-
                     constexpr int num_trials = 20;
 
                     Eigen::MatrixXd x_stars(D, num_trials);
@@ -238,7 +225,9 @@ namespace sequential_line_search
 
                         const double y_star = [&]() {
                             const auto mu    = [&](const Eigen::VectorXd& x) { return regressor.PredictMu(x); };
-                            const auto sigma = [&](const Eigen::VectorXd& x) { return reg.PredictSigma(x); };
+                            const auto sigma = [&](const Eigen::VectorXd& x) {
+                                return temporary_regressor.PredictSigma(x);
+                            };
 
                             return mathtoolbox::GetExpectedImprovement(x_star, mu, sigma, x_best);
                         }();
@@ -257,15 +246,6 @@ namespace sequential_line_search
                     }();
 
                     return x_stars.col(best_index);
-#else
-                    const VectorXd x_ini         = VectorXd::Constant(D, 0.5);
-                    const VectorXd x_star_global = nloptutil::solve(
-                        x_ini, upper, lower, objective_for_multiple_points, nlopt::GN_DIRECT, &data, true, 800);
-                    const VectorXd x_star_local = nloptutil::solve(
-                        x_star_global, upper, lower, objective_for_multiple_points, nlopt::LN_COBYLA, &data, true, 200);
-
-                    return x_star_local;
-#endif
                 }();
 
                 points.push_back(x_star);
@@ -275,16 +255,17 @@ namespace sequential_line_search
                     break;
                 }
 
-                const unsigned N = reg.getX().cols();
+                const unsigned N = temporary_regressor.getX().cols();
 
                 MatrixXd new_X(D, N + 1);
-                new_X.block(0, 0, D, N) = reg.getX();
+                new_X.block(0, 0, D, N) = temporary_regressor.getX();
                 new_X.col(N)            = x_star;
 
-                VectorXd new_y(reg.gety().rows() + 1);
-                new_y << reg.gety(), reg.PredictMu(x_star);
+                VectorXd new_y(temporary_regressor.gety().rows() + 1);
+                new_y << temporary_regressor.gety(), temporary_regressor.PredictMu(x_star);
 
-                reg = GaussianProcessRegressor(new_X, new_y, regressor.geta(), regressor.getb(), regressor.getr());
+                temporary_regressor =
+                    GaussianProcessRegressor(new_X, new_y, regressor.geta(), regressor.getb(), regressor.getr());
             }
 
             return points;
