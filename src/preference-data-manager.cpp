@@ -6,6 +6,8 @@ using Eigen::VectorXd;
 
 namespace internal
 {
+    /// \brief Merge sampled points that are sufficiently closer.
+    /// \param epsilon The threshold of the distance between sampled points to be merged
     void MergeClosePoints(const double epsilon, Eigen::MatrixXd& X, std::vector<sequential_line_search::Preference>& D)
     {
         const double eps_squared = epsilon * epsilon;
@@ -74,8 +76,6 @@ namespace internal
 
 namespace sequential_line_search
 {
-    void PreferenceDataManager::MergeClosePoints(const double epsilon) { internal::MergeClosePoints(epsilon, X, D); }
-
     void PreferenceDataManager::AddNewPoints(const Eigen::VectorXd&              x_preferable,
                                              const std::vector<Eigen::VectorXd>& xs_other,
                                              const bool                          merge_close_points)
@@ -126,7 +126,9 @@ namespace sequential_line_search
         // Merge
         if (merge_close_points)
         {
-            MergeClosePoints();
+            constexpr double epsilon = 1e-04;
+
+            internal::MergeClosePoints(epsilon, X, D);
         }
     }
 } // namespace sequential_line_search
