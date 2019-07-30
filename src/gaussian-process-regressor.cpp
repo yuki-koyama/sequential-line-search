@@ -6,8 +6,6 @@
 #include <sequential-line-search/gaussian-process-regressor.h>
 #include <sequential-line-search/utils.h>
 
-// #define NOISELESS
-
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
@@ -18,12 +16,8 @@ namespace
     const bool   use_log_normal_prior  = true;
     const double a_prior_mu            = std::log(0.500);
     const double a_prior_sigma_squared = 0.50;
-#ifdef NOISELESS
-    const double b_fixed = 1e-06;
-#else
     const double b_prior_mu            = std::log(1e-04);
     const double b_prior_sigma_squared = 0.50;
-#endif
     const double r_prior_mu            = std::log(0.500);
     const double r_prior_sigma_squared = 0.50;
 
@@ -32,12 +26,10 @@ namespace
         return mathtoolbox::GetLogOfLogNormalDistDerivative(a, a_prior_mu, a_prior_sigma_squared);
     }
 
-#ifndef NOISELESS
     double calc_grad_b_prior(const double b)
     {
         return mathtoolbox::GetLogOfLogNormalDistDerivative(b, b_prior_mu, b_prior_sigma_squared);
     }
-#endif
 
     double calc_grad_r_i_prior(const Eigen::VectorXd& r, const int index)
     {
@@ -49,12 +41,10 @@ namespace
         return mathtoolbox::GetLogOfLogNormalDist(a, a_prior_mu, a_prior_sigma_squared);
     }
 
-#ifndef NOISELESS
     double calc_b_prior(const double b)
     {
         return mathtoolbox::GetLogOfLogNormalDist(b, b_prior_mu, b_prior_sigma_squared);
     }
-#endif
 
     double calc_r_i_prior(const Eigen::VectorXd& r, const int index)
     {
@@ -70,7 +60,6 @@ namespace
         return term1 + term2 + (use_log_normal_prior ? calc_grad_a_prior(a) : 0.0);
     }
 
-#ifndef NOISELESS
     double calc_grad_b(
         const MatrixXd& X, const MatrixXd& C_inv, const VectorXd& y, const double a, const double b, const VectorXd& r)
     {
@@ -79,7 +68,6 @@ namespace
         const double   term2    = -0.5 * (C_inv * C_grad_b).trace();
         return term1 + term2 + (use_log_normal_prior ? calc_grad_b_prior(b) : 0.0);
     }
-#endif
 
     double calc_grad_r_i(const MatrixXd& X,
                          const MatrixXd& C_inv,
@@ -102,11 +90,7 @@ namespace
 
         VectorXd grad(D + 2);
         grad(0) = calc_grad_a(X, C_inv, y, a, b, r);
-#ifdef NOISELESS
-        grad(1) = 0.0;
-#else
-        grad(1)              = calc_grad_b(X, C_inv, y, a, b, r);
-#endif
+        grad(1) = calc_grad_b(X, C_inv, y, a, b, r);
 
         for (unsigned i = 2; i < D + 2; ++i)
         {
@@ -138,12 +122,8 @@ namespace
 
         const unsigned N = X.cols();
 
-        const double a = x[0];
-#ifdef NOISELESS
-        const double b = b_fixed;
-#else
-        const double b       = x[1];
-#endif
+        const double   a = x[0];
+        const double   b = x[1];
         const VectorXd r = Eigen::Map<const VectorXd>(&x[2], x.size() - 2);
 
         const MatrixXd C     = Regressor::calc_C(X, a, b, r);
@@ -165,11 +145,7 @@ namespace
 
         // Computing the regularization terms from a prior assumptions
         const double a_prior = calc_a_prior(a);
-#ifdef NOISELESS
-        const double b_prior = 1.0;
-#else
         const double b_prior = calc_b_prior(b);
-#endif
         const double r_prior = [&r]() {
             double sum = 0.0;
             for (unsigned i = 0; i < r.rows(); ++i)
@@ -196,7 +172,7 @@ namespace sequential_line_search
             return;
         }
 
-        compute_MAP();
+        PerformMapEstimation();
 
         C     = calc_C(X, a, b, r);
         C_inv = C.inverse();
@@ -222,6 +198,7 @@ namespace sequential_line_search
 
     double GaussianProcessRegressor::PredictMu(const VectorXd& x) const
     {
+        // TODO: Incorporate a mean function
         const VectorXd k = calc_k(x, X, a, b, r);
         return k.transpose() * C_inv * y;
     }
@@ -232,7 +209,22 @@ namespace sequential_line_search
         return std::sqrt(a - k.transpose() * C_inv * k);
     }
 
-    void GaussianProcessRegressor::compute_MAP()
+    Eigen::VectorXd GaussianProcessRegressor::PredictMuDerivative(const Eigen::VectorXd& x) const
+    {
+        // TODO: Incorporate a mean function
+        const MatrixXd k_x_derivative = Regressor::CalcSmallKSmallXDerivative(x, X, a, b, r);
+        return k_x_derivative * C_inv * y;
+    }
+
+    Eigen::VectorXd GaussianProcessRegressor::PredictSigmaDerivative(const Eigen::VectorXd& x) const
+    {
+        const MatrixXd k_x_derivative = Regressor::CalcSmallKSmallXDerivative(x, X, a, b, r);
+        const VectorXd k              = calc_k(x, X, a, b, r);
+        const double   sigma          = PredictSigma(x);
+        return -(1.0 / sigma) * k_x_derivative * C_inv * k;
+    }
+
+    void GaussianProcessRegressor::PerformMapEstimation()
     {
         const unsigned D = X.rows();
 
@@ -241,12 +233,8 @@ namespace sequential_line_search
         const VectorXd x_ini = [&]() {
             VectorXd x(D + 2);
 
-            x(0) = std::exp(a_prior_mu);
-#ifdef NOISELESS
-            x(1) = b_fixed;
-#else
-            x(1) = std::exp(b_prior_mu);
-#endif
+            x(0)            = std::exp(a_prior_mu);
+            x(1)            = std::exp(b_prior_mu);
             x.segment(2, D) = VectorXd::Constant(D, std::exp(r_prior_mu));
 
             return x;
@@ -261,9 +249,5 @@ namespace sequential_line_search
         a = x_loc(0);
         b = x_loc(1);
         r = x_loc.block(2, 0, D, 1);
-
-#ifdef NOISELESS
-        b = b_fixed;
-#endif
     }
 } // namespace sequential_line_search
