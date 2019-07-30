@@ -19,18 +19,18 @@ void internal::MergeClosePoints(const double                                    
 
     while (true)
     {
-        bool dirty = false;
+        bool is_dirty = false;
 
         const unsigned N = X.rows();
         const unsigned M = X.cols();
 
         // Distance matrix (upper triangle only)
-        MatrixXd Dist(M, M);
+        MatrixXd distance_matrix(M, M);
         for (unsigned i = 0; i < M; ++i)
         {
             for (unsigned j = i + 1; j < M; ++j)
             {
-                Dist(i, j) = (X.col(i) - X.col(j)).squaredNorm();
+                distance_matrix(i, j) = (X.col(i) - X.col(j)).squaredNorm();
             }
         }
 
@@ -38,7 +38,7 @@ void internal::MergeClosePoints(const double                                    
         {
             for (unsigned j = i + 1; j < M; ++j)
             {
-                if (!dirty && Dist(i, j) < eps_squared)
+                if (!is_dirty && distance_matrix(i, j) < eps_squared)
                 {
                     // Construct a mapping from the old indices to the new one
                     std::map<unsigned, unsigned> mapping;
@@ -53,27 +53,32 @@ void internal::MergeClosePoints(const double                                    
                     mapping[i] = M - 2;
                     mapping[j] = M - 2;
 
-                    // Update the matrix
-                    MatrixXd newX(N, M - 1);
+                    // Construct a new matrix
+                    MatrixXd new_X(N, M - 1);
                     for (unsigned old_index = 0; old_index < M; ++old_index)
                     {
-                        newX.col(mapping[old_index]) = X.col(old_index);
+                        new_X.col(mapping[old_index]) = X.col(old_index);
                     }
-                    newX.col(M - 2) = 0.5 * (X.col(i) + X.col(j));
-                    X               = newX;
+                    new_X.col(M - 2) = 0.5 * (X.col(i) + X.col(j));
+
+                    // Replace the data
+                    X = new_X;
 
                     // Update the indices in the preference pairs
                     for (sequential_line_search::Preference& p : D)
                     {
                         for (unsigned i = 0; i < p.size(); ++i)
+                        {
                             p[i] = mapping[p[i]];
+                        }
                     }
 
-                    dirty = true;
+                    is_dirty = true;
                 }
             }
         }
-        if (!dirty)
+
+        if (!is_dirty)
         {
             return;
         }
@@ -85,15 +90,15 @@ void sequential_line_search::PreferenceDataManager::AddNewPoints(const Eigen::Ve
                                                                  const bool                          merge_close_points,
                                                                  const double                        epsilon)
 {
-    if (X.rows() == 0)
+    if (m_X.rows() == 0)
     {
         // X
         const unsigned d = xs_other[0].rows();
-        X                = MatrixXd(d, xs_other.size() + 1);
-        X.col(0)         = x_preferable;
+        m_X              = MatrixXd(d, xs_other.size() + 1);
+        m_X.col(0)       = x_preferable;
         for (unsigned i = 0; i < xs_other.size(); ++i)
         {
-            X.col(i + 1) = xs_other[i];
+            m_X.col(i + 1) = xs_other[i];
         }
 
         // D
@@ -102,23 +107,23 @@ void sequential_line_search::PreferenceDataManager::AddNewPoints(const Eigen::Ve
         {
             indices[i] = i;
         }
-        D.push_back(Preference(indices));
+        m_D.push_back(Preference(indices));
 
         return;
     }
 
-    const unsigned d = X.rows();
-    const unsigned N = X.cols();
+    const unsigned d = m_X.rows();
+    const unsigned N = m_X.cols();
 
     // X
-    MatrixXd newX(d, N + xs_other.size() + 1);
-    newX.block(0, 0, d, N) = X;
-    newX.col(N)            = x_preferable;
+    MatrixXd new_X(d, N + xs_other.size() + 1);
+    new_X.block(0, 0, d, N) = m_X;
+    new_X.col(N)            = x_preferable;
     for (unsigned i = 0; i < xs_other.size(); ++i)
     {
-        newX.col(N + i + 1) = xs_other[i];
+        new_X.col(N + i + 1) = xs_other[i];
     }
-    X = newX;
+    m_X = new_X;
 
     // D
     std::vector<unsigned> indices(xs_other.size() + 1);
@@ -126,11 +131,11 @@ void sequential_line_search::PreferenceDataManager::AddNewPoints(const Eigen::Ve
     {
         indices[i] = N + i;
     }
-    D.push_back(Preference(indices));
+    m_D.push_back(Preference(indices));
 
     // Merge
     if (merge_close_points)
     {
-        internal::MergeClosePoints(epsilon, X, D);
+        internal::MergeClosePoints(epsilon, m_X, m_D);
     }
 }

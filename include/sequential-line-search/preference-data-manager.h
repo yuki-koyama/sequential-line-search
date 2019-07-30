@@ -11,8 +11,8 @@ namespace sequential_line_search
     class PreferenceDataManager
     {
     public:
-        Eigen::MatrixXd         X;
-        std::vector<Preference> D;
+        Eigen::MatrixXd         m_X;
+        std::vector<Preference> m_D;
 
         void AddNewPoints(const Eigen::VectorXd&              x_preferable,
                           const std::vector<Eigen::VectorXd>& xs_other,
