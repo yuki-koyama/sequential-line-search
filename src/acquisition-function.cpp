@@ -3,6 +3,7 @@
 #include <iostream>
 #include <mathtoolbox/acquisition-functions.hpp>
 #include <nlopt-util.hpp>
+#include <parallel-util.hpp>
 #include <sequential-line-search/acquisition-function.h>
 #include <sequential-line-search/gaussian-process-regressor.h>
 #include <utility>
@@ -153,28 +154,32 @@ namespace sequential_line_search
             const VectorXd upper = VectorXd::Constant(D, 1.0);
             const VectorXd lower = VectorXd::Constant(D, 0.0);
 
-//#define MULTISTART
+#define MULTISTART
 #ifdef MULTISTART
-            // TODO: parallelize
             constexpr int num_trials = 20;
 
-            double   y_star_global = -std::numeric_limits<double>::infinity();
-            VectorXd x_star_global;
-            for (int i = 0; i < num_trials; ++i)
-            {
+            Eigen::MatrixXd x_stars(D, num_trials);
+            Eigen::VectorXd y_stars(num_trials);
+            const auto      perform_local_optimization_from_random_initialization = [&](const int i) {
                 const VectorXd x_ini = 0.5 * (VectorXd::Random(D) + VectorXd::Ones(D));
                 const VectorXd x_star =
-                    nloptutil::solve(x_ini, upper, lower, objective, nlopt::LD_LBFGS, &regressor, true, 100);
+                    nloptutil::solve(x_ini, upper, lower, objective, nlopt::LD_LBFGS, &regressor, true, 50);
 
                 const double y_star = CalculateAcqusitionValue(regressor, x_star);
-                if (y_star_global < y_star)
-                {
-                    x_star_global = x_star;
-                    y_star_global = y_star;
-                }
-            }
 
-            return x_star_global;
+                x_stars.col(i) = x_star;
+                y_stars(i)     = y_star;
+            };
+
+            parallelutil::queue_based_parallel_for(num_trials, perform_local_optimization_from_random_initialization);
+
+            const int best_index = [&]() {
+                int index;
+                y_stars.maxCoeff(&index);
+                return index;
+            }();
+
+            return x_stars.col(best_index);
 #else
             const VectorXd x_ini = VectorXd::Constant(D, 0.5);
 
@@ -207,46 +212,51 @@ namespace sequential_line_search
 
                 const VectorXd x_star = [&]() {
 #ifdef MULTISTART
-                    // TODO: parallelize
+                    const Eigen::VectorXd x_best = [&]() {
+                        const int num_data_points = regressor.getX().cols();
+
+                        Eigen::VectorXd f(num_data_points);
+                        for (int i = 0; i < num_data_points; ++i)
+                        {
+                            f(i) = regressor.PredictMu(regressor.getX().col(i));
+                        }
+
+                        int best_index;
+                        f.maxCoeff(&best_index);
+
+                        return regressor.getX().col(best_index);
+                    }();
+
                     constexpr int num_trials = 20;
 
-                    double   y_star_global = -std::numeric_limits<double>::infinity();
-                    VectorXd x_star_global;
-                    for (int i = 0; i < num_trials; ++i)
-                    {
+                    Eigen::MatrixXd x_stars(D, num_trials);
+                    Eigen::VectorXd y_stars(num_trials);
+                    const auto      perform_local_optimization_from_random_initialization = [&](const int i) {
                         const VectorXd x_ini  = 0.5 * (VectorXd::Random(D) + VectorXd::Ones(D));
                         const VectorXd x_star = nloptutil::solve(
                             x_ini, upper, lower, objective_for_multiple_points, nlopt::LD_LBFGS, &data, true, 100);
 
                         const double y_star = [&]() {
-                            const Eigen::VectorXd x_best = [&]() {
-                                const int num_data_points = regressor.getX().cols();
-
-                                Eigen::VectorXd f(num_data_points);
-                                for (int i = 0; i < num_data_points; ++i)
-                                {
-                                    f(i) = regressor.PredictMu(regressor.getX().col(i));
-                                }
-
-                                int best_index;
-                                f.maxCoeff(&best_index);
-
-                                return regressor.getX().col(best_index);
-                            }();
-
                             const auto mu    = [&](const Eigen::VectorXd& x) { return regressor.PredictMu(x); };
                             const auto sigma = [&](const Eigen::VectorXd& x) { return reg.PredictSigma(x); };
 
                             return mathtoolbox::GetExpectedImprovement(x_star, mu, sigma, x_best);
                         }();
-                        if (y_star_global < y_star)
-                        {
-                            x_star_global = x_star;
-                            y_star_global = y_star;
-                        }
-                    }
 
-                    return x_star_global;
+                        x_stars.col(i) = x_star;
+                        y_stars(i)     = y_star;
+                    };
+
+                    parallelutil::queue_based_parallel_for(num_trials,
+                                                           perform_local_optimization_from_random_initialization);
+
+                    const int best_index = [&]() {
+                        int index;
+                        y_stars.maxCoeff(&index);
+                        return index;
+                    }();
+
+                    return x_stars.col(best_index);
 #else
                     const VectorXd x_ini         = VectorXd::Constant(D, 0.5);
                     const VectorXd x_star_global = nloptutil::solve(

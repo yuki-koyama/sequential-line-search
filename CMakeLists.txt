@@ -59,6 +59,10 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/nlopt)
 # nlopt-util
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/nlopt-util)
 
+# parallel-util
+set(PARALLELUTIL_BUILD_TESTS OFF CACHE INTERNAL "" FORCE)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/parallel-util)
+
 # rand-util
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/rand-util)
 
@@ -82,7 +86,7 @@ IF (WIN32)
 ENDIF()
 
 target_include_directories(SequentialLineSearch PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(SequentialLineSearch Eigen3::Eigen mathtoolbox nlopt nlopt-util rand-util timer)
+target_link_libraries(SequentialLineSearch Eigen3::Eigen mathtoolbox nlopt nlopt-util parallel-util rand-util timer)
 
 install(FILES ${headers} DESTINATION include/SequentialLineSearch)
 install(TARGETS SequentialLineSearch ARCHIVE DESTINATION lib)
@@ -126,10 +130,6 @@ if(SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS)
 	set(ENHANCER_USE_QT_FEATURES ON CACHE INTERNAL "" FORCE)
 	set(ENHANCER_BUILD_QT_TESTS OFF CACHE INTERNAL "" FORCE)
 	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/enhancer)
-
-	# parallel-util
-	set(PARALLELUTIL_BUILD_TESTS OFF CACHE INTERNAL "" FORCE)
-	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/parallel-util)
 
 	add_subdirectory(demos/sequential_line_search_photo)
 endif()

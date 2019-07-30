@@ -20,7 +20,7 @@ file(GLOB files ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.
 # Executable definition for macOS
 add_executable(SequentialLineSearchPhoto MACOSX_BUNDLE ${files} ${photo_files})
 set_target_properties(SequentialLineSearchPhoto PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/resources/Info.plist.in)
-target_link_libraries(SequentialLineSearchPhoto ${OPENGL_LIBRARIES} Qt5::Gui Qt5::Widgets Qt5::OpenGL Eigen3::Eigen SequentialLineSearch tinycolormap enhancer parallel-util)
+target_link_libraries(SequentialLineSearchPhoto ${OPENGL_LIBRARIES} Qt5::Gui Qt5::Widgets Qt5::OpenGL Eigen3::Eigen SequentialLineSearch tinycolormap enhancer)
 
 # Resource properties
 set_source_files_properties(

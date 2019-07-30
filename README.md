@@ -32,6 +32,7 @@ DOI: https://doi.org/10.1145/3072959.3073598
 - timer <https://github.com/yuki-koyama/timer> (included via gitsubmodule)
 - mathtoolbox <https://github.com/yuki-koyama/mathtoolbox> (included via gitsubmodule)
 - nlopt-util <https://github.com/yuki-koyama/nlopt-util> (included via gitsubmodule)
+- parallel-util <https://github.com/yuki-koyama/parallel-util> (included via gitsubmodule)
 - rand-util <https://github.com/yuki-koyama/rand-util> (included via gitsubmodule)
 
 ### Required for Command Line Demos
@@ -51,7 +52,6 @@ To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_D
 
 - Qt5 <http://doc.qt.io/qt-5/> (`brew install qt` / `sudo apt install qt5-default`)
 - enhancer <https://github.com/yuki-koyama/enhancer> (included via gitsubmodule)
-- parallel-util <https://github.com/yuki-koyama/parallel-util> (included via gitsubmodule)
 - tinycolormap <https://github.com/yuki-koyama/tinycolormap> (included via gitsubmodule)
 
 To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS` should be set `ON`. They require runtime environments to support OpenGL 3.2 Core Profile and GLSL 3.3.
