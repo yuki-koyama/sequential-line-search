@@ -9,7 +9,7 @@ namespace sequential_line_search
 {
     class PreferenceRegressor;
     class Slider;
-    class Data;
+    class PreferenceDataManager;
 
     class SequentialLineSearchOptimizer
     {
@@ -41,9 +41,9 @@ namespace sequential_line_search
         const bool m_use_slider_enlargement;
         const bool m_use_map_hyperparameters;
 
-        std::shared_ptr<PreferenceRegressor> m_regressor;
-        std::shared_ptr<Slider>              m_slider;
-        std::shared_ptr<Data>                m_data;
+        std::shared_ptr<PreferenceRegressor>   m_regressor;
+        std::shared_ptr<Slider>                m_slider;
+        std::shared_ptr<PreferenceDataManager> m_data;
 
         double m_a;
         double m_r;

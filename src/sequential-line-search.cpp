@@ -1,5 +1,5 @@
 #include <sequential-line-search/acquisition-function.h>
-#include <sequential-line-search/data.h>
+#include <sequential-line-search/preference-data-manager.h>
 #include <sequential-line-search/preference-regressor.h>
 #include <sequential-line-search/sequential-line-search.h>
 #include <sequential-line-search/slider.h>
@@ -13,7 +13,7 @@ sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptim
       m_use_map_hyperparameters(use_map_hyperparameters), m_a(0.500), m_r(0.500), m_b(0.005), m_variance(0.250),
       m_btl_scale(0.010)
 {
-    m_data      = std::make_shared<Data>();
+    m_data      = std::make_shared<PreferenceDataManager>();
     m_regressor = nullptr;
     m_slider    = std::make_shared<Slider>(
         utils::generateRandomVector(m_dimension), utils::generateRandomVector(m_dimension), false);

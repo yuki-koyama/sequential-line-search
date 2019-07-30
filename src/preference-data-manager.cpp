@@ -1,5 +1,5 @@
 #include <map>
-#include <sequential-line-search/data.h>
+#include <sequential-line-search/preference-data-manager.h>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -74,11 +74,11 @@ namespace internal
 
 namespace sequential_line_search
 {
-    void Data::MergeClosePoints(const double epsilon) { internal::MergeClosePoints(epsilon, X, D); }
+    void PreferenceDataManager::MergeClosePoints(const double epsilon) { internal::MergeClosePoints(epsilon, X, D); }
 
-    void Data::AddNewPoints(const Eigen::VectorXd&              x_preferable,
-                            const std::vector<Eigen::VectorXd>& xs_other,
-                            const bool                          merge_close_points)
+    void PreferenceDataManager::AddNewPoints(const Eigen::VectorXd&              x_preferable,
+                                             const std::vector<Eigen::VectorXd>& xs_other,
+                                             const bool                          merge_close_points)
     {
         if (X.rows() == 0)
         {

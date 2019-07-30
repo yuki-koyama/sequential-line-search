@@ -1,5 +1,5 @@
-#ifndef data_h
-#define data_h
+#ifndef SEQUENTIAL_LINE_SEARCH_PREFERENCE_DATA_MANAGER_H
+#define SEQUENTIAL_LINE_SEARCH_PREFERENCE_DATA_MANAGER_H
 
 #include <Eigen/Core>
 #include <sequential-line-search/preference.h>
@@ -8,7 +8,7 @@
 namespace sequential_line_search
 {
     /// \brief Utility class for managing observed data during optimization.
-    class Data
+    class PreferenceDataManager
     {
     public:
         Eigen::MatrixXd         X;
@@ -25,4 +25,4 @@ namespace sequential_line_search
     };
 } // namespace sequential_line_search
 
-#endif // data_h
+#endif // SEQUENTIAL_LINE_SEARCH_PREFERENCE_DATA_MANAGER_H
