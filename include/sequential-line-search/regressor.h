@@ -13,6 +13,9 @@ namespace sequential_line_search
         virtual double PredictMu(const Eigen::VectorXd& x) const    = 0;
         virtual double PredictSigma(const Eigen::VectorXd& x) const = 0;
 
+        virtual Eigen::VectorXd PredictMuDerivative(const Eigen::VectorXd& x) const    = 0;
+        virtual Eigen::VectorXd PredictSigmaDerivative(const Eigen::VectorXd& x) const = 0;
+
         virtual const Eigen::MatrixXd& getX() const = 0;
         virtual const Eigen::VectorXd& gety() const = 0;
         virtual double                 geta() const = 0;
@@ -35,6 +38,13 @@ namespace sequential_line_search
                                       const double           a,
                                       const double /*b*/,
                                       const Eigen::VectorXd& r);
+
+        // partial k / partial x
+        static Eigen::MatrixXd CalcSmallKSmallXDerivative(const Eigen::VectorXd& x,
+                                                          const Eigen::MatrixXd& X,
+                                                          const double           a,
+                                                          const double           b,
+                                                          const Eigen::VectorXd& r);
     };
 } // namespace sequential_line_search
 

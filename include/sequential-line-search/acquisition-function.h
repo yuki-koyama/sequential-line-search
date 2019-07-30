@@ -21,6 +21,11 @@ namespace sequential_line_search
                                         const Eigen::VectorXd& x,
                                         const FunctionType     function_type = FunctionType::ExpectedImprovement);
 
+        Eigen::VectorXd
+        CalculateAcquisitionValueDerivative(const Regressor&       regressor,
+                                            const Eigen::VectorXd& x,
+                                            const FunctionType     function_type = FunctionType::ExpectedImprovement);
+
         Eigen::VectorXd FindNextPoint(Regressor&         regressor,
                                       const FunctionType function_type = FunctionType::ExpectedImprovement);
 

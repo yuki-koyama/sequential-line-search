@@ -251,6 +251,21 @@ namespace sequential_line_search
         return std::sqrt(a - k.transpose() * C_inv * k);
     }
 
+    Eigen::VectorXd PreferenceRegressor::PredictMuDerivative(const Eigen::VectorXd& x) const
+    {
+        // TODO: Incorporate a mean function
+        const MatrixXd k_x_derivative = Regressor::CalcSmallKSmallXDerivative(x, X, a, b, r);
+        return k_x_derivative * C_inv * y;
+    }
+
+    Eigen::VectorXd PreferenceRegressor::PredictSigmaDerivative(const Eigen::VectorXd& x) const
+    {
+        const MatrixXd k_x_derivative = Regressor::CalcSmallKSmallXDerivative(x, X, a, b, r);
+        const VectorXd k              = calc_k(x, X, a, b, r);
+        const double   sigma          = PredictSigma(x);
+        return -(1.0 / sigma) * k_x_derivative * C_inv * k;
+    }
+
     void PreferenceRegressor::PerformMapEstimation(const PreferenceRegressor* previous_iter_regressor)
     {
         const unsigned M = X.cols();

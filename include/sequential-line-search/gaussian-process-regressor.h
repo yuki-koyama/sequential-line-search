@@ -19,6 +19,9 @@ namespace sequential_line_search
         double PredictMu(const Eigen::VectorXd& x) const override;
         double PredictSigma(const Eigen::VectorXd& x) const override;
 
+        Eigen::VectorXd PredictMuDerivative(const Eigen::VectorXd& x) const override;
+        Eigen::VectorXd PredictSigmaDerivative(const Eigen::VectorXd& x) const override;
+
         /// \brief Data points.
         Eigen::MatrixXd X;
 
@@ -49,7 +52,7 @@ namespace sequential_line_search
         const Eigen::VectorXd& getr() const override { return r; }
 
     private:
-        void compute_MAP();
+        void PerformMapEstimation();
     };
 } // namespace sequential_line_search
 

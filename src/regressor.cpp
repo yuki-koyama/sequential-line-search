@@ -17,8 +17,9 @@ inline VectorXd concat(const double a, const VectorXd& b)
 
 namespace sequential_line_search
 {
-    constexpr auto kernel                    = mathtoolbox::GetArdMatern52Kernel;
-    constexpr auto kernel_theta_i_derivative = mathtoolbox::GetArdMatern52KernelThetaIDerivative;
+    constexpr auto kernel                      = mathtoolbox::GetArdMatern52Kernel;
+    constexpr auto kernel_theta_i_derivative   = mathtoolbox::GetArdMatern52KernelThetaIDerivative;
+    constexpr auto kernel_first_arg_derivative = mathtoolbox::GetArdMatern52KernelFirstArgDerivative;
 
     MatrixXd Regressor::calc_C(const MatrixXd& X, const double a, const double b, const VectorXd& r)
     {
@@ -96,5 +97,23 @@ namespace sequential_line_search
         }
 
         return k;
+    }
+
+    Eigen::MatrixXd Regressor::CalcSmallKSmallXDerivative(
+        const Eigen::VectorXd& x, const Eigen::MatrixXd& X, const double a, const double b, const Eigen::VectorXd& r)
+    {
+        const unsigned N   = X.cols();
+        const unsigned dim = X.rows();
+
+        assert(dim == r.size());
+        assert(dim != 0);
+
+        MatrixXd k_x_derivative(dim, N);
+        for (unsigned i = 0; i < N; ++i)
+        {
+            k_x_derivative.col(i) = kernel_first_arg_derivative(x, X.col(i), concat(a, r));
+        }
+
+        return k_x_derivative;
     }
 } // namespace sequential_line_search

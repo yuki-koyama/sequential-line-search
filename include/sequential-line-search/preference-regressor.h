@@ -28,6 +28,9 @@ namespace sequential_line_search
         double PredictMu(const Eigen::VectorXd& x) const override;
         double PredictSigma(const Eigen::VectorXd& x) const override;
 
+        Eigen::VectorXd PredictMuDerivative(const Eigen::VectorXd& x) const override;
+        Eigen::VectorXd PredictSigmaDerivative(const Eigen::VectorXd& x) const override;
+
         const bool m_use_map_hyperparameters;
 
         /// \brief Find the data point that is likely to have the largest value from the so-far observed data points.
