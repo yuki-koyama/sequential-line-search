@@ -16,7 +16,8 @@ namespace sequential_line_search
 
         void AddNewPoints(const Eigen::VectorXd&              x_preferable,
                           const std::vector<Eigen::VectorXd>& xs_other,
-                          const bool                          merge_close_points = true);
+                          const bool                          merge_close_points = true,
+                          const double                        epsilon            = 1e-04);
     };
 } // namespace sequential_line_search
 

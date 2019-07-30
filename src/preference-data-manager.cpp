@@ -78,7 +78,8 @@ namespace sequential_line_search
 {
     void PreferenceDataManager::AddNewPoints(const Eigen::VectorXd&              x_preferable,
                                              const std::vector<Eigen::VectorXd>& xs_other,
-                                             const bool                          merge_close_points)
+                                             const bool                          merge_close_points,
+                                             const double                        epsilon)
     {
         if (X.rows() == 0)
         {
@@ -126,8 +127,6 @@ namespace sequential_line_search
         // Merge
         if (merge_close_points)
         {
-            constexpr double epsilon = 1e-04;
-
             internal::MergeClosePoints(epsilon, X, D);
         }
     }
