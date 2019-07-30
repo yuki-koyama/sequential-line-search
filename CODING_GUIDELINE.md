@@ -73,3 +73,19 @@ The current source codes in this repository are really messy; they follow many i
 - `calc`: calculate
 - `iter`: iteration
 - `dir`: directory
+
+## Coding Style
+
+### Unnest Namespace
+
+```
+namespace my_library_namespace
+{
+    void CalculateValue();
+}
+
+void my_library_namespace::CalculateValue()
+{
+    // ...
+}
+```
