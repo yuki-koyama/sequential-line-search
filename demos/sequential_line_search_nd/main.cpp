@@ -1,6 +1,9 @@
 #include <iostream>
 #include <sequential-line-search/sequential-line-search.h>
 #include <sequential-line-search/utils.h>
+#ifdef PARALLEL
+#include <parallel-util.hpp>
+#endif
 
 namespace
 {
@@ -9,6 +12,9 @@ namespace
     constexpr double b         = 0.001;
     constexpr double variance  = 0.100;
     constexpr double btl_scale = 0.010;
+
+    constexpr unsigned n_trials     = 3;
+    constexpr unsigned n_iterations = 10;
 
     constexpr bool use_slider_enlargement = true;
     constexpr bool use_MAP                = true;
@@ -33,22 +39,18 @@ namespace
 
 int main(int argc, char* argv[])
 {
-    constexpr unsigned n_trials     = 3;
-    constexpr unsigned n_iterations = 10;
-
     // Storage for performance reports
     Eigen::MatrixXd objective_values(n_iterations, n_trials);
     Eigen::MatrixXd residual_norms(n_iterations, n_trials);
 
-    for (unsigned trial = 0; trial < n_trials; ++trial)
-    {
+    const auto perform_test = [&](const int trial_index) {
         sequential_line_search::SequentialLineSearchOptimizer optimizer(
             test_dimension, use_slider_enlargement, use_MAP);
 
         optimizer.SetHyperparameters(a, r, b, variance, btl_scale);
 
         std::cout << "========================" << std::endl;
-        std::cout << "Trial " << trial + 1 << std::endl;
+        std::cout << "Trial " << trial_index + 1 << std::endl;
         std::cout << "========================" << std::endl;
 
         // Iterate optimization steps
@@ -72,15 +74,24 @@ int main(int argc, char* argv[])
             std::cout << "x: " << optimizer.GetParameters(max_slider_position).transpose() << std::endl;
             std::cout << "y: " << max_y << std::endl;
 
-            objective_values(i, trial) = max_y;
-            residual_norms(i, trial)   = (optimizer.GetParameters(max_slider_position) - analytic_solution).norm();
+            objective_values(i, trial_index) = max_y;
+            residual_norms(i, trial_index) = (optimizer.GetParameters(max_slider_position) - analytic_solution).norm();
 
             optimizer.SubmitLineSearchResult(max_slider_position);
         }
 
         std::cout << std::endl << "Found maximizer: " << optimizer.GetMaximizer().transpose() << std::endl;
         std::cout << "Found maximum: " << evaluateObjectiveFunction(optimizer.GetMaximizer()) << std::endl << std::endl;
+    };
+
+#ifdef PARALLEL
+    parallelutil::queue_based_parallel_for(n_trials, perform_test);
+#else
+    for (unsigned trial_index = 0; trial_index < n_trials; ++trial_index)
+    {
+        perform_test(trial_index);
     }
+#endif
 
     // Export a report as a CSV file
     sequential_line_search::utils::exportMatrixToCsv("objective_values.csv", objective_values);
