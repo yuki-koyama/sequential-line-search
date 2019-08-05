@@ -21,6 +21,16 @@ namespace
 {
     using namespace sequential_line_search;
 
+    inline VectorXd concat(const double a, const VectorXd& b)
+    {
+        VectorXd result(b.size() + 1);
+
+        result(0)                   = a;
+        result.segment(1, b.size()) = b;
+
+        return result;
+    }
+
 #ifdef NOISELESS
     const double b_fixed = 1e-06;
 #endif
@@ -131,7 +141,7 @@ namespace
         }
 
         // Log likelihood of y distribution
-        const MatrixXd C     = Regressor::calc_C(X, a, b, r);
+        const MatrixXd C     = CalcLargeKY(X, concat(a, r), b);
         const MatrixXd C_inv = C.inverse();
         const double   C_det = C.determinant();
         const double   term1 = -0.5 * y.transpose() * C_inv * y;
@@ -235,33 +245,33 @@ namespace sequential_line_search
 
         PerformMapEstimation();
 
-        C     = Regressor::calc_C(X, a, b, r);
+        C     = CalcLargeKY(X, concat(a, r), b);
         C_inv = C.inverse();
     }
 
     double PreferenceRegressor::PredictMu(const VectorXd& x) const
     {
-        const VectorXd k = Regressor::calc_k(x, X, a, b, r);
+        const VectorXd k = CalcSmallK(x, X, concat(a, r));
         return k.transpose() * C_inv * y;
     }
 
     double PreferenceRegressor::PredictSigma(const VectorXd& x) const
     {
-        const VectorXd k = Regressor::calc_k(x, X, a, b, r);
+        const VectorXd k = CalcSmallK(x, X, concat(a, r));
         return std::sqrt(a - k.transpose() * C_inv * k);
     }
 
     Eigen::VectorXd PreferenceRegressor::PredictMuDerivative(const Eigen::VectorXd& x) const
     {
         // TODO: Incorporate a mean function
-        const MatrixXd k_x_derivative = Regressor::CalcSmallKSmallXDerivative(x, X, a, b, r);
+        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, concat(a, r));
         return k_x_derivative * C_inv * y;
     }
 
     Eigen::VectorXd PreferenceRegressor::PredictSigmaDerivative(const Eigen::VectorXd& x) const
     {
-        const MatrixXd k_x_derivative = Regressor::CalcSmallKSmallXDerivative(x, X, a, b, r);
-        const VectorXd k              = calc_k(x, X, a, b, r);
+        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, concat(a, r));
+        const VectorXd k              = CalcSmallK(x, X, concat(a, r));
         const double   sigma          = PredictSigma(x);
         return -(1.0 / sigma) * k_x_derivative * C_inv * k;
     }

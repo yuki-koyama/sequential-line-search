@@ -25,29 +25,28 @@ namespace sequential_line_search
         Eigen::VectorXd PredictMaximumPointFromData() const;
 
         static Eigen::MatrixXd
-        calc_C(const Eigen::MatrixXd& X, const double a, const double b, const Eigen::VectorXd& r);
+        calc_C_grad_a(const Eigen::MatrixXd& X, const double a, const double b, const Eigen::VectorXd& r);
         static Eigen::MatrixXd
-        calc_C_grad_a(const Eigen::MatrixXd& X, const double a, const double /*b*/, const Eigen::VectorXd& r);
-        static Eigen::MatrixXd
-                               calc_C_grad_b(const Eigen::MatrixXd& X, const double /*a*/, const double /*b*/, const Eigen::VectorXd& /*r*/);
-        static Eigen::MatrixXd calc_C_grad_r_i(const Eigen::MatrixXd& X,
-                                               const double           a,
-                                               const double /*b*/,
-                                               const Eigen::VectorXd& r,
-                                               const unsigned         index);
-        static Eigen::VectorXd calc_k(const Eigen::VectorXd& x,
-                                      const Eigen::MatrixXd& X,
-                                      const double           a,
-                                      const double /*b*/,
-                                      const Eigen::VectorXd& r);
-
-        // partial k / partial x
-        static Eigen::MatrixXd CalcSmallKSmallXDerivative(const Eigen::VectorXd& x,
-                                                          const Eigen::MatrixXd& X,
-                                                          const double           a,
-                                                          const double           b,
-                                                          const Eigen::VectorXd& r);
+                               calc_C_grad_b(const Eigen::MatrixXd& X, const double a, const double b, const Eigen::VectorXd& r);
+        static Eigen::MatrixXd calc_C_grad_r_i(
+            const Eigen::MatrixXd& X, const double a, const double b, const Eigen::VectorXd& r, const unsigned index);
     };
+
+    // k
+    Eigen::VectorXd
+    CalcSmallK(const Eigen::VectorXd& x, const Eigen::MatrixXd& X, const Eigen::VectorXd& kernel_hyperparameters);
+
+    // K_y = K_f + sigma^{2} I
+    Eigen::MatrixXd
+    CalcLargeKY(const Eigen::MatrixXd& X, const Eigen::VectorXd& kernel_hyperparameters, const double noise_level);
+
+    // K_f
+    Eigen::MatrixXd CalcLargeKF(const Eigen::MatrixXd& X, const Eigen::VectorXd& kernel_hyperparameters);
+
+    // partial k / partial x
+    Eigen::MatrixXd CalcSmallKSmallXDerivative(const Eigen::VectorXd& x,
+                                               const Eigen::MatrixXd& X,
+                                               const Eigen::VectorXd& kernel_hyperparameters);
 } // namespace sequential_line_search
 
 #endif // REGRESSOR_H

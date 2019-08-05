@@ -21,6 +21,16 @@ namespace
     const double r_prior_mu            = std::log(0.500);
     const double r_prior_sigma_squared = 0.50;
 
+    inline VectorXd concat(const double a, const VectorXd& b)
+    {
+        VectorXd result(b.size() + 1);
+
+        result(0)                   = a;
+        result.segment(1, b.size()) = b;
+
+        return result;
+    }
+
     double calc_grad_a_prior(const double a)
     {
         return mathtoolbox::GetLogOfLogNormalDistDerivative(a, a_prior_mu, a_prior_sigma_squared);
@@ -126,7 +136,7 @@ namespace
         const double   b = x[1];
         const VectorXd r = Eigen::Map<const VectorXd>(&x[2], x.size() - 2);
 
-        const MatrixXd C     = Regressor::calc_C(X, a, b, r);
+        const MatrixXd C     = CalcLargeKY(X, concat(a, r), b);
         const MatrixXd C_inv = C.inverse();
 
         // When the algorithm is gradient-based, compute the gradient vector
@@ -174,7 +184,7 @@ namespace sequential_line_search
 
         PerformMapEstimation();
 
-        C     = calc_C(X, a, b, r);
+        C     = CalcLargeKY(X, concat(a, r), b);
         C_inv = C.inverse();
     }
 
@@ -192,34 +202,34 @@ namespace sequential_line_search
             return;
         }
 
-        C     = calc_C(X, a, b, r);
+        C     = CalcLargeKY(X, concat(a, r), b);
         C_inv = C.inverse();
     }
 
     double GaussianProcessRegressor::PredictMu(const VectorXd& x) const
     {
         // TODO: Incorporate a mean function
-        const VectorXd k = calc_k(x, X, a, b, r);
+        const VectorXd k = CalcSmallK(x, X, concat(a, r));
         return k.transpose() * C_inv * y;
     }
 
     double GaussianProcessRegressor::PredictSigma(const VectorXd& x) const
     {
-        const VectorXd k = calc_k(x, X, a, b, r);
+        const VectorXd k = CalcSmallK(x, X, concat(a, r));
         return std::sqrt(a - k.transpose() * C_inv * k);
     }
 
     Eigen::VectorXd GaussianProcessRegressor::PredictMuDerivative(const Eigen::VectorXd& x) const
     {
         // TODO: Incorporate a mean function
-        const MatrixXd k_x_derivative = Regressor::CalcSmallKSmallXDerivative(x, X, a, b, r);
+        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, concat(a, r));
         return k_x_derivative * C_inv * y;
     }
 
     Eigen::VectorXd GaussianProcessRegressor::PredictSigmaDerivative(const Eigen::VectorXd& x) const
     {
-        const MatrixXd k_x_derivative = Regressor::CalcSmallKSmallXDerivative(x, X, a, b, r);
-        const VectorXd k              = calc_k(x, X, a, b, r);
+        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, concat(a, r));
+        const VectorXd k              = CalcSmallK(x, X, concat(a, r));
         const double   sigma          = PredictSigma(x);
         return -(1.0 / sigma) * k_x_derivative * C_inv * k;
     }
