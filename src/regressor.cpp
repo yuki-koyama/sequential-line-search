@@ -17,9 +17,15 @@ inline VectorXd concat(const double a, const VectorXd& b)
 
 namespace sequential_line_search
 {
+#ifdef SEQUENTIAL_LINE_SEARCH_USE_ARD_SQUARED_EXP_KERNEL
+    constexpr auto kernel                      = mathtoolbox::GetArdSquaredExpKernel;
+    constexpr auto kernel_theta_i_derivative   = mathtoolbox::GetArdSquaredExpKernelThetaIDerivative;
+    constexpr auto kernel_first_arg_derivative = mathtoolbox::GetArdSquaredExpKernelFirstArgDerivative;
+#else
     constexpr auto kernel                      = mathtoolbox::GetArdMatern52Kernel;
     constexpr auto kernel_theta_i_derivative   = mathtoolbox::GetArdMatern52KernelThetaIDerivative;
     constexpr auto kernel_first_arg_derivative = mathtoolbox::GetArdMatern52KernelFirstArgDerivative;
+#endif
 
     VectorXd Regressor::PredictMaximumPointFromData() const
     {
