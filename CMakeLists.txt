@@ -83,7 +83,7 @@ IF (WIN32)
 ENDIF()
 
 target_include_directories(SequentialLineSearch PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(SequentialLineSearch Eigen3::Eigen mathtoolbox nlopt nlopt-util parallel-util rand-util timer)
+target_link_libraries(SequentialLineSearch Eigen3::Eigen mathtoolbox nlopt nlopt-util parallel-util timer)
 
 install(FILES ${headers} DESTINATION include/SequentialLineSearch)
 install(TARGETS SequentialLineSearch ARCHIVE DESTINATION lib)
@@ -105,6 +105,9 @@ if(SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS)
 	set(TINYCOLORMAP_WITH_QT5    OFF CACHE INTERNAL "" FORCE)
 	set(TINYCOLORMAP_BUILD_TOOLS OFF CACHE INTERNAL "" FORCE)
 	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/tinycolormap)
+
+	# rand-util
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/rand-util)
 
 	add_subdirectory(demos/bayesian_optimization_1d_gui)
 	add_subdirectory(demos/bayesian_optimization_2d_gui)

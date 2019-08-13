@@ -43,6 +43,7 @@ To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_
 ### Required for Visual Demos
 
 - Qt5 <http://doc.qt.io/qt-5/> (`brew install qt` / `sudo apt install qt5-default`)
+- rand-util <https://github.com/yuki-koyama/rand-util> (included via gitsubmodule)
 - tinycolormap <https://github.com/yuki-koyama/tinycolormap> (included via gitsubmodule)
 
 To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS` should be set `ON`.

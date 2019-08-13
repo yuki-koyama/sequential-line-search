@@ -22,3 +22,6 @@
 [submodule "external/mathtoolbox"]
 	path = external/mathtoolbox
 	url = https://github.com/yuki-koyama/mathtoolbox.git
+[submodule "external/rand-util"]
+	path = external/rand-util
+	url = https://github.com/yuki-koyama/rand-util.git

@@ -6,7 +6,7 @@ set(CMAKE_AUTOUIC ON)
 
 file(GLOB files *.cpp *.h)
 add_executable(BayesianOptimization1dGui ${files})
-target_link_libraries(BayesianOptimization1dGui Qt5::Widgets SequentialLineSearch)
+target_link_libraries(BayesianOptimization1dGui Qt5::Widgets rand-util SequentialLineSearch)
 
 # set working folder as Qt5 binary folder
 if(WIN32 AND MSVC)
