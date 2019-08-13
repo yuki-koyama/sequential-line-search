@@ -33,7 +33,6 @@ DOI: https://doi.org/10.1145/3072959.3073598
 - mathtoolbox <https://github.com/yuki-koyama/mathtoolbox> (included via gitsubmodule)
 - nlopt-util <https://github.com/yuki-koyama/nlopt-util> (included via gitsubmodule)
 - parallel-util <https://github.com/yuki-koyama/parallel-util> (included via gitsubmodule)
-- rand-util <https://github.com/yuki-koyama/rand-util> (included via gitsubmodule)
 
 ### Required for Command Line Demos
 

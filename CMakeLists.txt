@@ -63,9 +63,6 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/nlopt-util)
 set(PARALLELUTIL_BUILD_TESTS OFF CACHE INTERNAL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/parallel-util)
 
-# rand-util
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/rand-util)
-
 ###############################################
 # Main library
 ###############################################
