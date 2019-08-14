@@ -69,7 +69,7 @@ namespace sequential_line_search
         // Bradley-Terry-Luce Model
         ////////////////////////////////////////////////
 
-        inline double BTL(Eigen::VectorXd f, double scale = 1.0)
+        inline double BTL(const Eigen::VectorXd& f, double scale = 1.0)
         {
             const unsigned dim = f.rows();
             double         sum = 0.0;
