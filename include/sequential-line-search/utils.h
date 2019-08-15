@@ -69,7 +69,7 @@ namespace sequential_line_search
         // Bradley-Terry-Luce Model
         ////////////////////////////////////////////////
 
-        inline double BTL(const Eigen::VectorXd& f, double scale = 1.0)
+        inline double CalcBtl(const Eigen::VectorXd& f, double scale = 1.0)
         {
             const unsigned dim = f.rows();
             double         sum = 0.0;
@@ -80,10 +80,10 @@ namespace sequential_line_search
             return std::exp(f(0) / scale) / sum;
         }
 
-        inline Eigen::VectorXd derivative_BTL(const Eigen::VectorXd& f, double scale = 1.0)
+        inline Eigen::VectorXd CalcBtlDerivative(const Eigen::VectorXd& f, double scale = 1.0)
         {
             const unsigned dim = f.rows();
-            const double   btl = BTL(f, scale);
+            const double   btl = CalcBtl(f, scale);
             const double   tmp = -btl * btl / scale;
 
             Eigen::VectorXd d(dim);

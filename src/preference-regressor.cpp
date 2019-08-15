@@ -108,7 +108,7 @@ namespace
         {
             tmp(i) = y(p[i]);
         }
-        return std::log(utils::BTL(tmp, btl_scale));
+        return std::log(utils::CalcBtl(tmp, btl_scale));
     }
 
     // Log likelihood that will be maximized
@@ -185,7 +185,7 @@ namespace
                 {
                     tmp1(i) = y(p[i]);
                 }
-                const VectorXd tmp2 = utils::derivative_BTL(tmp1, s) / utils::BTL(tmp1, s);
+                const VectorXd tmp2 = utils::CalcBtlDerivative(tmp1, s) / utils::CalcBtl(tmp1, s);
                 for (unsigned i = 0; i < p.size(); ++i)
                 {
                     grad_y(p[i]) += tmp2(i);
