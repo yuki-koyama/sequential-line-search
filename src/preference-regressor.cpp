@@ -305,7 +305,7 @@ namespace sequential_line_search
         timer::Timer t("PreferenceRegressor::compute_MAP");
 #endif
 
-        const VectorXd x_opt = nloptutil::solve(x_ini, upper, lower, objective, nlopt::LD_TNEWTON, this, 500);
+        const VectorXd x_opt = nloptutil::solve(x_ini, upper, lower, objective, nlopt::LD_TNEWTON, this, true, 500);
 
         y = x_opt.block(0, 0, M, 1);
 
