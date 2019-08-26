@@ -337,7 +337,7 @@ namespace sequential_line_search
 
     ///////////////////////////////////////////////////////////////////
 
-    VectorXd PreferenceRegressor::FindArgMax()
+    VectorXd PreferenceRegressor::FindArgMax() const
     {
         int i;
         y.maxCoeff(&i);

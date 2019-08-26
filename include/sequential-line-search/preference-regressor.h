@@ -34,7 +34,7 @@ namespace sequential_line_search
         const bool m_use_map_hyperparameters;
 
         /// \brief Find the data point that is likely to have the largest value from the so-far observed data points.
-        Eigen::VectorXd FindArgMax();
+        Eigen::VectorXd FindArgMax() const;
 
         // Data
         Eigen::MatrixXd         X;
