@@ -215,7 +215,10 @@ namespace
             {
                 grad[M + 0] = 0.0;
                 grad[M + 1] = 0.0;
-                grad[M + 2] = 0.0;
+                for (unsigned i = 0; i < r.size(); ++i)
+                {
+                    grad[M + 2 + i] = 0.0;
+                }
             }
         }
 
