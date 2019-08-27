@@ -139,7 +139,7 @@
   <customwidget>
    <class>MainWidget</class>
    <extends>QWidget</extends>
-   <header>mainwidget.h</header>
+   <header>mainwidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
