@@ -21,18 +21,18 @@ namespace
 {
     using namespace sequential_line_search;
 
-    inline VectorXd concat(const double a, const VectorXd& b)
+    inline VectorXd Concat(const double scalar, const VectorXd& vector)
     {
-        VectorXd result(b.size() + 1);
+        VectorXd result(vector.size() + 1);
 
-        result(0)                   = a;
-        result.segment(1, b.size()) = b;
+        result(0)                        = scalar;
+        result.segment(1, vector.size()) = vector;
 
         return result;
     }
 
 #ifdef NOISELESS
-    const double b_fixed = 1e-06;
+    const double b_fixed = 0.0;
 #endif
 
     inline double calc_grad_a(const VectorXd& y,
@@ -83,17 +83,21 @@ namespace
                                 const double    r_prior_variance)
     {
         VectorXd grad = VectorXd::Zero(r.rows());
+
+        const std::vector<MatrixXd> K_y_grad_r = CalcLargeKYThetaDerivative(X, Concat(a, r));
         for (unsigned i = 0; i < r.rows(); ++i)
         {
-            const MatrixXd C_grad_r = Regressor::calc_C_grad_r_i(X, a, b, r, i);
-            const double   log_p_f_theta_grad_r_i =
-                0.5 * y.transpose() * C_inv * C_grad_r * C_inv * y - 0.5 * (C_inv * C_grad_r).trace();
+            const MatrixXd& K_y_grad_r_i = K_y_grad_r[i + 1];
+            const double    log_p_f_theta_grad_r_i =
+                0.5 * y.transpose() * C_inv * K_y_grad_r_i * C_inv * y - 0.5 * (C_inv * K_y_grad_r_i).trace();
+
             grad(i) += log_p_f_theta_grad_r_i;
         }
         for (unsigned i = 0; i < r.rows(); ++i)
         {
             const double log_prior =
                 mathtoolbox::GetLogOfLogNormalDistDerivative(r(i), std::log(r_prior_mean), r_prior_variance);
+
             grad(i) += log_prior;
         }
 
@@ -141,7 +145,7 @@ namespace
         }
 
         // Log likelihood of y distribution
-        const MatrixXd C     = CalcLargeKY(X, concat(a, r), b);
+        const MatrixXd C     = CalcLargeKY(X, Concat(a, r), b);
         const MatrixXd C_inv = C.inverse();
         const double   C_det = C.determinant();
         const double   term1 = -0.5 * y.transpose() * C_inv * y;
@@ -248,33 +252,33 @@ namespace sequential_line_search
 
         PerformMapEstimation();
 
-        C     = CalcLargeKY(X, concat(a, r), b);
+        C     = CalcLargeKY(X, Concat(a, r), b);
         C_inv = C.inverse();
     }
 
     double PreferenceRegressor::PredictMu(const VectorXd& x) const
     {
-        const VectorXd k = CalcSmallK(x, X, concat(a, r));
+        const VectorXd k = CalcSmallK(x, X, Concat(a, r));
         return k.transpose() * C_inv * y;
     }
 
     double PreferenceRegressor::PredictSigma(const VectorXd& x) const
     {
-        const VectorXd k = CalcSmallK(x, X, concat(a, r));
+        const VectorXd k = CalcSmallK(x, X, Concat(a, r));
         return std::sqrt(a - k.transpose() * C_inv * k);
     }
 
     Eigen::VectorXd PreferenceRegressor::PredictMuDerivative(const Eigen::VectorXd& x) const
     {
         // TODO: Incorporate a mean function
-        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, concat(a, r));
+        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, Concat(a, r));
         return k_x_derivative * C_inv * y;
     }
 
     Eigen::VectorXd PreferenceRegressor::PredictSigmaDerivative(const Eigen::VectorXd& x) const
     {
-        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, concat(a, r));
-        const VectorXd k              = CalcSmallK(x, X, concat(a, r));
+        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, Concat(a, r));
+        const VectorXd k              = CalcSmallK(x, X, Concat(a, r));
         const double   sigma          = PredictSigma(x);
         return -(1.0 / sigma) * k_x_derivative * C_inv * k;
     }

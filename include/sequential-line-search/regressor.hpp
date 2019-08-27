@@ -2,6 +2,7 @@
 #define REGRESSOR_H
 
 #include <Eigen/Core>
+#include <vector>
 
 namespace sequential_line_search
 {
@@ -28,8 +29,6 @@ namespace sequential_line_search
         calc_C_grad_a(const Eigen::MatrixXd& X, const double a, const double b, const Eigen::VectorXd& r);
         static Eigen::MatrixXd
                                calc_C_grad_b(const Eigen::MatrixXd& X, const double a, const double b, const Eigen::VectorXd& r);
-        static Eigen::MatrixXd calc_C_grad_r_i(
-            const Eigen::MatrixXd& X, const double a, const double b, const Eigen::VectorXd& r, const unsigned index);
     };
 
     // k
@@ -47,6 +46,9 @@ namespace sequential_line_search
     Eigen::MatrixXd CalcSmallKSmallXDerivative(const Eigen::VectorXd& x,
                                                const Eigen::MatrixXd& X,
                                                const Eigen::VectorXd& kernel_hyperparameters);
+
+    // partial K_y / partial theta
+    std::vector<Eigen::MatrixXd> CalcLargeKYThetaDerivative(const Eigen::MatrixXd& X, const Eigen::VectorXd& kernel_hyperparameters);
 } // namespace sequential_line_search
 
 #endif // REGRESSOR_H

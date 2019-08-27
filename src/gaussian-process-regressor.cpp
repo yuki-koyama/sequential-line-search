@@ -21,12 +21,12 @@ namespace
     const double r_prior_mu            = std::log(0.500);
     const double r_prior_sigma_squared = 0.50;
 
-    inline VectorXd concat(const double a, const VectorXd& b)
+    inline VectorXd Concat(const double scalar, const VectorXd& vector)
     {
-        VectorXd result(b.size() + 1);
+        VectorXd result(vector.size() + 1);
 
-        result(0)                   = a;
-        result.segment(1, b.size()) = b;
+        result(0)                        = scalar;
+        result.segment(1, vector.size()) = vector;
 
         return result;
     }
@@ -79,18 +79,25 @@ namespace
         return term1 + term2 + (use_log_normal_prior ? calc_grad_b_prior(b) : 0.0);
     }
 
-    double calc_grad_r_i(const MatrixXd& X,
-                         const MatrixXd& C_inv,
-                         const VectorXd& y,
-                         const double    a,
-                         const double    b,
-                         const VectorXd& r,
-                         const int       index)
+    VectorXd calc_grad_r(
+        const MatrixXd& X, const MatrixXd& C_inv, const VectorXd& y, const double a, const double b, const VectorXd& r)
     {
-        const MatrixXd C_grad_r_i = Regressor::calc_C_grad_r_i(X, a, b, r, index);
-        const double   term1      = +0.5 * y.transpose() * C_inv * C_grad_r_i * C_inv * y;
-        const double   term2      = -0.5 * (C_inv * C_grad_r_i).trace();
-        return term1 + term2 + (use_log_normal_prior ? calc_grad_r_i_prior(r, index) : 0.0);
+        const std::vector<MatrixXd> tensor = CalcLargeKYThetaDerivative(X, Concat(a, r));
+
+        assert(tensor.size() == r.size() + 1);
+
+        VectorXd grad(r.size());
+        for (unsigned i = 0; i < r.size(); ++i)
+        {
+            const MatrixXd& K_y_grad_r_i = tensor[i + 1];
+
+            const double term1 = +0.5 * y.transpose() * C_inv * K_y_grad_r_i * C_inv * y;
+            const double term2 = -0.5 * (C_inv * K_y_grad_r_i).trace();
+
+            grad(i) = term1 + term2 + (use_log_normal_prior ? calc_grad_r_i_prior(r, i) : 0.0);
+        }
+
+        return grad;
     }
 
     VectorXd calc_grad(
@@ -99,15 +106,10 @@ namespace
         const unsigned D = X.rows();
 
         VectorXd grad(D + 2);
-        grad(0) = calc_grad_a(X, C_inv, y, a, b, r);
-        grad(1) = calc_grad_b(X, C_inv, y, a, b, r);
 
-        for (unsigned i = 2; i < D + 2; ++i)
-        {
-            const unsigned index = i - 2;
-
-            grad(i) = calc_grad_r_i(X, C_inv, y, a, b, r, index);
-        }
+        grad(0)            = calc_grad_a(X, C_inv, y, a, b, r);
+        grad(1)            = calc_grad_b(X, C_inv, y, a, b, r);
+        grad.segment(2, D) = calc_grad_r(X, C_inv, y, a, b, r);
 
         return grad;
     }
@@ -136,7 +138,7 @@ namespace
         const double   b = x[1];
         const VectorXd r = Eigen::Map<const VectorXd>(&x[2], x.size() - 2);
 
-        const MatrixXd C     = CalcLargeKY(X, concat(a, r), b);
+        const MatrixXd C     = CalcLargeKY(X, Concat(a, r), b);
         const MatrixXd C_inv = C.inverse();
 
         // When the algorithm is gradient-based, compute the gradient vector
@@ -184,7 +186,7 @@ namespace sequential_line_search
 
         PerformMapEstimation();
 
-        C     = CalcLargeKY(X, concat(a, r), b);
+        C     = CalcLargeKY(X, Concat(a, r), b);
         C_inv = C.inverse();
     }
 
@@ -202,34 +204,34 @@ namespace sequential_line_search
             return;
         }
 
-        C     = CalcLargeKY(X, concat(a, r), b);
+        C     = CalcLargeKY(X, Concat(a, r), b);
         C_inv = C.inverse();
     }
 
     double GaussianProcessRegressor::PredictMu(const VectorXd& x) const
     {
         // TODO: Incorporate a mean function
-        const VectorXd k = CalcSmallK(x, X, concat(a, r));
+        const VectorXd k = CalcSmallK(x, X, Concat(a, r));
         return k.transpose() * C_inv * y;
     }
 
     double GaussianProcessRegressor::PredictSigma(const VectorXd& x) const
     {
-        const VectorXd k = CalcSmallK(x, X, concat(a, r));
+        const VectorXd k = CalcSmallK(x, X, Concat(a, r));
         return std::sqrt(a - k.transpose() * C_inv * k);
     }
 
     Eigen::VectorXd GaussianProcessRegressor::PredictMuDerivative(const Eigen::VectorXd& x) const
     {
         // TODO: Incorporate a mean function
-        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, concat(a, r));
+        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, Concat(a, r));
         return k_x_derivative * C_inv * y;
     }
 
     Eigen::VectorXd GaussianProcessRegressor::PredictSigmaDerivative(const Eigen::VectorXd& x) const
     {
-        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, concat(a, r));
-        const VectorXd k              = CalcSmallK(x, X, concat(a, r));
+        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, Concat(a, r));
+        const VectorXd k              = CalcSmallK(x, X, Concat(a, r));
         const double   sigma          = PredictSigma(x);
         return -(1.0 / sigma) * k_x_derivative * C_inv * k;
     }

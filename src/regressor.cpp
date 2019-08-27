@@ -23,6 +23,7 @@ namespace sequential_line_search
     constexpr auto kernel_first_arg_derivative = mathtoolbox::GetArdSquaredExpKernelFirstArgDerivative;
 #else
     constexpr auto kernel                      = mathtoolbox::GetArdMatern52Kernel;
+    constexpr auto kernel_theta_derivative     = mathtoolbox::GetArdMatern52KernelThetaDerivative;
     constexpr auto kernel_theta_i_derivative   = mathtoolbox::GetArdMatern52KernelThetaIDerivative;
     constexpr auto kernel_first_arg_derivative = mathtoolbox::GetArdMatern52KernelFirstArgDerivative;
 #endif
@@ -66,26 +67,6 @@ namespace sequential_line_search
     {
         const unsigned N = X.cols();
         return MatrixXd::Identity(N, N);
-    }
-
-    MatrixXd Regressor::calc_C_grad_r_i(
-        const MatrixXd& X, const double a, const double /*b*/, const VectorXd& r, const unsigned index)
-    {
-        const unsigned N = X.cols();
-
-        MatrixXd C_grad_r(N, N);
-        for (unsigned i = 0; i < N; ++i)
-        {
-            for (unsigned j = i; j < N; ++j)
-            {
-                const double value = kernel_theta_i_derivative(X.col(i), X.col(j), concat(a, r), index + 1);
-
-                C_grad_r(i, j) = value;
-                C_grad_r(j, i) = value;
-            }
-        }
-
-        return C_grad_r;
     }
 } // namespace sequential_line_search
 
@@ -148,4 +129,28 @@ Eigen::MatrixXd sequential_line_search::CalcSmallKSmallXDerivative(const Eigen::
     }
 
     return k_x_derivative;
+}
+
+std::vector<MatrixXd> sequential_line_search::CalcLargeKYThetaDerivative(const MatrixXd& X,
+                                                                         const VectorXd& kernel_hyperparameters)
+{
+    const unsigned N = X.cols();
+
+    std::vector<MatrixXd> tensor(kernel_hyperparameters.size(), MatrixXd(N, N));
+
+    for (unsigned i = 0; i < N; ++i)
+    {
+        for (unsigned j = i; j < N; ++j)
+        {
+            const VectorXd grad = kernel_theta_derivative(X.col(i), X.col(j), kernel_hyperparameters);
+
+            for (unsigned k = 0; k < kernel_hyperparameters.size(); ++k)
+            {
+                tensor[k](i, j) = grad(k);
+                tensor[k](j, i) = grad(k);
+            }
+        }
+    }
+
+    return tensor;
 }
