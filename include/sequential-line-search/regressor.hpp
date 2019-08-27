@@ -11,6 +11,8 @@ namespace sequential_line_search
     public:
         virtual ~Regressor() {}
 
+        unsigned GetNumDims() const { return getX().rows(); }
+
         virtual double PredictMu(const Eigen::VectorXd& x) const    = 0;
         virtual double PredictSigma(const Eigen::VectorXd& x) const = 0;
 
