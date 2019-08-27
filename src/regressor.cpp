@@ -5,26 +5,15 @@
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
-inline VectorXd concat(const double a, const VectorXd& b)
-{
-    VectorXd result(b.size() + 1);
-
-    result(0)                   = a;
-    result.segment(1, b.size()) = b;
-
-    return result;
-}
-
 namespace sequential_line_search
 {
 #ifdef SEQUENTIAL_LINE_SEARCH_USE_ARD_SQUARED_EXP_KERNEL
     constexpr auto kernel                      = mathtoolbox::GetArdSquaredExpKernel;
-    constexpr auto kernel_theta_i_derivative   = mathtoolbox::GetArdSquaredExpKernelThetaIDerivative;
+    constexpr auto kernel_theta_derivative     = mathtoolbox::GetArdSquaredExpKernelThetaDerivative;
     constexpr auto kernel_first_arg_derivative = mathtoolbox::GetArdSquaredExpKernelFirstArgDerivative;
 #else
     constexpr auto kernel                      = mathtoolbox::GetArdMatern52Kernel;
     constexpr auto kernel_theta_derivative     = mathtoolbox::GetArdMatern52KernelThetaDerivative;
-    constexpr auto kernel_theta_i_derivative   = mathtoolbox::GetArdMatern52KernelThetaIDerivative;
     constexpr auto kernel_first_arg_derivative = mathtoolbox::GetArdMatern52KernelFirstArgDerivative;
 #endif
 
@@ -42,31 +31,6 @@ namespace sequential_line_search
         f.maxCoeff(&best_index);
 
         return getX().col(best_index);
-    }
-
-    MatrixXd Regressor::calc_C_grad_a(const MatrixXd& X, const double a, const double /*b*/, const VectorXd& r)
-    {
-        const unsigned N = X.cols();
-
-        MatrixXd C_grad_a(N, N);
-        for (unsigned i = 0; i < N; ++i)
-        {
-            for (unsigned j = i; j < N; ++j)
-            {
-                const double value = kernel_theta_i_derivative(X.col(i), X.col(j), concat(a, r), 0);
-
-                C_grad_a(i, j) = value;
-                C_grad_a(j, i) = value;
-            }
-        }
-
-        return C_grad_a;
-    }
-
-    MatrixXd Regressor::calc_C_grad_b(const MatrixXd& X, const double /*a*/, const double /*b*/, const VectorXd& /*r*/)
-    {
-        const unsigned N = X.cols();
-        return MatrixXd::Identity(N, N);
     }
 } // namespace sequential_line_search
 
@@ -153,4 +117,10 @@ std::vector<MatrixXd> sequential_line_search::CalcLargeKYThetaDerivative(const M
     }
 
     return tensor;
+}
+
+Eigen::MatrixXd
+sequential_line_search::CalcLargeKYNoiseLevelDerivative(const Eigen::MatrixXd& X, const Eigen::VectorXd& kernel_hyperparameters, const double noise_level)
+{
+    return MatrixXd::Identity(X.cols(), X.cols());
 }

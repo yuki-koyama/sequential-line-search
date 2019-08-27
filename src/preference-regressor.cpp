@@ -35,24 +35,6 @@ namespace
     const double b_fixed = 0.0;
 #endif
 
-    inline double calc_grad_a(const VectorXd& y,
-                              const MatrixXd& C_inv,
-                              const MatrixXd& X,
-                              const double    a,
-                              const double    b,
-                              const VectorXd& r,
-                              const double    a_prior_mean,
-                              const double    a_prior_variance)
-    {
-        const MatrixXd C_grad_a = Regressor::calc_C_grad_a(X, a, b, r);
-        const double   log_p_f_theta_grad_a =
-            0.5 * y.transpose() * C_inv * C_grad_a * C_inv * y - 0.5 * (C_inv * C_grad_a).trace();
-        const double log_prior =
-            mathtoolbox::GetLogOfLogNormalDistDerivative(a, std::log(a_prior_mean), a_prior_variance);
-
-        return log_p_f_theta_grad_a + log_prior;
-    }
-
 #ifndef NOISELESS
     inline double calc_grad_b(const VectorXd& y,
                               const MatrixXd& C_inv,
@@ -63,7 +45,7 @@ namespace
                               const double    b_prior_mean,
                               const double    b_prior_variance)
     {
-        const MatrixXd C_grad_b = Regressor::calc_C_grad_b(X, a, b, r);
+        const MatrixXd C_grad_b = CalcLargeKYNoiseLevelDerivative(X, Concat(a, r), b);
         const double   log_p_f_theta_grad_b =
             0.5 * y.transpose() * C_inv * C_grad_b * C_inv * y - 0.5 * (C_inv * C_grad_b).trace();
         const double log_prior =
@@ -73,30 +55,33 @@ namespace
     }
 #endif
 
-    inline VectorXd calc_grad_r(const VectorXd& y,
-                                const MatrixXd& C_inv,
-                                const MatrixXd& X,
-                                const double    a,
-                                const double    b,
-                                const VectorXd& r,
-                                const double    r_prior_mean,
-                                const double    r_prior_variance)
+    inline VectorXd calc_grad_theta(const VectorXd& y,
+                                    const MatrixXd& C_inv,
+                                    const MatrixXd& X,
+                                    const VectorXd& kernel_hyperparams,
+                                    const double    a_prior_mean,
+                                    const double    a_prior_variance,
+                                    const double    r_prior_mean,
+                                    const double    r_prior_variance)
     {
-        VectorXd grad = VectorXd::Zero(r.rows());
+        VectorXd grad = VectorXd::Zero(kernel_hyperparams.size());
 
-        const std::vector<MatrixXd> K_y_grad_r = CalcLargeKYThetaDerivative(X, Concat(a, r));
-        for (unsigned i = 0; i < r.rows(); ++i)
+        const std::vector<MatrixXd> K_y_grad_r = CalcLargeKYThetaDerivative(X, kernel_hyperparams);
+        for (unsigned i = 0; i < kernel_hyperparams.size(); ++i)
         {
-            const MatrixXd& K_y_grad_r_i = K_y_grad_r[i + 1];
-            const double    log_p_f_theta_grad_r_i =
-                0.5 * y.transpose() * C_inv * K_y_grad_r_i * C_inv * y - 0.5 * (C_inv * K_y_grad_r_i).trace();
+            const MatrixXd& K_y_grad_theta_i = K_y_grad_r[i];
+            const double    log_p_f_theta_grad_theta_i =
+                0.5 * y.transpose() * C_inv * K_y_grad_theta_i * C_inv * y - 0.5 * (C_inv * K_y_grad_theta_i).trace();
 
-            grad(i) += log_p_f_theta_grad_r_i;
+            grad(i) += log_p_f_theta_grad_theta_i;
         }
-        for (unsigned i = 0; i < r.rows(); ++i)
+        for (unsigned i = 0; i < kernel_hyperparams.size(); ++i)
         {
-            const double log_prior =
-                mathtoolbox::GetLogOfLogNormalDistDerivative(r(i), std::log(r_prior_mean), r_prior_variance);
+            const double prior_mean     = (i == 0) ? a_prior_mean : r_prior_mean;
+            const double prior_variance = (i == 0) ? a_prior_variance : r_prior_variance;
+
+            const double log_prior = mathtoolbox::GetLogOfLogNormalDistDerivative(
+                kernel_hyperparams(i), std::log(prior_mean), prior_variance);
 
             grad(i) += log_prior;
         }
@@ -203,14 +188,16 @@ namespace
 
             if (regressor->m_use_map_hyperparameters)
             {
-                grad[M + 0] = calc_grad_a(y, C_inv, X, a, b, r, regressor->m_default_a, regressor->m_variance);
+                const VectorXd grad_theta = calc_grad_theta(y, C_inv, X, Concat(a, r), regressor->m_default_a, regressor->m_variance, regressor->m_default_r, regressor->m_variance);
+
+                grad[M + 0] = grad_theta(0);
 #ifdef NOISELESS
                 grad[M + 1] = 0.0;
 #else
                 grad[M + 1] = calc_grad_b(y, C_inv, X, a, b, r, regressor->m_default_b, regressor->m_variance);
 #endif
-                VectorXd grad_r = calc_grad_r(y, C_inv, X, a, b, r, regressor->m_default_r, regressor->m_variance);
-                for (unsigned i = 0; i < grad_r.rows(); ++i)
+                const VectorXd grad_r = grad_theta.segment(1, r.size());
+                for (unsigned i = 0; i < grad_r.size(); ++i)
                 {
                     grad[M + 2 + i] = grad_r(i);
                 }

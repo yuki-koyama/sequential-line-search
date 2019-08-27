@@ -24,11 +24,6 @@ namespace sequential_line_search
         virtual const Eigen::VectorXd& getr() const = 0;
 
         Eigen::VectorXd PredictMaximumPointFromData() const;
-
-        static Eigen::MatrixXd
-        calc_C_grad_a(const Eigen::MatrixXd& X, const double a, const double b, const Eigen::VectorXd& r);
-        static Eigen::MatrixXd
-                               calc_C_grad_b(const Eigen::MatrixXd& X, const double a, const double b, const Eigen::VectorXd& r);
     };
 
     // k
@@ -49,6 +44,11 @@ namespace sequential_line_search
 
     // partial K_y / partial theta
     std::vector<Eigen::MatrixXd> CalcLargeKYThetaDerivative(const Eigen::MatrixXd& X, const Eigen::VectorXd& kernel_hyperparameters);
+
+    // partial K_y / partial sigma^{2}
+    Eigen::MatrixXd
+    CalcLargeKYNoiseLevelDerivative(const Eigen::MatrixXd& X, const Eigen::VectorXd& kernel_hyperparameters, const double noise_level);
+
 } // namespace sequential_line_search
 
 #endif // REGRESSOR_H
