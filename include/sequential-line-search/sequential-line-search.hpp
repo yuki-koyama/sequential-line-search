@@ -11,12 +11,17 @@ namespace sequential_line_search
     class Slider;
     class PreferenceDataManager;
 
+    std::pair<Eigen::VectorXd, Eigen::VectorXd> GenerateRandomSliderEnds(const int num_dims);
+    std::pair<Eigen::VectorXd, Eigen::VectorXd> GenerateCenteredFixedLengthRandomSliderEnds(const int num_dims);
+
     class SequentialLineSearchOptimizer
     {
     public:
         SequentialLineSearchOptimizer(const int  dimension,
                                       const bool use_slider_enlargement  = true,
-                                      const bool use_map_hyperparameters = true);
+                                      const bool use_map_hyperparameters = true,
+                                      const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>&
+                                          initial_slider_generator = GenerateRandomSliderEnds);
 
         void SetHyperparameters(
             const double a, const double r, const double b, const double variance, const double btl_scale);
@@ -37,7 +42,6 @@ namespace sequential_line_search
         void DampData(const std::string& directory_path) const;
 
     private:
-        const int  m_dimension;
         const bool m_use_slider_enlargement;
         const bool m_use_map_hyperparameters;
 

@@ -6,17 +6,34 @@
 #include <sequential-line-search/utils.hpp>
 #include <stdexcept>
 
-sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptimizer(const int  dimension,
-                                                                                     const bool use_slider_enlargement,
-                                                                                     const bool use_map_hyperparameters)
-    : m_dimension(dimension), m_use_slider_enlargement(use_slider_enlargement),
-      m_use_map_hyperparameters(use_map_hyperparameters), m_a(0.500), m_r(0.500), m_b(0.005), m_variance(0.250),
-      m_btl_scale(0.010)
+std::pair<Eigen::VectorXd, Eigen::VectorXd> sequential_line_search::GenerateRandomSliderEnds(const int num_dims)
 {
+    return {0.5 * (Eigen::VectorXd::Random(num_dims) + Eigen::VectorXd::Ones(num_dims)),
+            0.5 * (Eigen::VectorXd::Random(num_dims) + Eigen::VectorXd::Ones(num_dims))};
+}
+
+std::pair<Eigen::VectorXd, Eigen::VectorXd>
+sequential_line_search::GenerateCenteredFixedLengthRandomSliderEnds(const int num_dims)
+{
+    const Eigen::VectorXd x_center   = Eigen::VectorXd::Constant(num_dims, 0.50);
+    const Eigen::VectorXd random_dir = 0.5 * Eigen::VectorXd::Random(num_dims);
+
+    return {x_center + random_dir, x_center - random_dir};
+}
+
+sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptimizer(
+    const int                                                                    dimension,
+    const bool                                                                   use_slider_enlargement,
+    const bool                                                                   use_map_hyperparameters,
+    const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>& initial_slider_generator)
+    : m_use_slider_enlargement(use_slider_enlargement), m_use_map_hyperparameters(use_map_hyperparameters), m_a(0.500),
+      m_r(0.500), m_b(0.005), m_variance(0.250), m_btl_scale(0.010)
+{
+    const auto slider_ends = initial_slider_generator(dimension);
+
     m_data      = std::make_shared<PreferenceDataManager>();
     m_regressor = nullptr;
-    m_slider    = std::make_shared<Slider>(
-        utils::generateRandomVector(m_dimension), utils::generateRandomVector(m_dimension), false);
+    m_slider    = std::make_shared<Slider>(std::get<0>(slider_ends), std::get<1>(slider_ends), false);
 }
 
 void sequential_line_search::SequentialLineSearchOptimizer::SetHyperparameters(
