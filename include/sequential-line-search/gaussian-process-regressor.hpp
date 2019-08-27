@@ -2,7 +2,7 @@
 #define GAUSSIAN_PROCESS_REGRESSOR_H
 
 #include <Eigen/Core>
-#include <sequential-line-search/regressor.h>
+#include <sequential-line-search/regressor.hpp>
 
 namespace sequential_line_search
 {

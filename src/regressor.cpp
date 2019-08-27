@@ -1,6 +1,6 @@
 #include <mathtoolbox/kernel-functions.hpp>
-#include <sequential-line-search/regressor.h>
-#include <sequential-line-search/utils.h>
+#include <sequential-line-search/regressor.hpp>
+#include <sequential-line-search/utils.hpp>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;

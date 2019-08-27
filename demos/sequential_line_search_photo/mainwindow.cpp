@@ -1,7 +1,7 @@
-#include "mainwindow.h"
-#include "core.h"
-#include "directoryutility.h"
-#include "imagemodifier.h"
+#include "mainwindow.hpp"
+#include "core.hpp"
+#include "directoryutility.hpp"
+#include "imagemodifier.hpp"
 #include "ui_mainwindow.h"
 #include <QDir>
 #include <QImage>
@@ -9,7 +9,7 @@
 #include <enhancer/enhancerwidget.hpp>
 #include <iostream>
 #include <memory>
-#include <sequential-line-search/sequential-line-search.h>
+#include <sequential-line-search/sequential-line-search.hpp>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;

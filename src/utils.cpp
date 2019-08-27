@@ -1,6 +1,6 @@
 #include <Eigen/Core>
 #include <fstream>
-#include <sequential-line-search/utils.h>
+#include <sequential-line-search/utils.hpp>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;

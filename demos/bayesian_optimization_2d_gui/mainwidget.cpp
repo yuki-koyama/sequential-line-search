@@ -1,10 +1,10 @@
-#include "mainwidget.h"
-#include "core.h"
+#include "mainwidget.hpp"
+#include "core.hpp"
 #include <QPaintEvent>
 #include <QPainter>
 #include <iostream>
-#include <sequential-line-search/acquisition-function.h>
-#include <sequential-line-search/gaussian-process-regressor.h>
+#include <sequential-line-search/acquisition-function.hpp>
+#include <sequential-line-search/gaussian-process-regressor.hpp>
 #include <tinycolormap.hpp>
 
 using namespace sequential_line_search;

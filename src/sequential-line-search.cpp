@@ -1,9 +1,9 @@
-#include <sequential-line-search/acquisition-function.h>
-#include <sequential-line-search/preference-data-manager.h>
-#include <sequential-line-search/preference-regressor.h>
-#include <sequential-line-search/sequential-line-search.h>
-#include <sequential-line-search/slider.h>
-#include <sequential-line-search/utils.h>
+#include <sequential-line-search/acquisition-function.hpp>
+#include <sequential-line-search/preference-data-manager.hpp>
+#include <sequential-line-search/preference-regressor.hpp>
+#include <sequential-line-search/sequential-line-search.hpp>
+#include <sequential-line-search/slider.hpp>
+#include <sequential-line-search/utils.hpp>
 #include <stdexcept>
 
 sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptimizer(const int  dimension,

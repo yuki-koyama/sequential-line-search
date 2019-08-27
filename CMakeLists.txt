@@ -69,7 +69,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/parallel-util)
 
 file(GLOB
 	headers
-	${CMAKE_CURRENT_SOURCE_DIR}/include/sequential-line-search/*.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/sequential-line-search/*.hpp
 )
 file(GLOB
 	sources

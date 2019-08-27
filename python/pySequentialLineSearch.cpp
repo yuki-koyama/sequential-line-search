@@ -1,6 +1,6 @@
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
-#include <sequential-line-search/sequential-line-search.h>
+#include <sequential-line-search/sequential-line-search.hpp>
 
 using sequential_line_search::SequentialLineSearchOptimizer;
 namespace py = pybind11;

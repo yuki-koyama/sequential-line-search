@@ -1,5 +1,5 @@
 #include <map>
-#include <sequential-line-search/preference-data-manager.h>
+#include <sequential-line-search/preference-data-manager.hpp>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;

@@ -3,8 +3,8 @@
 #include <iostream>
 #include <mathtoolbox/probability-distributions.hpp>
 #include <nlopt-util.hpp>
-#include <sequential-line-search/gaussian-process-regressor.h>
-#include <sequential-line-search/utils.h>
+#include <sequential-line-search/gaussian-process-regressor.hpp>
+#include <sequential-line-search/utils.hpp>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;

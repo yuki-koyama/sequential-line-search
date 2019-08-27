@@ -184,13 +184,13 @@
   <customwidget>
    <class>MainWidget</class>
    <extends>QWidget</extends>
-   <header>mainwidget.h</header>
+   <header>mainwidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>WidgetPreview</class>
    <extends>QWidget</extends>
-   <header>widgetpreview.h</header>
+   <header>widgetpreview.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

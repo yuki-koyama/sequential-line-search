@@ -3,7 +3,7 @@
 
 #include <Eigen/Core>
 #include <memory>
-#include <sequential-line-search/regressor.h>
+#include <sequential-line-search/regressor.hpp>
 #include <vector>
 
 namespace sequential_line_search

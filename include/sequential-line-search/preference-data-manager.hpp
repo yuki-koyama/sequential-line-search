@@ -2,7 +2,7 @@
 #define SEQUENTIAL_LINE_SEARCH_PREFERENCE_DATA_MANAGER_H
 
 #include <Eigen/Core>
-#include <sequential-line-search/preference.h>
+#include <sequential-line-search/preference.hpp>
 #include <vector>
 
 namespace sequential_line_search

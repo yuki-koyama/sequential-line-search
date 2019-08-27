@@ -4,8 +4,8 @@
 #include <mathtoolbox/acquisition-functions.hpp>
 #include <nlopt-util.hpp>
 #include <parallel-util.hpp>
-#include <sequential-line-search/acquisition-function.h>
-#include <sequential-line-search/gaussian-process-regressor.h>
+#include <sequential-line-search/acquisition-function.hpp>
+#include <sequential-line-search/gaussian-process-regressor.hpp>
 #include <utility>
 
 using Eigen::MatrixXd;

@@ -1,5 +1,5 @@
-#include "mainwindow.h"
-#include "core.h"
+#include "mainwindow.hpp"
+#include "core.hpp"
 #include "ui_mainwindow.h"
 #include <QDir>
 #include <QFileDialog>
@@ -9,7 +9,7 @@
 #include <fstream>
 #include <iostream>
 #include <nlopt-util.hpp>
-#include <sequential-line-search/sequential-line-search.h>
+#include <sequential-line-search/sequential-line-search.hpp>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;

@@ -1,10 +1,10 @@
-#include "mainwidget.h"
-#include "core.h"
-#include "mainwindow.h"
+#include "mainwidget.hpp"
+#include "core.hpp"
+#include "mainwindow.hpp"
 #include <QPaintEvent>
 #include <QPainter>
 #include <iostream>
-#include <sequential-line-search/sequential-line-search.h>
+#include <sequential-line-search/sequential-line-search.hpp>
 #include <tinycolormap.hpp>
 
 using Eigen::VectorXd;

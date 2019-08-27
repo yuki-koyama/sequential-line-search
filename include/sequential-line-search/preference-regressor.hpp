@@ -2,8 +2,8 @@
 #define PREFERENCE_REGRESSOR_H
 
 #include <Eigen/Core>
-#include <sequential-line-search/preference.h>
-#include <sequential-line-search/regressor.h>
+#include <sequential-line-search/preference.hpp>
+#include <sequential-line-search/regressor.hpp>
 #include <string>
 #include <utility>
 #include <vector>

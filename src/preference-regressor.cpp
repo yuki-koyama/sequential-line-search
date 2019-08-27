@@ -4,8 +4,8 @@
 #include <iostream>
 #include <mathtoolbox/probability-distributions.hpp>
 #include <nlopt-util.hpp>
-#include <sequential-line-search/preference-regressor.h>
-#include <sequential-line-search/utils.h>
+#include <sequential-line-search/preference-regressor.hpp>
+#include <sequential-line-search/utils.hpp>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;

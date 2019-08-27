@@ -1,9 +1,9 @@
-#include "core.h"
+#include "core.hpp"
 #include <cmath>
 #include <iostream>
 #include <rand-util.hpp>
-#include <sequential-line-search/acquisition-function.h>
-#include <sequential-line-search/gaussian-process-regressor.h>
+#include <sequential-line-search/acquisition-function.hpp>
+#include <sequential-line-search/gaussian-process-regressor.hpp>
 
 using namespace sequential_line_search;
 using Eigen::MatrixXd;

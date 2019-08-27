@@ -1,10 +1,10 @@
-#include "widgetpreview.h"
-#include "core.h"
-#include "mainwindow.h"
+#include "widgetpreview.hpp"
+#include "core.hpp"
+#include "mainwindow.hpp"
 #include <Eigen/Core>
 #include <QPaintEvent>
 #include <QPainter>
-#include <sequential-line-search/sequential-line-search.h>
+#include <sequential-line-search/sequential-line-search.hpp>
 #include <tinycolormap.hpp>
 
 using Eigen::Vector3d;

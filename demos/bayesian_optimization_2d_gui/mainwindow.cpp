@@ -1,9 +1,9 @@
-#include "mainwindow.h"
-#include "core.h"
+#include "mainwindow.hpp"
+#include "core.hpp"
 #include "ui_mainwindow.h"
 #include <QDir>
 #include <QFileDialog>
-#include <sequential-line-search/gaussian-process-regressor.h>
+#include <sequential-line-search/gaussian-process-regressor.hpp>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;

@@ -4,7 +4,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 
-file(GLOB files *.cpp *.h)
+file(GLOB files *.cpp *.hpp)
 add_executable(BayesianOptimization1dGui ${files})
 target_link_libraries(BayesianOptimization1dGui Qt5::Widgets rand-util SequentialLineSearch)
 

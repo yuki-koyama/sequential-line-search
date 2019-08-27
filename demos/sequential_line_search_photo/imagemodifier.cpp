@@ -1,4 +1,4 @@
-#include "imagemodifier.h"
+#include "imagemodifier.hpp"
 #include <cassert>
 #include <cmath>
 #include <enhancer/enhancer.hpp>

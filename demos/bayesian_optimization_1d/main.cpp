@@ -1,4 +1,4 @@
-#include "core.h"
+#include "core.hpp"
 #include <iostream>
 
 using Eigen::MatrixXd;

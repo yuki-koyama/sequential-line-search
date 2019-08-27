@@ -1,6 +1,6 @@
 #include <iostream>
-#include <sequential-line-search/sequential-line-search.h>
-#include <sequential-line-search/utils.h>
+#include <sequential-line-search/sequential-line-search.hpp>
+#include <sequential-line-search/utils.hpp>
 #ifdef PARALLEL
 #include <parallel-util.hpp>
 #endif
