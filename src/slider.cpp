@@ -121,25 +121,22 @@ namespace
     }
 } // namespace
 
-namespace sequential_line_search
+sequential_line_search::Slider::Slider(const Eigen::VectorXd& end_0,
+                                       const Eigen::VectorXd& end_1,
+                                       const bool             enlarge,
+                                       const double           scale,
+                                       const double           minimum_length)
+    : orig_0(end_0), orig_1(end_1)
 {
-    Slider::Slider(const Eigen::VectorXd& end_0,
-                   const Eigen::VectorXd& end_1,
-                   const bool             enlarge,
-                   const double           scale,
-                   const double           minimum_length)
-        : enlarge(enlarge), minimum_length(minimum_length), orig_0(end_0), orig_1(end_1)
+    if (enlarge)
     {
-        if (enlarge)
-        {
-            const auto ends = EnlargeSliderEnds(orig_0, orig_1, scale, minimum_length);
-            this->end_0     = ends.first;
-            this->end_1     = ends.second;
-        }
-        else
-        {
-            this->end_0 = orig_0;
-            this->end_1 = orig_1;
-        }
+        const auto ends = EnlargeSliderEnds(orig_0, orig_1, scale, minimum_length);
+        this->end_0     = ends.first;
+        this->end_1     = ends.second;
     }
-} // namespace sequential_line_search
+    else
+    {
+        this->end_0 = orig_0;
+        this->end_1 = orig_1;
+    }
+}

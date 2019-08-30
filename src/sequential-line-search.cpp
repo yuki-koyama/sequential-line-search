@@ -70,7 +70,7 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> sequential_line_search::SequentialLi
 
 Eigen::VectorXd sequential_line_search::SequentialLineSearchOptimizer::GetParameters(const double slider_position) const
 {
-    return m_slider->getValue(slider_position);
+    return m_slider->GetValue(slider_position);
 }
 
 Eigen::VectorXd sequential_line_search::SequentialLineSearchOptimizer::GetMaximizer() const { return m_slider->orig_0; }
