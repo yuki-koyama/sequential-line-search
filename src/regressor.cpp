@@ -119,8 +119,9 @@ std::vector<MatrixXd> sequential_line_search::CalcLargeKYThetaDerivative(const M
     return tensor;
 }
 
-Eigen::MatrixXd
-sequential_line_search::CalcLargeKYNoiseLevelDerivative(const Eigen::MatrixXd& X, const Eigen::VectorXd& kernel_hyperparameters, const double noise_level)
+Eigen::MatrixXd sequential_line_search::CalcLargeKYNoiseLevelDerivative(const Eigen::MatrixXd& X,
+                                                                        const Eigen::VectorXd& kernel_hyperparameters,
+                                                                        const double           noise_level)
 {
     return MatrixXd::Identity(X.cols(), X.cols());
 }

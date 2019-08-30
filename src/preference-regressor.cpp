@@ -188,7 +188,14 @@ namespace
 
             if (regressor->m_use_map_hyperparameters)
             {
-                const VectorXd grad_theta = calc_grad_theta(y, C_inv, X, Concat(a, r), regressor->m_default_a, regressor->m_variance, regressor->m_default_r, regressor->m_variance);
+                const VectorXd grad_theta = calc_grad_theta(y,
+                                                            C_inv,
+                                                            X,
+                                                            Concat(a, r),
+                                                            regressor->m_default_a,
+                                                            regressor->m_variance,
+                                                            regressor->m_default_r,
+                                                            regressor->m_variance);
 
                 grad[M + 0] = grad_theta(0);
 #ifdef NOISELESS
