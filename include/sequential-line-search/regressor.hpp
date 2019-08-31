@@ -19,6 +19,8 @@ namespace sequential_line_search
         virtual Eigen::VectorXd PredictMuDerivative(const Eigen::VectorXd& x) const    = 0;
         virtual Eigen::VectorXd PredictSigmaDerivative(const Eigen::VectorXd& x) const = 0;
 
+        Eigen::VectorXd GetKernelHyperparams() const;
+
         virtual const Eigen::MatrixXd& getX() const = 0;
         virtual const Eigen::VectorXd& gety() const = 0;
         virtual double                 geta() const = 0;

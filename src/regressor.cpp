@@ -5,6 +5,19 @@
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
+namespace
+{
+    inline VectorXd Concat(const double scalar, const VectorXd& vector)
+    {
+        VectorXd result(vector.size() + 1);
+
+        result(0)                        = scalar;
+        result.segment(1, vector.size()) = vector;
+
+        return result;
+    }
+} // namespace
+
 namespace sequential_line_search
 {
 #ifdef SEQUENTIAL_LINE_SEARCH_USE_ARD_SQUARED_EXP_KERNEL
@@ -16,23 +29,25 @@ namespace sequential_line_search
     constexpr auto kernel_theta_derivative     = mathtoolbox::GetArdMatern52KernelThetaDerivative;
     constexpr auto kernel_first_arg_derivative = mathtoolbox::GetArdMatern52KernelFirstArgDerivative;
 #endif
-
-    VectorXd Regressor::PredictMaximumPointFromData() const
-    {
-        const int num_data_points = getX().cols();
-
-        VectorXd f(num_data_points);
-        for (int i = 0; i < num_data_points; ++i)
-        {
-            f(i) = PredictMu(getX().col(i));
-        }
-
-        int best_index;
-        f.maxCoeff(&best_index);
-
-        return getX().col(best_index);
-    }
 } // namespace sequential_line_search
+
+VectorXd sequential_line_search::Regressor::PredictMaximumPointFromData() const
+{
+    const int num_data_points = getX().cols();
+
+    VectorXd f(num_data_points);
+    for (int i = 0; i < num_data_points; ++i)
+    {
+        f(i) = PredictMu(getX().col(i));
+    }
+
+    int best_index;
+    f.maxCoeff(&best_index);
+
+    return getX().col(best_index);
+}
+
+VectorXd sequential_line_search::Regressor::GetKernelHyperparams() const { return Concat(geta(), getr()); }
 
 VectorXd
 sequential_line_search::CalcSmallK(const VectorXd& x, const MatrixXd& X, const Eigen::VectorXd& kernel_hyperparameters)
