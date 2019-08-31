@@ -53,7 +53,7 @@ namespace sequential_line_search
         Eigen::MatrixXd C_inv;
 
         // IO
-        void DampData(const std::string& dir_path) const;
+        void DampData(const std::string& dir_path, const std::string& prefix = "") const;
 
         // Getter
         const Eigen::MatrixXd& getX() const override { return X; }

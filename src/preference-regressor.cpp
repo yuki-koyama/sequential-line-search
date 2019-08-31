@@ -342,13 +342,13 @@ namespace sequential_line_search
         return X.col(i);
     }
 
-    void PreferenceRegressor::DampData(const std::string& dir_path) const
+    void PreferenceRegressor::DampData(const std::string& dir_path, const std::string& prefix) const
     {
         // Export X using CSV
-        utils::exportMatrixToCsv(dir_path + "/X.csv", X);
+        utils::exportMatrixToCsv(dir_path + "/" + prefix + "X.csv", X);
 
         // Export D using CSV
-        std::ofstream ofs_D(dir_path + "/D.csv");
+        std::ofstream ofs_D(dir_path + "/" + prefix + "D.csv");
         for (unsigned i = 0; i < D.size(); ++i)
         {
             for (unsigned j = 0; j < D[i].size(); ++j)
