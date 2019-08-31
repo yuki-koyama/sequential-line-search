@@ -310,6 +310,10 @@ namespace sequential_line_search
 
         y = x_opt.block(0, 0, M, 1);
 
+#ifdef VERBOSE
+        std::cout << "Estimated values: " << y.transpose().format(Eigen::IOFormat(3)) << std::endl;
+#endif
+
         if (m_use_map_hyperparameters)
         {
             a = x_opt(M + 0);
