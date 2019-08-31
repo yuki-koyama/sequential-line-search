@@ -1,4 +1,4 @@
-#include <Eigen/LU>
+#include <Eigen/Cholesky>
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -36,18 +36,19 @@ namespace
 #endif
 
 #ifndef NOISELESS
-    inline double calc_grad_b(const VectorXd& y,
-                              const MatrixXd& C_inv,
-                              const MatrixXd& X,
-                              const double    a,
-                              const double    b,
-                              const VectorXd& r,
-                              const double    b_prior_mean,
-                              const double    b_prior_variance)
+    inline double calc_grad_b(const VectorXd&             y,
+                              const Eigen::LLT<MatrixXd>& K_llt,
+                              const VectorXd&             K_inv_y,
+                              const MatrixXd&             X,
+                              const double                a,
+                              const double                b,
+                              const VectorXd&             r,
+                              const double                b_prior_mean,
+                              const double                b_prior_variance)
     {
         const MatrixXd C_grad_b = CalcLargeKYNoiseLevelDerivative(X, Concat(a, r), b);
         const double   log_p_f_theta_grad_b =
-            0.5 * y.transpose() * C_inv * C_grad_b * C_inv * y - 0.5 * (C_inv * C_grad_b).trace();
+            0.5 * K_inv_y.transpose() * C_grad_b * K_inv_y - 0.5 * K_llt.solve(C_grad_b).trace();
         const double log_prior =
             mathtoolbox::GetLogOfLogNormalDistDerivative(b, std::log(b_prior_mean), b_prior_variance);
 
@@ -55,14 +56,15 @@ namespace
     }
 #endif
 
-    inline VectorXd calc_grad_theta(const VectorXd& y,
-                                    const MatrixXd& C_inv,
-                                    const MatrixXd& X,
-                                    const VectorXd& kernel_hyperparams,
-                                    const double    a_prior_mean,
-                                    const double    a_prior_variance,
-                                    const double    r_prior_mean,
-                                    const double    r_prior_variance)
+    inline VectorXd calc_grad_theta(const VectorXd&             y,
+                                    const Eigen::LLT<MatrixXd>& K_llt,
+                                    const VectorXd&             K_inv_y,
+                                    const MatrixXd&             X,
+                                    const VectorXd&             kernel_hyperparams,
+                                    const double                a_prior_mean,
+                                    const double                a_prior_variance,
+                                    const double                r_prior_mean,
+                                    const double                r_prior_variance)
     {
         VectorXd grad = VectorXd::Zero(kernel_hyperparams.size());
 
@@ -70,8 +72,11 @@ namespace
         for (unsigned i = 0; i < kernel_hyperparams.size(); ++i)
         {
             const MatrixXd& K_y_grad_theta_i = K_y_grad_r[i];
-            const double    log_p_f_theta_grad_theta_i =
-                0.5 * y.transpose() * C_inv * K_y_grad_theta_i * C_inv * y - 0.5 * (C_inv * K_y_grad_theta_i).trace();
+
+            const double term_1 = 0.5 * K_inv_y.transpose() * K_y_grad_theta_i * K_inv_y;
+            const double term_2 = -0.5 * K_llt.solve(K_y_grad_theta_i).trace();
+
+            const double log_p_f_theta_grad_theta_i = term_1 + term_2;
 
             grad(i) += log_p_f_theta_grad_theta_i;
         }
@@ -130,13 +135,16 @@ namespace
         }
 
         // Log likelihood of y distribution
-        const MatrixXd C     = CalcLargeKY(X, Concat(a, r), b);
-        const MatrixXd C_inv = C.inverse();
-        const double   C_det = C.determinant();
-        const double   term1 = -0.5 * y.transpose() * C_inv * y;
-        const double   term2 = -0.5 * std::log(C_det);
-        const double   term3 = -0.5 * M * std::log(2.0 * M_PI);
+        const MatrixXd                    K = CalcLargeKY(X, Concat(a, r), b);
+        const Eigen::LLT<Eigen::MatrixXd> K_llt(K);
+        const VectorXd                    K_inv_y = K_llt.solve(y);
+        const double log_det_K = 2.0 * K_llt.matrixL().toDenseMatrix().diagonal().array().log().sum();
+        const double term1     = -0.5 * y.transpose() * K_inv_y;
+        const double term2     = -0.5 * log_det_K;
+        const double term3     = -0.5 * M * std::log(2.0 * M_PI);
         obj += term1 + term2 + term3;
+
+        assert(!std::isnan(obj));
 
         if (regressor->m_use_map_hyperparameters)
         {
@@ -181,15 +189,16 @@ namespace
                 }
             }
 
-            // Add GP term
-            grad_y += -C_inv * y;
+            // Add the GP term
+            grad_y += -K_inv_y;
 
             Eigen::Map<VectorXd>(&grad[0], grad_y.rows()) = grad_y;
 
             if (regressor->m_use_map_hyperparameters)
             {
                 const VectorXd grad_theta = calc_grad_theta(y,
-                                                            C_inv,
+                                                            K_llt,
+                                                            K_inv_y,
                                                             X,
                                                             Concat(a, r),
                                                             regressor->m_default_a,
@@ -201,7 +210,7 @@ namespace
 #ifdef NOISELESS
                 grad[M + 1] = 0.0;
 #else
-                grad[M + 1] = calc_grad_b(y, C_inv, X, a, b, r, regressor->m_default_b, regressor->m_variance);
+                grad[M + 1] = calc_grad_b(y, K_llt, K_inv_y, X, a, b, r, regressor->m_default_b, regressor->m_variance);
 #endif
                 const VectorXd grad_r = grad_theta.segment(1, r.size());
                 for (unsigned i = 0; i < grad_r.size(); ++i)
@@ -306,9 +315,9 @@ namespace sequential_line_search
         timer::Timer t("PreferenceRegressor::compute_MAP");
 #endif
 
-        const VectorXd x_opt = nloptutil::solve(x_ini, upper, lower, objective, nlopt::LD_TNEWTON, this, true, 500);
+        const VectorXd x_opt = nloptutil::solve(x_ini, upper, lower, objective, nlopt::LD_TNEWTON, this, true, 100);
 
-        y = x_opt.block(0, 0, M, 1);
+        y = x_opt.segment(0, M);
 
 #ifdef VERBOSE
         std::cout << "Estimated values: " << y.transpose().format(Eigen::IOFormat(3)) << std::endl;
