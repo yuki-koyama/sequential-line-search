@@ -105,7 +105,7 @@ namespace sequential_line_search
             return mathtoolbox::GetExpectedImprovementDerivative(x, mu, sigma, x_best, mu_derivative, sigma_derivative);
         }
 
-        Eigen::VectorXd FindNextPoint(Regressor& regressor, const FunctionType function_type)
+        Eigen::VectorXd FindNextPoint(Regressor& regressor, const unsigned num_trials, const FunctionType function_type)
         {
             assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
 
@@ -114,10 +114,9 @@ namespace sequential_line_search
             const VectorXd upper = VectorXd::Constant(D, 1.0);
             const VectorXd lower = VectorXd::Constant(D, 0.0);
 
-            constexpr int num_trials = 20;
+            MatrixXd x_stars(D, num_trials);
+            VectorXd y_stars(num_trials);
 
-            MatrixXd   x_stars(D, num_trials);
-            VectorXd   y_stars(num_trials);
             const auto perform_local_optimization_from_random_initialization = [&](const int i) {
                 const VectorXd x_ini = 0.5 * (VectorXd::Random(D) + VectorXd::Ones(D));
                 const VectorXd x_star =
@@ -140,7 +139,10 @@ namespace sequential_line_search
             return x_stars.col(best_index);
         }
 
-        vector<VectorXd> FindNextPoints(const Regressor& regressor, const unsigned n, const FunctionType function_type)
+        vector<VectorXd> FindNextPoints(const Regressor&   regressor,
+                                        const unsigned     num_points,
+                                        const unsigned     num_trials,
+                                        const FunctionType function_type)
         {
             assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
 
@@ -156,15 +158,14 @@ namespace sequential_line_search
 
             const VectorXd x_best = regressor.PredictMaximumPointFromData();
 
-            for (unsigned i = 0; i < n; ++i)
+            for (unsigned i = 0; i < num_points; ++i)
             {
                 pair<const Regressor*, const GaussianProcessRegressor*> data(&regressor, &temporary_regressor);
 
                 const VectorXd x_star = [&]() {
-                    constexpr int num_trials = 20;
+                    MatrixXd x_stars(D, num_trials);
+                    VectorXd y_stars(num_trials);
 
-                    MatrixXd   x_stars(D, num_trials);
-                    VectorXd   y_stars(num_trials);
                     const auto perform_local_optimization_from_random_initialization = [&](const int i) {
                         const VectorXd x_ini  = 0.5 * (VectorXd::Random(D) + VectorXd::Ones(D));
                         const VectorXd x_star = nloptutil::solve(
@@ -195,7 +196,7 @@ namespace sequential_line_search
 
                 points.push_back(x_star);
 
-                if (i + 1 == n)
+                if (i + 1 == num_points)
                 {
                     break;
                 }
