@@ -162,7 +162,7 @@ namespace sequential_line_search
             {
                 pair<const Regressor*, const GaussianProcessRegressor*> data(&regressor, &temporary_regressor);
 
-                const VectorXd x_star = [&]() {
+                const VectorXd x_star = [&]() -> VectorXd {
                     MatrixXd x_stars(D, num_trials);
                     VectorXd y_stars(num_trials);
 
@@ -194,24 +194,25 @@ namespace sequential_line_search
                     return x_stars.col(best_index);
                 }();
 
+                assert(x_star.minCoeff() > 0.0 - 1e-16 && x_star.maxCoeff() < 1.1 + 1e-16);
+
                 points.push_back(x_star);
 
-                if (i + 1 == num_points)
+                // If this is not the final iteration, prepare data for the next iteration
+                if (points.size() != num_points)
                 {
-                    break;
+                    const unsigned N = temporary_regressor.getX().cols();
+
+                    MatrixXd new_X(D, N + 1);
+                    new_X.block(0, 0, D, N) = temporary_regressor.getX();
+                    new_X.col(N)            = x_star;
+
+                    VectorXd new_y(temporary_regressor.gety().rows() + 1);
+                    new_y << temporary_regressor.gety(), temporary_regressor.PredictMu(x_star);
+
+                    temporary_regressor =
+                        GaussianProcessRegressor(new_X, new_y, regressor.geta(), regressor.getb(), regressor.getr());
                 }
-
-                const unsigned N = temporary_regressor.getX().cols();
-
-                MatrixXd new_X(D, N + 1);
-                new_X.block(0, 0, D, N) = temporary_regressor.getX();
-                new_X.col(N)            = x_star;
-
-                VectorXd new_y(temporary_regressor.gety().rows() + 1);
-                new_y << temporary_regressor.gety(), temporary_regressor.PredictMu(x_star);
-
-                temporary_regressor =
-                    GaussianProcessRegressor(new_X, new_y, regressor.geta(), regressor.getb(), regressor.getr());
             }
 
             return points;
