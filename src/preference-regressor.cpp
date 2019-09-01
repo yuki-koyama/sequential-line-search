@@ -10,8 +10,12 @@
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
+// By define this macro, this class will report many verbose messages.
 // #define VERBOSE
-// #define NOISELESS
+
+// By define this macro, this class will use a formulation based on "no noise" kernel matrix. That is, K = K(X, X) will
+// be used instead of K = K(X, X) + sigma^{2} I.
+// #define SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
 
 #ifdef VERBOSE
 #include <timer.hpp>
@@ -31,11 +35,11 @@ namespace
         return result;
     }
 
-#ifdef NOISELESS
+#ifdef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
     const double b_fixed = 0.0;
 #endif
 
-#ifndef NOISELESS
+#ifndef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
     inline double CalcObjectiveNoiseLevelDerivative(const VectorXd&             y,
                                                     const Eigen::LLT<MatrixXd>& K_llt,
                                                     const VectorXd&             K_inv_y,
@@ -121,7 +125,7 @@ namespace
         const VectorXd                 y = Eigen::Map<const VectorXd>(&x[0], M);
 
         const double a = (regressor->m_use_map_hyperparameters) ? x[M + 0] : regressor->m_default_a;
-#ifdef NOISELESS
+#ifdef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
         const double b = b_fixed;
 #else
         const double b = (regressor->m_use_map_hyperparameters) ? x[M + 1] : regressor->m_default_b;
@@ -154,14 +158,14 @@ namespace
         {
             // Priors for GP parameters
             const double a_prior = regressor->m_default_a;
-#ifndef NOISELESS
+#ifndef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
             const double b_prior = regressor->m_default_b;
 #endif
             const double r_prior  = regressor->m_default_r;
             const double variance = regressor->m_variance;
 
             obj += mathtoolbox::GetLogOfLogNormalDist(a, std::log(a_prior), variance);
-#ifndef NOISELESS
+#ifndef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
             obj += mathtoolbox::GetLogOfLogNormalDist(b, std::log(b_prior), variance);
 #endif
             for (unsigned i = 0; i < r.rows(); ++i)
@@ -211,7 +215,7 @@ namespace
                                                                          regressor->m_variance);
 
                 grad[M + 0] = grad_theta(0);
-#ifdef NOISELESS
+#ifdef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
                 grad[M + 1] = 0.0;
 #else
                 grad[M + 1] = CalcObjectiveNoiseLevelDerivative(
@@ -331,7 +335,7 @@ namespace sequential_line_search
         if (m_use_map_hyperparameters)
         {
             a = x_opt(M + 0);
-#ifdef NOISELESS
+#ifdef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
             b = b_fixed;
 #else
             b = x_opt(M + 1);
