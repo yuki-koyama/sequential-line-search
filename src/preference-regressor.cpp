@@ -14,7 +14,7 @@ using Eigen::VectorXd;
 // #define VERBOSE
 
 // By define this macro, this class will use a formulation based on "no noise" kernel matrix. That is, K = K(X, X) will
-// be used instead of K = K(X, X) + sigma^{2} I.
+// be used instead of K = K(X, X) + sigma^{2} I. This macro can be enabled via CMake option.
 // #define SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
 
 #ifdef VERBOSE
