@@ -36,19 +36,23 @@ namespace
 #endif
 
 #ifndef NOISELESS
-    inline double calc_grad_b(const VectorXd&             y,
-                              const Eigen::LLT<MatrixXd>& K_llt,
-                              const VectorXd&             K_inv_y,
-                              const MatrixXd&             X,
-                              const double                a,
-                              const double                b,
-                              const VectorXd&             r,
-                              const double                b_prior_mean,
-                              const double                b_prior_variance)
+    inline double CalcObjectiveNoiseLevelDerivative(const VectorXd&             y,
+                                                    const Eigen::LLT<MatrixXd>& K_llt,
+                                                    const VectorXd&             K_inv_y,
+                                                    const MatrixXd&             X,
+                                                    const double                a,
+                                                    const double                b,
+                                                    const VectorXd&             r,
+                                                    const double                b_prior_mean,
+                                                    const double                b_prior_variance)
     {
-        const MatrixXd C_grad_b = CalcLargeKYNoiseLevelDerivative(X, Concat(a, r), b);
-        const double   log_p_f_theta_grad_b =
-            0.5 * K_inv_y.transpose() * C_grad_b * K_inv_y - 0.5 * K_llt.solve(C_grad_b).trace();
+        const MatrixXd K_y_grad_b = CalcLargeKYNoiseLevelDerivative(X, Concat(a, r), b);
+
+        const double term_1 = 0.5 * K_inv_y.transpose() * K_y_grad_b * K_inv_y;
+        const double term_2 = -0.5 * K_llt.solve(K_y_grad_b).trace();
+
+        const double log_p_f_theta_grad_b = term_1 + term_2;
+
         const double log_prior =
             mathtoolbox::GetLogOfLogNormalDistDerivative(b, std::log(b_prior_mean), b_prior_variance);
 
@@ -56,15 +60,15 @@ namespace
     }
 #endif
 
-    inline VectorXd calc_grad_theta(const VectorXd&             y,
-                                    const Eigen::LLT<MatrixXd>& K_llt,
-                                    const VectorXd&             K_inv_y,
-                                    const MatrixXd&             X,
-                                    const VectorXd&             kernel_hyperparams,
-                                    const double                a_prior_mean,
-                                    const double                a_prior_variance,
-                                    const double                r_prior_mean,
-                                    const double                r_prior_variance)
+    inline VectorXd CalcObjectiveThetaDerivative(const VectorXd&             y,
+                                                 const Eigen::LLT<MatrixXd>& K_llt,
+                                                 const VectorXd&             K_inv_y,
+                                                 const MatrixXd&             X,
+                                                 const VectorXd&             kernel_hyperparams,
+                                                 const double                a_prior_mean,
+                                                 const double                a_prior_variance,
+                                                 const double                r_prior_mean,
+                                                 const double                r_prior_variance)
     {
         VectorXd grad = VectorXd::Zero(kernel_hyperparams.size());
 
@@ -196,21 +200,22 @@ namespace
 
             if (regressor->m_use_map_hyperparameters)
             {
-                const VectorXd grad_theta = calc_grad_theta(y,
-                                                            K_llt,
-                                                            K_inv_y,
-                                                            X,
-                                                            Concat(a, r),
-                                                            regressor->m_default_a,
-                                                            regressor->m_variance,
-                                                            regressor->m_default_r,
-                                                            regressor->m_variance);
+                const VectorXd grad_theta = CalcObjectiveThetaDerivative(y,
+                                                                         K_llt,
+                                                                         K_inv_y,
+                                                                         X,
+                                                                         Concat(a, r),
+                                                                         regressor->m_default_a,
+                                                                         regressor->m_variance,
+                                                                         regressor->m_default_r,
+                                                                         regressor->m_variance);
 
                 grad[M + 0] = grad_theta(0);
 #ifdef NOISELESS
                 grad[M + 1] = 0.0;
 #else
-                grad[M + 1] = calc_grad_b(y, K_llt, K_inv_y, X, a, b, r, regressor->m_default_b, regressor->m_variance);
+                grad[M + 1] = CalcObjectiveNoiseLevelDerivative(
+                    y, K_llt, K_inv_y, X, a, b, r, regressor->m_default_b, regressor->m_variance);
 #endif
                 const VectorXd grad_r = grad_theta.segment(1, r.size());
                 for (unsigned i = 0; i < grad_r.size(); ++i)
