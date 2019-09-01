@@ -305,7 +305,11 @@ namespace sequential_line_search
         lower.block(M, 0, 2 + d, 1) = VectorXd::Constant(2 + d, 1e-05);
         VectorXd x_ini              = VectorXd::Constant(M + 2 + d, 0.0);
         x_ini(M + 0)                = m_default_a;
+#ifdef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
+        x_ini(M + 1)                = 0.5 * (upper(M + 1) + lower(M + 1));
+#else
         x_ini(M + 1)                = m_default_b;
+#endif
         x_ini.block(M + 2, 0, d, 1) = VectorXd::Constant(d, m_default_r);
 
         // Use the MAP estimated values in previous regression as initial values
