@@ -2,6 +2,7 @@
 #include <cmath>
 #include <iostream>
 #include <mathtoolbox/probability-distributions.hpp>
+#include <mathtoolbox/constants.hpp>
 #include <nlopt-util.hpp>
 #include <sequential-line-search/gaussian-process-regressor.hpp>
 #include <sequential-line-search/utils.hpp>
@@ -148,9 +149,12 @@ namespace
             }
         }
 
+        // Constant
+        constexpr double prod_of_two_and_pi = 2.0 * mathtoolbox::constants::pi;
+
         const double term1 = -0.5 * y.transpose() * C_inv * y;
         const double term2 = -0.5 * std::log(C.determinant());
-        const double term3 = -0.5 * N * std::log(2.0 * M_PI);
+        const double term3 = -0.5 * N * std::log(prod_of_two_and_pi);
 
         // Computing the regularization terms from a prior assumptions
         const double a_prior = calc_a_prior(a);

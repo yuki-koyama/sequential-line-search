@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <mathtoolbox/probability-distributions.hpp>
+#include <mathtoolbox/constants.hpp>
 #include <nlopt-util.hpp>
 #include <sequential-line-search/preference-regressor.hpp>
 #include <sequential-line-search/utils.hpp>
@@ -142,6 +143,9 @@ namespace
             obj += calc_log_likelihood(D[i], w(i), y, regressor->m_btl_scale);
         }
 
+        // Constant
+        constexpr double prod_of_two_and_pi = 2.0 * mathtoolbox::constants::pi;
+
         // Log likelihood of y distribution
         const MatrixXd                    K = CalcLargeKY(X, Concat(a, r), b);
         const Eigen::LLT<Eigen::MatrixXd> K_llt(K);
@@ -149,7 +153,7 @@ namespace
         const double log_det_K = 2.0 * K_llt.matrixL().toDenseMatrix().diagonal().array().log().sum();
         const double term1     = -0.5 * y.transpose() * K_inv_y;
         const double term2     = -0.5 * log_det_K;
-        const double term3     = -0.5 * M * std::log(2.0 * M_PI);
+        const double term3     = -0.5 * M * std::log(prod_of_two_and_pi);
         obj += term1 + term2 + term3;
 
         assert(!std::isnan(obj));
