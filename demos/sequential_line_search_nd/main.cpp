@@ -94,8 +94,8 @@ int main(int argc, char* argv[])
 #endif
 
     // Export a report as a CSV file
-    sequential_line_search::utils::exportMatrixToCsv("objective_values.csv", objective_values);
-    sequential_line_search::utils::exportMatrixToCsv("residual_norms.csv", residual_norms);
+    sequential_line_search::utils::ExportMatrixToCsv("objective_values.csv", objective_values);
+    sequential_line_search::utils::ExportMatrixToCsv("residual_norms.csv", residual_norms);
 
     return 0;
 }

@@ -375,7 +375,7 @@ namespace sequential_line_search
     void PreferenceRegressor::DampData(const std::string& dir_path, const std::string& prefix) const
     {
         // Export X using CSV
-        utils::exportMatrixToCsv(dir_path + "/" + prefix + "X.csv", X);
+        utils::ExportMatrixToCsv(dir_path + "/" + prefix + "X.csv", X);
 
         // Export D using CSV
         std::ofstream ofs_D(dir_path + "/" + prefix + "D.csv");

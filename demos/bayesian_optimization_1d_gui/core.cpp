@@ -24,7 +24,7 @@ Core::Core() : show_slider_value(false)
 void Core::proceedOptimization()
 {
     const VectorXd x =
-        (X.cols() == 0) ? utils::generateRandomVector(1) : acquisition_function::FindNextPoint(*regressor);
+        (X.cols() == 0) ? utils::GenerateRandomVector(1) : acquisition_function::FindNextPoint(*regressor);
 
 #ifdef NOISY
     const double y = evaluateObjectiveFunction(x) + 0.1 * randutil::GenNumFromNormalDist();

@@ -16,7 +16,7 @@ namespace sequential_line_search
         ////////////////////////////////////////////////
 
         // Uniform sampling from [0, 1]^n
-        Eigen::VectorXd generateRandomVector(unsigned n);
+        Eigen::VectorXd GenerateRandomVector(unsigned n);
 
         ////////////////////////////////////////////////
         // Bradley-Terry-Luce Model
@@ -60,7 +60,7 @@ namespace sequential_line_search
         // File IO
         ////////////////////////////////////////////////
 
-        void exportMatrixToCsv(const std::string& filePath, const Eigen::MatrixXd& X);
+        void ExportMatrixToCsv(const std::string& file_path, const Eigen::MatrixXd& X);
     } // namespace utils
 } // namespace sequential_line_search
 
