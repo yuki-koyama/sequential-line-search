@@ -2,8 +2,8 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
-#include <mathtoolbox/probability-distributions.hpp>
 #include <mathtoolbox/constants.hpp>
+#include <mathtoolbox/probability-distributions.hpp>
 #include <nlopt-util.hpp>
 #include <sequential-line-search/preference-regressor.hpp>
 #include <sequential-line-search/utils.hpp>
@@ -104,7 +104,7 @@ namespace
     }
 
     // log p(d_k | f)
-    inline double calc_log_likelihood(const Preference& p, const double w, const VectorXd& y, const double btl_scale)
+    inline double calc_log_likelihood(const Preference& p, const VectorXd& y, const double btl_scale)
     {
         VectorXd tmp(p.size());
         for (unsigned i = 0; i < p.size(); ++i)
@@ -121,7 +121,6 @@ namespace
 
         const MatrixXd&                X = regressor->X;
         const std::vector<Preference>& D = regressor->D;
-        const VectorXd&                w = regressor->w;
         const unsigned                 M = X.cols();
         const VectorXd                 y = Eigen::Map<const VectorXd>(&x[0], M);
 
@@ -140,7 +139,7 @@ namespace
         // Log likelihood of data
         for (unsigned i = 0; i < D.size(); ++i)
         {
-            obj += calc_log_likelihood(D[i], w(i), y, regressor->m_btl_scale);
+            obj += calc_log_likelihood(D[i], y, regressor->m_btl_scale);
         }
 
         // Constant
@@ -188,7 +187,7 @@ namespace
             for (unsigned i = 0; i < D.size(); ++i)
             {
                 const Preference& p = D[i];
-                const double      s = btl_scale * w(i);
+                const double      s = btl_scale;
                 VectorXd          tmp1(p.size());
                 for (unsigned i = 0; i < p.size(); ++i)
                 {
@@ -250,16 +249,14 @@ namespace sequential_line_search
 {
     PreferenceRegressor::PreferenceRegressor(const MatrixXd&                X,
                                              const std::vector<Preference>& D,
-                                             const Eigen::VectorXd&         w,
                                              bool                           use_map_hyperparameters,
                                              const double                   default_a,
                                              const double                   default_r,
                                              const double                   default_b,
                                              const double                   variance,
                                              const double                   btl_scale)
-        : m_use_map_hyperparameters(use_map_hyperparameters), X(X), D(D),
-          w(w.size() == 0 ? Eigen::VectorXd::Ones(D.size()) : w), m_default_a(default_a), m_default_r(default_r),
-          m_default_b(default_b), m_variance(variance), m_btl_scale(btl_scale)
+        : m_use_map_hyperparameters(use_map_hyperparameters), X(X), D(D), m_default_a(default_a),
+          m_default_r(default_r), m_default_b(default_b), m_variance(variance), m_btl_scale(btl_scale)
     {
         if (X.cols() == 0 || D.size() == 0)
         {
@@ -310,9 +307,9 @@ namespace sequential_line_search
         VectorXd x_ini              = VectorXd::Constant(M + 2 + d, 0.0);
         x_ini(M + 0)                = m_default_a;
 #ifdef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
-        x_ini(M + 1)                = 0.5 * (upper(M + 1) + lower(M + 1));
+        x_ini(M + 1) = 0.5 * (upper(M + 1) + lower(M + 1));
 #else
-        x_ini(M + 1)                = m_default_b;
+        x_ini(M + 1) = m_default_b;
 #endif
         x_ini.block(M + 2, 0, d, 1) = VectorXd::Constant(d, m_default_r);
 

@@ -1,8 +1,8 @@
 #include <Eigen/LU>
 #include <cmath>
 #include <iostream>
-#include <mathtoolbox/probability-distributions.hpp>
 #include <mathtoolbox/constants.hpp>
+#include <mathtoolbox/probability-distributions.hpp>
 #include <nlopt-util.hpp>
 #include <sequential-line-search/gaussian-process-regressor.hpp>
 #include <sequential-line-search/utils.hpp>

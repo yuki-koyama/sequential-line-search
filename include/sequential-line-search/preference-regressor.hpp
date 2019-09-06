@@ -17,7 +17,6 @@ namespace sequential_line_search
     public:
         PreferenceRegressor(const Eigen::MatrixXd&         X,
                             const std::vector<Preference>& D,
-                            const Eigen::VectorXd&         w                       = Eigen::VectorXd(),
                             const bool                     use_map_hyperparameters = false,
                             const double                   default_a               = 0.500,
                             const double                   default_r               = 0.500,
@@ -39,8 +38,6 @@ namespace sequential_line_search
         // Data
         Eigen::MatrixXd         X;
         std::vector<Preference> D;
-        Eigen::VectorXd
-            w; ///< Weights for calculating the scales in the BTL model (default = ones), used in crowdsourcing settings
 
         // Derived by MAP estimation
         Eigen::VectorXd y;

@@ -55,7 +55,7 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResu
     m_data->AddNewPoints(x_chosen, {x_prev_max, x_prev_ei}, true);
 
     m_regressor = std::make_shared<PreferenceRegressor>(
-        m_data->m_X, m_data->m_D, Eigen::VectorXd(), m_use_map_hyperparameters, m_a, m_r, m_b, m_variance, m_btl_scale);
+        m_data->m_X, m_data->m_D, m_use_map_hyperparameters, m_a, m_r, m_b, m_variance, m_btl_scale);
 
     const auto x_max = m_regressor->FindArgMax();
     const auto x_ei  = acquisition_function::FindNextPoint(*m_regressor);
