@@ -86,8 +86,9 @@ namespace
 
             const double prior =
                 use_log_normal_prior
-                    ? (i == 0 ? calc_grad_a_prior(kernel_hyperparams(i))
-                              : calc_grad_r_i_prior(kernel_hyperparams.segment(1, kernel_hyperparams.size() - 1), i))
+                    ? (i == 0
+                           ? calc_grad_a_prior(kernel_hyperparams(i))
+                           : calc_grad_r_i_prior(kernel_hyperparams.segment(1, kernel_hyperparams.size() - 1), i - 1))
                     : 0.0;
 
             grad(i) = term1 + term2 + prior;
