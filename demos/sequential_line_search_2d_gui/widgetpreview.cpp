@@ -24,9 +24,9 @@ void WidgetPreview::paintEvent(QPaintEvent* event)
 
     const VectorXd x = core.optimizer->GetParameters(core.mainWindow->obtainSliderPosition());
     const double   y = core.evaluateObjectiveFunction(x);
-    const auto     c = tinycolormap::GetJetColor(y);
+    const auto     c = tinycolormap::GetJetColor(y).ConvertToQColor();
 
-    const QBrush backgroundBrush = QBrush(QColor(c[0] * 255.0, c[1] * 255.0, c[2] * 255.0));
+    const QBrush backgroundBrush = QBrush(c);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.fillRect(rect, backgroundBrush);
 }
