@@ -2,6 +2,7 @@
 #define PREFERENCE_REGRESSOR_H
 
 #include <Eigen/Core>
+#include <Eigen/Cholesky>
 #include <sequential-line-search/preference.hpp>
 #include <sequential-line-search/regressor.hpp>
 #include <string>
@@ -47,9 +48,11 @@ namespace sequential_line_search
         double          b; ///< ARD hyperparameter about noise level.
         Eigen::VectorXd r; ///< ARD hyperparameter about length scales.
 
-        // Kernel matrix, calculated in the MAP estimation procedure
-        Eigen::MatrixXd C;
-        Eigen::MatrixXd C_inv;
+        // Kernel matrix calculated in the MAP estimation procedure
+        Eigen::MatrixXd m_K;
+
+        // Kernel matrix stored as a Cholesky-decomposed form
+        Eigen::LLT<Eigen::MatrixXd> m_K_llt;
 
         // IO
         void DampData(const std::string& dir_path, const std::string& prefix = "") const;
