@@ -7,6 +7,7 @@
 #include <sequential-line-search/preference-regressor.hpp>
 #include <sequential-line-search/utils.hpp>
 
+using Eigen::LLT;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
@@ -40,15 +41,15 @@ namespace
 #endif
 
 #ifndef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
-    inline double CalcObjectiveNoiseLevelDerivative(const VectorXd&             y,
-                                                    const Eigen::LLT<MatrixXd>& K_llt,
-                                                    const VectorXd&             K_inv_y,
-                                                    const MatrixXd&             X,
-                                                    const double                a,
-                                                    const double                b,
-                                                    const VectorXd&             r,
-                                                    const double                b_prior_mean,
-                                                    const double                b_prior_variance)
+    inline double CalcObjectiveNoiseLevelDerivative(const VectorXd&      y,
+                                                    const LLT<MatrixXd>& K_llt,
+                                                    const VectorXd&      K_inv_y,
+                                                    const MatrixXd&      X,
+                                                    const double         a,
+                                                    const double         b,
+                                                    const VectorXd&      r,
+                                                    const double         b_prior_mean,
+                                                    const double         b_prior_variance)
     {
         const MatrixXd K_y_grad_b = CalcLargeKYNoiseLevelDerivative(X, Concat(a, r), b);
 
@@ -64,15 +65,15 @@ namespace
     }
 #endif
 
-    inline VectorXd CalcObjectiveThetaDerivative(const VectorXd&             y,
-                                                 const Eigen::LLT<MatrixXd>& K_llt,
-                                                 const VectorXd&             K_inv_y,
-                                                 const MatrixXd&             X,
-                                                 const VectorXd&             kernel_hyperparams,
-                                                 const double                a_prior_mean,
-                                                 const double                a_prior_variance,
-                                                 const double                r_prior_mean,
-                                                 const double                r_prior_variance)
+    inline VectorXd CalcObjectiveThetaDerivative(const VectorXd&      y,
+                                                 const LLT<MatrixXd>& K_llt,
+                                                 const VectorXd&      K_inv_y,
+                                                 const MatrixXd&      X,
+                                                 const VectorXd&      kernel_hyperparams,
+                                                 const double         a_prior_mean,
+                                                 const double         a_prior_variance,
+                                                 const double         r_prior_mean,
+                                                 const double         r_prior_variance)
     {
         VectorXd grad = VectorXd::Zero(kernel_hyperparams.size());
 
@@ -144,21 +145,23 @@ namespace
         // Constant
         constexpr double prod_of_two_and_pi = 2.0 * mathtoolbox::constants::pi;
 
+        // Kernel matrix
+        const MatrixXd      K = regressor->m_use_map_hyperparameters ? CalcLargeKY(X, Concat(a, r), b) : regressor->m_K;
+        const LLT<MatrixXd> K_llt = regressor->m_use_map_hyperparameters ? LLT<MatrixXd>(K) : regressor->m_K_llt;
+
         // Log likelihood of y distribution
-        const MatrixXd                    K = CalcLargeKY(X, Concat(a, r), b);
-        const Eigen::LLT<Eigen::MatrixXd> K_llt(K);
-        const VectorXd                    K_inv_y = K_llt.solve(y);
-        const double log_det_K = 2.0 * K_llt.matrixL().toDenseMatrix().diagonal().array().log().sum();
-        const double term1     = -0.5 * y.transpose() * K_inv_y;
-        const double term2     = -0.5 * log_det_K;
-        const double term3     = -0.5 * M * std::log(prod_of_two_and_pi);
+        const VectorXd K_inv_y   = K_llt.solve(y);
+        const double   log_det_K = 2.0 * K_llt.matrixL().toDenseMatrix().diagonal().array().log().sum();
+        const double   term1     = -0.5 * y.transpose() * K_inv_y;
+        const double   term2     = -0.5 * log_det_K;
+        const double   term3     = -0.5 * M * std::log(prod_of_two_and_pi);
         obj += term1 + term2 + term3;
 
         assert(!std::isnan(obj));
 
+        // Priors for Gaussian process hyperparameters
         if (regressor->m_use_map_hyperparameters)
         {
-            // Priors for GP parameters
             const double a_prior = regressor->m_default_a;
 #ifndef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
             const double b_prior = regressor->m_default_b;
@@ -261,7 +264,7 @@ sequential_line_search::PreferenceRegressor::PreferenceRegressor(const MatrixXd&
     PerformMapEstimation();
 
     m_K     = CalcLargeKY(X, Concat(a, r), b);
-    m_K_llt = Eigen::LLT<Eigen::MatrixXd>(m_K);
+    m_K_llt = LLT<MatrixXd>(m_K);
 }
 
 double sequential_line_search::PreferenceRegressor::PredictMu(const VectorXd& x) const
@@ -343,7 +346,7 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation(
         b = m_default_b;
 
         m_K     = CalcLargeKY(X, Concat(a, r), b);
-        m_K_llt = Eigen::LLT<Eigen::MatrixXd>(m_K);
+        m_K_llt = LLT<MatrixXd>(m_K);
     }
 
 #ifdef VERBOSE

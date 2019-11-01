@@ -58,10 +58,12 @@ int main(int argc, char* argv[])
         {
             std::cout << "---- Iteration " << i + 1 << " ----" << std::endl;
 
+            constexpr double search_epsilon = 1e-05;
+
             // search the best position
             double max_slider_position = 0.0;
             double max_y               = -1e+10;
-            for (double slider_position = 0.0; slider_position <= 1.0; slider_position += 0.0001)
+            for (double slider_position = 0.0; slider_position <= 1.0; slider_position += search_epsilon)
             {
                 const double y = evaluateObjectiveFunction(optimizer.GetParameters(slider_position));
                 if (y > max_y)

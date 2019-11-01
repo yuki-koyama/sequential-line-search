@@ -1,8 +1,8 @@
 #ifndef PREFERENCE_REGRESSOR_H
 #define PREFERENCE_REGRESSOR_H
 
-#include <Eigen/Core>
 #include <Eigen/Cholesky>
+#include <Eigen/Core>
 #include <sequential-line-search/preference.hpp>
 #include <sequential-line-search/regressor.hpp>
 #include <string>
