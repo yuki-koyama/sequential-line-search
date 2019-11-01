@@ -39,13 +39,15 @@ namespace sequential_line_search
         Eigen::MatrixXd         X;
         std::vector<Preference> D;
 
-        // Derived by MAP estimation
+        // Goodness values derived by the MAP estimation
         Eigen::VectorXd y;
+
+        // Hyperparameters either derived by the MAP estimation or copied from the default values
         double          a; ///< ARD hyperparameter about signal level.
         double          b; ///< ARD hyperparameter about noise level.
         Eigen::VectorXd r; ///< ARD hyperparameter about length scales.
 
-        // Can be derived after MAP estimation
+        // Kernel matrix, calculated in the MAP estimation procedure
         Eigen::MatrixXd C;
         Eigen::MatrixXd C_inv;
 

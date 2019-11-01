@@ -178,7 +178,8 @@ namespace
         }
 
         // When the algorithm is gradient-based, compute the gradient vector
-        if (grad.size() == x.size())
+        const bool is_gradient_based = grad.size() == x.size();
+        if (is_gradient_based)
         {
             VectorXd grad_y = VectorXd::Zero(y.rows());
 
