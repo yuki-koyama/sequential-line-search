@@ -24,7 +24,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->widget_s->content = MainWidget::Content::StandardDeviation;
 }
 
-MainWindow::~MainWindow() { delete ui; }
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
 
 void MainWindow::on_actionBatch_visualization_triggered()
 {

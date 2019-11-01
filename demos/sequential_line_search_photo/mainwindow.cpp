@@ -111,7 +111,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     });
 }
 
-MainWindow::~MainWindow() { delete ui; }
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
 
 double MainWindow::obtainSliderPosition() const
 {
@@ -184,7 +187,10 @@ void MainWindow::on_horizontalSlider_valueChanged(int /*value*/)
     enhancer_widget->update();
 }
 
-void MainWindow::on_pushButton_clicked() { on_actionProceed_optimization_triggered(); }
+void MainWindow::on_pushButton_clicked()
+{
+    on_actionProceed_optimization_triggered();
+}
 
 void MainWindow::on_actionPrint_current_best_triggered()
 {

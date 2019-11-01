@@ -35,7 +35,8 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
                         "variance"_a,
                         "btl_scale"_a);
 
-    optimizer_class.def("submit_line_search_result", &SequentialLineSearchOptimizer::SubmitLineSearchResult, "slider_position"_a);
+    optimizer_class.def(
+        "submit_line_search_result", &SequentialLineSearchOptimizer::SubmitLineSearchResult, "slider_position"_a);
 
     optimizer_class.def("get_slider_ends", &SequentialLineSearchOptimizer::GetSliderEnds);
 

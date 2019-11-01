@@ -1,10 +1,10 @@
 #include "core.hpp"
 #include <cmath>
 #include <iostream>
+#include <rand-util.hpp>
 #include <sequential-line-search/acquisition-function.hpp>
 #include <sequential-line-search/gaussian-process-regressor.hpp>
 #include <sequential-line-search/utils.hpp>
-#include <rand-util.hpp>
 
 // #define NOISY
 
@@ -40,7 +40,7 @@ void Core::proceedOptimization()
     const int num_data_points = X.cols();
 
     VectorXd f(num_data_points);
-    for (int i = 0; i < X.cols(); ++ i)
+    for (int i = 0; i < X.cols(); ++i)
     {
         f(i) = regressor->PredictMu(X.col(i));
 
@@ -79,4 +79,7 @@ double Core::evaluateObjectiveFunction(const Eigen::VectorXd& x) const
     return 1.0 - 1.5 * x(0) * std::sin(x(0) * 13.0);
 }
 
-void Core::computeRegression() { regressor = std::make_shared<GaussianProcessRegressor>(X, y); }
+void Core::computeRegression()
+{
+    regressor = std::make_shared<GaussianProcessRegressor>(X, y);
+}

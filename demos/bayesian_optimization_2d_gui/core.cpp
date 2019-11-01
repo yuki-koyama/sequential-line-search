@@ -18,7 +18,10 @@ Core::Core() : show_slider_value(false)
     y_max = NAN;
 }
 
-VectorXd Core::findNextPoint() const { return acquisition_function::FindNextPoint(*regressor); }
+VectorXd Core::findNextPoint() const
+{
+    return acquisition_function::FindNextPoint(*regressor);
+}
 
 void Core::proceedOptimization()
 {
@@ -41,7 +44,7 @@ void Core::proceedOptimization()
     const int num_data_points = X.cols();
 
     VectorXd f(num_data_points);
-    for (int i = 0; i < X.cols(); ++ i)
+    for (int i = 0; i < X.cols(); ++i)
     {
         f(i) = regressor->PredictMu(X.col(i));
 
@@ -84,4 +87,7 @@ double Core::evaluateObjectiveFunction(Eigen::VectorXd x) const
     return lambda(x, Eigen::Vector2d(0.3, 0.3), 0.3) + 1.5 * lambda(x, Eigen::Vector2d(0.7, 0.7), 0.4);
 }
 
-void Core::computeRegression() { regressor = std::make_shared<GaussianProcessRegressor>(X, y); }
+void Core::computeRegression()
+{
+    regressor = std::make_shared<GaussianProcessRegressor>(X, y);
+}

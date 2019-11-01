@@ -255,8 +255,14 @@ namespace sequential_line_search
                                              const double                   default_b,
                                              const double                   variance,
                                              const double                   btl_scale)
-        : m_use_map_hyperparameters(use_map_hyperparameters), X(X), D(D), m_default_a(default_a),
-          m_default_r(default_r), m_default_b(default_b), m_variance(variance), m_btl_scale(btl_scale)
+        : m_use_map_hyperparameters(use_map_hyperparameters),
+          X(X),
+          D(D),
+          m_default_a(default_a),
+          m_default_r(default_r),
+          m_default_b(default_b),
+          m_variance(variance),
+          m_btl_scale(btl_scale)
     {
         if (X.cols() == 0 || D.size() == 0)
         {
@@ -381,8 +387,11 @@ namespace sequential_line_search
             for (unsigned j = 0; j < D[i].size(); ++j)
             {
                 ofs_D << D[i][j];
+
                 if (j + 1 != D[i].size())
+                {
                     ofs_D << ",";
+                }
             }
             ofs_D << std::endl;
         }

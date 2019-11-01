@@ -47,7 +47,10 @@ VectorXd sequential_line_search::Regressor::PredictMaximumPointFromData() const
     return getX().col(best_index);
 }
 
-VectorXd sequential_line_search::Regressor::GetKernelHyperparams() const { return Concat(geta(), getr()); }
+VectorXd sequential_line_search::Regressor::GetKernelHyperparams() const
+{
+    return Concat(geta(), getr());
+}
 
 VectorXd
 sequential_line_search::CalcSmallK(const VectorXd& x, const MatrixXd& X, const Eigen::VectorXd& kernel_hyperparameters)

@@ -13,8 +13,11 @@ namespace sequential_line_search
         GaussianProcessRegressor(const Eigen::MatrixXd& X, const Eigen::VectorXd& y);
 
         /// \details Specified hyperparameters will be used.
-        GaussianProcessRegressor(
-            const Eigen::MatrixXd& X, const Eigen::VectorXd& y, double a, double b, const Eigen::VectorXd& r);
+        GaussianProcessRegressor(const Eigen::MatrixXd& X,
+                                 const Eigen::VectorXd& y,
+                                 double                 a,
+                                 double                 b,
+                                 const Eigen::VectorXd& r);
 
         double PredictMu(const Eigen::VectorXd& x) const override;
         double PredictSigma(const Eigen::VectorXd& x) const override;

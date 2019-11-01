@@ -62,8 +62,12 @@ namespace
         return mathtoolbox::GetLogOfLogNormalDist(r(index), r_prior_mu, r_prior_sigma_squared);
     }
 
-    double calc_grad_b(
-        const MatrixXd& X, const MatrixXd& C_inv, const VectorXd& y, const double a, const double b, const VectorXd& r)
+    double calc_grad_b(const MatrixXd& X,
+                       const MatrixXd& C_inv,
+                       const VectorXd& y,
+                       const double    a,
+                       const double    b,
+                       const VectorXd& r)
     {
         const MatrixXd C_grad_b = CalcLargeKYNoiseLevelDerivative(X, Concat(a, r), b);
         const double   term1    = +0.5 * y.transpose() * C_inv * C_grad_b * C_inv * y;
@@ -97,8 +101,12 @@ namespace
         return grad;
     }
 
-    VectorXd calc_grad(
-        const MatrixXd& X, const MatrixXd& C_inv, const VectorXd& y, const double a, const double b, const VectorXd& r)
+    VectorXd calc_grad(const MatrixXd& X,
+                       const MatrixXd& C_inv,
+                       const VectorXd& y,
+                       const double    a,
+                       const double    b,
+                       const VectorXd& r)
     {
         const unsigned D = X.rows();
 
@@ -192,8 +200,11 @@ namespace sequential_line_search
         C_inv = C.inverse();
     }
 
-    GaussianProcessRegressor::GaussianProcessRegressor(
-        const Eigen::MatrixXd& X, const Eigen::VectorXd& y, double a, double b, const Eigen::VectorXd& r)
+    GaussianProcessRegressor::GaussianProcessRegressor(const Eigen::MatrixXd& X,
+                                                       const Eigen::VectorXd& y,
+                                                       double                 a,
+                                                       double                 b,
+                                                       const Eigen::VectorXd& r)
     {
         this->X = X;
         this->y = y;

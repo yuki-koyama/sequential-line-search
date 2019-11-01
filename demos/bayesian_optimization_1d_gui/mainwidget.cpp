@@ -29,7 +29,10 @@ namespace
     }
 } // namespace
 
-MainWidget::MainWidget(QWidget* parent) : QWidget(parent) { setAutoFillBackground(true); }
+MainWidget::MainWidget(QWidget* parent) : QWidget(parent)
+{
+    setAutoFillBackground(true);
+}
 
 void MainWidget::paintEvent(QPaintEvent* event)
 {

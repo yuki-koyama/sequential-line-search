@@ -14,7 +14,10 @@ namespace
     Core& core = Core::getInstance();
 }
 
-MainWidget::MainWidget(QWidget* parent) : QWidget(parent) { setAutoFillBackground(true); }
+MainWidget::MainWidget(QWidget* parent) : QWidget(parent)
+{
+    setAutoFillBackground(true);
+}
 
 void MainWidget::paintEvent(QPaintEvent* event)
 {
@@ -55,21 +58,21 @@ void MainWidget::paintEvent(QPaintEvent* event)
 
             switch (content)
             {
-            case Content::Objective:
-                val(pix_x, pix_y) = core.evaluateObjectiveFunction(x);
-                break;
-            case Content::Mean:
-                val(pix_x, pix_y) = core.optimizer->GetPreferenceValueMean(x);
-                break;
-            case Content::StandardDeviation:
-                val(pix_x, pix_y) = core.optimizer->GetPreferenceValueStandardDeviation(x);
-                break;
-            case Content::ExpectedImprovement:
-                val(pix_x, pix_y) = core.optimizer->GetExpectedImprovementValue(x);
-                break;
-            default:
-                val(pix_x, pix_y) = 0.0;
-                break;
+                case Content::Objective:
+                    val(pix_x, pix_y) = core.evaluateObjectiveFunction(x);
+                    break;
+                case Content::Mean:
+                    val(pix_x, pix_y) = core.optimizer->GetPreferenceValueMean(x);
+                    break;
+                case Content::StandardDeviation:
+                    val(pix_x, pix_y) = core.optimizer->GetPreferenceValueStandardDeviation(x);
+                    break;
+                case Content::ExpectedImprovement:
+                    val(pix_x, pix_y) = core.optimizer->GetExpectedImprovementValue(x);
+                    break;
+                default:
+                    val(pix_x, pix_y) = 0.0;
+                    break;
             }
         }
     }

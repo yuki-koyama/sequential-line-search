@@ -23,8 +23,11 @@ namespace sequential_line_search
                                       const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>&
                                           initial_slider_generator = GenerateRandomSliderEnds);
 
-        void SetHyperparameters(
-            const double a, const double r, const double b, const double variance, const double btl_scale);
+        void SetHyperparameters(const double a,
+                                const double r,
+                                const double b,
+                                const double variance,
+                                const double btl_scale);
 
         void SubmitLineSearchResult(const double slider_position);
 

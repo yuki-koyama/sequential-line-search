@@ -26,8 +26,13 @@ sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptim
     const bool                                                                   use_slider_enlargement,
     const bool                                                                   use_map_hyperparameters,
     const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>& initial_slider_generator)
-    : m_use_slider_enlargement(use_slider_enlargement), m_use_map_hyperparameters(use_map_hyperparameters), m_a(0.500),
-      m_r(0.500), m_b(0.005), m_variance(0.250), m_btl_scale(0.010)
+    : m_use_slider_enlargement(use_slider_enlargement),
+      m_use_map_hyperparameters(use_map_hyperparameters),
+      m_a(0.500),
+      m_r(0.500),
+      m_b(0.005),
+      m_variance(0.250),
+      m_btl_scale(0.010)
 {
     const auto slider_ends = initial_slider_generator(dimension);
 
@@ -36,8 +41,11 @@ sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptim
     m_slider    = std::make_shared<Slider>(std::get<0>(slider_ends), std::get<1>(slider_ends), false);
 }
 
-void sequential_line_search::SequentialLineSearchOptimizer::SetHyperparameters(
-    const double a, const double r, const double b, const double variance, const double btl_scale)
+void sequential_line_search::SequentialLineSearchOptimizer::SetHyperparameters(const double a,
+                                                                               const double r,
+                                                                               const double b,
+                                                                               const double variance,
+                                                                               const double btl_scale)
 {
     m_a         = a;
     m_r         = r;
@@ -73,7 +81,10 @@ Eigen::VectorXd sequential_line_search::SequentialLineSearchOptimizer::GetParame
     return m_slider->GetValue(slider_position);
 }
 
-Eigen::VectorXd sequential_line_search::SequentialLineSearchOptimizer::GetMaximizer() const { return m_slider->orig_0; }
+Eigen::VectorXd sequential_line_search::SequentialLineSearchOptimizer::GetMaximizer() const
+{
+    return m_slider->orig_0;
+}
 
 double
 sequential_line_search::SequentialLineSearchOptimizer::GetPreferenceValueMean(const Eigen::VectorXd& parameter) const

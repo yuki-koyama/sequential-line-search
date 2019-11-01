@@ -15,7 +15,10 @@ namespace
     Core& core = Core::getInstance();
 }
 
-MainWidget::MainWidget(QWidget* parent) : QWidget(parent) { setAutoFillBackground(true); }
+MainWidget::MainWidget(QWidget* parent) : QWidget(parent)
+{
+    setAutoFillBackground(true);
+}
 
 void MainWidget::paintEvent(QPaintEvent* event)
 {
@@ -46,23 +49,23 @@ void MainWidget::paintEvent(QPaintEvent* event)
 
             switch (content)
             {
-            case Content::Objective:
-                val(pix_x, pix_y) = core.evaluateObjectiveFunction(x);
-                break;
-            case Content::Mean:
-                val(pix_x, pix_y) = (core.regressor.get() != nullptr) ? core.regressor->PredictMu(x) : 0.0;
-                break;
-            case Content::StandardDeviation:
-                val(pix_x, pix_y) = (core.regressor.get() != nullptr) ? core.regressor->PredictSigma(x) : 0.0;
-                break;
-            case Content::ExpectedImprovement:
-                val(pix_x, pix_y) = (core.regressor.get() != nullptr)
-                                        ? acquisition_function::CalculateAcqusitionValue(*core.regressor, x)
-                                        : 0.0;
-                break;
-            default:
-                val(pix_x, pix_y) = 0.0;
-                break;
+                case Content::Objective:
+                    val(pix_x, pix_y) = core.evaluateObjectiveFunction(x);
+                    break;
+                case Content::Mean:
+                    val(pix_x, pix_y) = (core.regressor.get() != nullptr) ? core.regressor->PredictMu(x) : 0.0;
+                    break;
+                case Content::StandardDeviation:
+                    val(pix_x, pix_y) = (core.regressor.get() != nullptr) ? core.regressor->PredictSigma(x) : 0.0;
+                    break;
+                case Content::ExpectedImprovement:
+                    val(pix_x, pix_y) = (core.regressor.get() != nullptr)
+                                            ? acquisition_function::CalculateAcqusitionValue(*core.regressor, x)
+                                            : 0.0;
+                    break;
+                default:
+                    val(pix_x, pix_y) = 0.0;
+                    break;
             }
         }
     }
