@@ -3,7 +3,11 @@
 [![Build Status](https://travis-ci.com/yuki-koyama/sequential-line-search.svg?branch=master)](https://travis-ci.com/yuki-koyama/sequential-line-search)
 ![GitHub](https://img.shields.io/github/license/yuki-koyama/sequential-line-search)
 
-This repository provides a C++ library to perform the **sequential line search** method (which is a variant of **Bayesian optimization**). The core algorithm is implemented in `include/sequential-line-search/*.h` and `src/*.cpp`. This repository also contains the following example applications:
+This repository provides a C++ library to perform the **sequential line search** method (which is a variant of **Bayesian optimization**).
+
+![](docs/concept.jpg)
+
+The core algorithm is implemented in `include/sequential-line-search/*.h` and `src/*.cpp`. This repository also contains the following example applications:
 
 - **bayesian_optimization_1d**: A simple demo of the standard Bayesian optimization applied to a one-dimensional test function.
 - **sequential_line_search_nd**: A simple demo of the sequential line search method applied to a multi-dimensional test function.
