@@ -23,7 +23,7 @@ namespace
 
         if (!grad.empty())
         {
-            const Eigen::VectorXd derivative = acquisition_function::CalculateAcquisitionValueDerivative(
+            const VectorXd derivative = acquisition_function::CalculateAcquisitionValueDerivative(
                 *regressor, Eigen::Map<const VectorXd>(&x[0], x.size()));
             std::memcpy(grad.data(), derivative.data(), sizeof(double) * derivative.size());
         }
@@ -53,7 +53,7 @@ namespace
                 return updated_regressor->PredictSigmaDerivative(x);
             };
 
-            const Eigen::VectorXd derivative = mathtoolbox::GetExpectedImprovementDerivative(
+            const VectorXd derivative = mathtoolbox::GetExpectedImprovementDerivative(
                 eigen_x, mu, sigma, x_best, mu_derivative, sigma_derivative);
 
             std::memcpy(grad.data(), derivative.data(), sizeof(double) * derivative.size());
@@ -63,66 +63,120 @@ namespace
     }
 } // namespace
 
-namespace sequential_line_search
+double sequential_line_search::acquisition_function::CalculateAcqusitionValue(const Regressor&   regressor,
+                                                                              const VectorXd&    x,
+                                                                              const FunctionType function_type)
 {
-    namespace acquisition_function
+    assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
+
+    if (regressor.gety().rows() == 0)
     {
-        double CalculateAcqusitionValue(const Regressor& regressor, const VectorXd& x, const FunctionType function_type)
-        {
-            assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
+        return 0.0;
+    }
 
-            if (regressor.gety().rows() == 0)
-            {
-                return 0.0;
-            }
+    const VectorXd x_best = regressor.PredictMaximumPointFromData();
 
-            const VectorXd x_best = regressor.PredictMaximumPointFromData();
+    const auto mu    = [&](const VectorXd& x) { return regressor.PredictMu(x); };
+    const auto sigma = [&](const VectorXd& x) { return regressor.PredictSigma(x); };
 
-            const auto mu    = [&](const Eigen::VectorXd& x) { return regressor.PredictMu(x); };
-            const auto sigma = [&](const Eigen::VectorXd& x) { return regressor.PredictSigma(x); };
+    return mathtoolbox::GetExpectedImprovement(x, mu, sigma, x_best);
+}
 
-            return mathtoolbox::GetExpectedImprovement(x, mu, sigma, x_best);
-        }
+VectorXd
+sequential_line_search::acquisition_function::CalculateAcquisitionValueDerivative(const Regressor&   regressor,
+                                                                                  const VectorXd&    x,
+                                                                                  const FunctionType function_type)
+{
+    assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
 
-        VectorXd CalculateAcquisitionValueDerivative(const Regressor&   regressor,
-                                                     const VectorXd&    x,
-                                                     const FunctionType function_type)
-        {
-            assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
+    if (regressor.gety().rows() == 0)
+    {
+        return VectorXd::Zero(x.size());
+    }
 
-            if (regressor.gety().rows() == 0)
-            {
-                return VectorXd::Zero(x.size());
-            }
+    const VectorXd x_best = regressor.PredictMaximumPointFromData();
 
-            const VectorXd x_best = regressor.PredictMaximumPointFromData();
+    const auto mu               = [&](const VectorXd& x) { return regressor.PredictMu(x); };
+    const auto sigma            = [&](const VectorXd& x) { return regressor.PredictSigma(x); };
+    const auto mu_derivative    = [&](const VectorXd& x) { return regressor.PredictMuDerivative(x); };
+    const auto sigma_derivative = [&](const VectorXd& x) { return regressor.PredictSigmaDerivative(x); };
 
-            const auto mu               = [&](const VectorXd& x) { return regressor.PredictMu(x); };
-            const auto sigma            = [&](const VectorXd& x) { return regressor.PredictSigma(x); };
-            const auto mu_derivative    = [&](const VectorXd& x) { return regressor.PredictMuDerivative(x); };
-            const auto sigma_derivative = [&](const VectorXd& x) { return regressor.PredictSigmaDerivative(x); };
+    return mathtoolbox::GetExpectedImprovementDerivative(x, mu, sigma, x_best, mu_derivative, sigma_derivative);
+}
 
-            return mathtoolbox::GetExpectedImprovementDerivative(x, mu, sigma, x_best, mu_derivative, sigma_derivative);
-        }
+VectorXd sequential_line_search::acquisition_function::FindNextPoint(Regressor&         regressor,
+                                                                     const unsigned     num_trials,
+                                                                     const FunctionType function_type)
+{
+    assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
 
-        Eigen::VectorXd FindNextPoint(Regressor& regressor, const unsigned num_trials, const FunctionType function_type)
-        {
-            assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
+    const unsigned D = regressor.getX().rows();
 
-            const unsigned D = regressor.getX().rows();
+    const VectorXd upper = VectorXd::Constant(D, 1.0);
+    const VectorXd lower = VectorXd::Constant(D, 0.0);
 
-            const VectorXd upper = VectorXd::Constant(D, 1.0);
-            const VectorXd lower = VectorXd::Constant(D, 0.0);
+    MatrixXd x_stars(D, num_trials);
+    VectorXd y_stars(num_trials);
 
+    const auto perform_local_optimization_from_random_initialization = [&](const int i) {
+        const VectorXd x_ini  = 0.5 * (VectorXd::Random(D) + VectorXd::Ones(D));
+        const VectorXd x_star = nloptutil::solve(x_ini, upper, lower, objective, nlopt::LD_LBFGS, &regressor, true, 50);
+
+        const double y_star = CalculateAcqusitionValue(regressor, x_star);
+
+        x_stars.col(i) = x_star;
+        y_stars(i)     = y_star;
+    };
+
+    parallelutil::queue_based_parallel_for(num_trials, perform_local_optimization_from_random_initialization);
+
+    const int best_index = [&]() {
+        int index;
+        y_stars.maxCoeff(&index);
+        return index;
+    }();
+
+    return x_stars.col(best_index);
+}
+
+vector<VectorXd> sequential_line_search::acquisition_function::FindNextPoints(const Regressor&   regressor,
+                                                                              const unsigned     num_points,
+                                                                              const unsigned     num_trials,
+                                                                              const FunctionType function_type)
+{
+    assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
+
+    const unsigned D = regressor.getX().rows();
+
+    const VectorXd upper = VectorXd::Constant(D, 1.0);
+    const VectorXd lower = VectorXd::Constant(D, 0.0);
+
+    vector<VectorXd> points;
+
+    GaussianProcessRegressor temporary_regressor(
+        regressor.getX(), regressor.gety(), regressor.geta(), regressor.getb(), regressor.getr());
+
+    const VectorXd x_best = regressor.PredictMaximumPointFromData();
+
+    for (unsigned i = 0; i < num_points; ++i)
+    {
+        pair<const Regressor*, const GaussianProcessRegressor*> data(&regressor, &temporary_regressor);
+
+        const VectorXd x_star = [&]() -> VectorXd {
             MatrixXd x_stars(D, num_trials);
             VectorXd y_stars(num_trials);
 
             const auto perform_local_optimization_from_random_initialization = [&](const int i) {
-                const VectorXd x_ini = 0.5 * (VectorXd::Random(D) + VectorXd::Ones(D));
-                const VectorXd x_star =
-                    nloptutil::solve(x_ini, upper, lower, objective, nlopt::LD_LBFGS, &regressor, true, 50);
+                const VectorXd x_ini  = 0.5 * (VectorXd::Random(D) + VectorXd::Ones(D));
+                const VectorXd x_star = nloptutil::solve(
+                    x_ini, upper, lower, objective_for_multiple_points, nlopt::LD_LBFGS, &data, true, 100);
 
-                const double y_star = CalculateAcqusitionValue(regressor, x_star);
+                const double y_star = [&]() {
+                    const auto mu    = [&](const VectorXd& x) { return regressor.PredictMu(x); };
+                    const auto sigma = [&](const VectorXd& x) { return temporary_regressor.PredictSigma(x); };
+
+                    return mathtoolbox::GetExpectedImprovement(x_star, mu, sigma, x_best);
+                }();
 
                 x_stars.col(i) = x_star;
                 y_stars(i)     = y_star;
@@ -137,85 +191,28 @@ namespace sequential_line_search
             }();
 
             return x_stars.col(best_index);
-        }
+        }();
 
-        vector<VectorXd> FindNextPoints(const Regressor&   regressor,
-                                        const unsigned     num_points,
-                                        const unsigned     num_trials,
-                                        const FunctionType function_type)
+        assert(x_star.minCoeff() > 0.0 - 1e-16 && x_star.maxCoeff() < 1.1 + 1e-16);
+
+        points.push_back(x_star);
+
+        // If this is not the final iteration, prepare data for the next iteration
+        if (points.size() != num_points)
         {
-            assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
+            const unsigned N = temporary_regressor.getX().cols();
 
-            const unsigned D = regressor.getX().rows();
+            MatrixXd new_X(D, N + 1);
+            new_X.block(0, 0, D, N) = temporary_regressor.getX();
+            new_X.col(N)            = x_star;
 
-            const VectorXd upper = VectorXd::Constant(D, 1.0);
-            const VectorXd lower = VectorXd::Constant(D, 0.0);
+            VectorXd new_y(temporary_regressor.gety().rows() + 1);
+            new_y << temporary_regressor.gety(), temporary_regressor.PredictMu(x_star);
 
-            vector<VectorXd> points;
-
-            GaussianProcessRegressor temporary_regressor(
-                regressor.getX(), regressor.gety(), regressor.geta(), regressor.getb(), regressor.getr());
-
-            const VectorXd x_best = regressor.PredictMaximumPointFromData();
-
-            for (unsigned i = 0; i < num_points; ++i)
-            {
-                pair<const Regressor*, const GaussianProcessRegressor*> data(&regressor, &temporary_regressor);
-
-                const VectorXd x_star = [&]() -> VectorXd {
-                    MatrixXd x_stars(D, num_trials);
-                    VectorXd y_stars(num_trials);
-
-                    const auto perform_local_optimization_from_random_initialization = [&](const int i) {
-                        const VectorXd x_ini  = 0.5 * (VectorXd::Random(D) + VectorXd::Ones(D));
-                        const VectorXd x_star = nloptutil::solve(
-                            x_ini, upper, lower, objective_for_multiple_points, nlopt::LD_LBFGS, &data, true, 100);
-
-                        const double y_star = [&]() {
-                            const auto mu    = [&](const VectorXd& x) { return regressor.PredictMu(x); };
-                            const auto sigma = [&](const VectorXd& x) { return temporary_regressor.PredictSigma(x); };
-
-                            return mathtoolbox::GetExpectedImprovement(x_star, mu, sigma, x_best);
-                        }();
-
-                        x_stars.col(i) = x_star;
-                        y_stars(i)     = y_star;
-                    };
-
-                    parallelutil::queue_based_parallel_for(num_trials,
-                                                           perform_local_optimization_from_random_initialization);
-
-                    const int best_index = [&]() {
-                        int index;
-                        y_stars.maxCoeff(&index);
-                        return index;
-                    }();
-
-                    return x_stars.col(best_index);
-                }();
-
-                assert(x_star.minCoeff() > 0.0 - 1e-16 && x_star.maxCoeff() < 1.1 + 1e-16);
-
-                points.push_back(x_star);
-
-                // If this is not the final iteration, prepare data for the next iteration
-                if (points.size() != num_points)
-                {
-                    const unsigned N = temporary_regressor.getX().cols();
-
-                    MatrixXd new_X(D, N + 1);
-                    new_X.block(0, 0, D, N) = temporary_regressor.getX();
-                    new_X.col(N)            = x_star;
-
-                    VectorXd new_y(temporary_regressor.gety().rows() + 1);
-                    new_y << temporary_regressor.gety(), temporary_regressor.PredictMu(x_star);
-
-                    temporary_regressor =
-                        GaussianProcessRegressor(new_X, new_y, regressor.geta(), regressor.getb(), regressor.getr());
-                }
-            }
-
-            return points;
+            temporary_regressor =
+                GaussianProcessRegressor(new_X, new_y, regressor.geta(), regressor.getb(), regressor.getr());
         }
-    } // namespace acquisition_function
-} // namespace sequential_line_search
+    }
+
+    return points;
+}
