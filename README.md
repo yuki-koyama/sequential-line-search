@@ -154,6 +154,17 @@ if __name__ == '__main__':
     main()
 ```
 
+## Technical Details
+
+### Gaussian Process Kernel
+
+- ARD Matern 5/2 kernel (default; recommended in [Snoek et al. NIPS 2011])
+- ARD squared exponential kernel (used in [Koyama et al. SIGGRAPH 2017])
+
+### Gaussian Process Kernel Hyperparameters
+
+The optimizer API takes a boolean named `use_MAP_hyperparameters` as input. If this is `true`, the optimizer calculates the kernel hyperparameters for every iteration via the MAP estimation, as described in [Koyama et al. SIGGRAPH 2017]. If this is `false`, the optimizer just uses default values, making the optimization much more efficient.
+
 ## License
 
 MIT License.
