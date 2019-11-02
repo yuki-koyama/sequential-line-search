@@ -27,6 +27,8 @@ Now this library has a [python binding](./python).
 Yuki Koyama, Issei Sato, Daisuke Sakamoto, and Takeo Igarashi. 2017. Sequential Line Search for Efficient Visual Design Optimization by Crowds. ACM Trans. Graph. 36, 4, pp.48:1--48:11 (2017). (a.k.a. Proceedings of SIGGRAPH 2017)
 DOI: https://doi.org/10.1145/3072959.3073598
 
+![](docs/publication.jpg)
+
 ## Dependencies
 
 ### Required for Core Algorithms
