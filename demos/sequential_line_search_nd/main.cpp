@@ -4,6 +4,7 @@
 #ifdef PARALLEL
 #include <parallel-util.hpp>
 #endif
+#include <timer.hpp>
 
 namespace
 {
@@ -17,7 +18,7 @@ namespace
     constexpr unsigned n_iterations = 10;
 
     constexpr bool use_slider_enlargement = true;
-    constexpr bool use_MAP                = true;
+    constexpr bool use_MAP_hyperparams    = true;
 
     constexpr unsigned test_dimension = 8;
 
@@ -42,10 +43,11 @@ int main(int argc, char* argv[])
     // Storage for performance reports
     Eigen::MatrixXd objective_values(n_iterations, n_trials);
     Eigen::MatrixXd residual_norms(n_iterations, n_trials);
+    Eigen::MatrixXd elapsed_times(n_iterations, n_trials);
 
     const auto perform_test = [&](const int trial_index) {
         sequential_line_search::SequentialLineSearchOptimizer optimizer(
-            test_dimension, use_slider_enlargement, use_MAP);
+            test_dimension, use_slider_enlargement, use_MAP_hyperparams);
 
         optimizer.SetHyperparameters(a, r, b, variance, btl_scale);
 
@@ -58,10 +60,12 @@ int main(int argc, char* argv[])
         {
             std::cout << "---- Iteration " << i + 1 << " ----" << std::endl;
 
-            // search the best position
+            constexpr double search_epsilon = 1e-05;
+
+            // Search the best position in the current slider space
             double max_slider_position = 0.0;
             double max_y               = -1e+10;
-            for (double slider_position = 0.0; slider_position <= 1.0; slider_position += 0.0001)
+            for (double slider_position = 0.0; slider_position <= 1.0; slider_position += search_epsilon)
             {
                 const double y = evaluateObjectiveFunction(optimizer.GetParameters(slider_position));
                 if (y > max_y)
@@ -77,7 +81,12 @@ int main(int argc, char* argv[])
             objective_values(i, trial_index) = max_y;
             residual_norms(i, trial_index) = (optimizer.GetParameters(max_slider_position) - analytic_solution).norm();
 
+            timer::Timer t;
+
+            // Perform Bayesian optimization
             optimizer.SubmitLineSearchResult(max_slider_position);
+
+            elapsed_times(i, trial_index) = t.get_elapsed_time_in_milliseconds();
         }
 
         std::cout << std::endl << "Found maximizer: " << optimizer.GetMaximizer().transpose() << std::endl;
@@ -96,6 +105,7 @@ int main(int argc, char* argv[])
     // Export a report as a CSV file
     sequential_line_search::utils::ExportMatrixToCsv("objective_values.csv", objective_values);
     sequential_line_search::utils::ExportMatrixToCsv("residual_norms.csv", residual_norms);
+    sequential_line_search::utils::ExportMatrixToCsv("elapsed_times.csv", elapsed_times);
 
     return 0;
 }
