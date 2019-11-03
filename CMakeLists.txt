@@ -16,11 +16,12 @@ if(APPLE AND EXISTS /usr/local/opt/qt)
 	list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt")
 endif()
 
-option(SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS       "" ON )
-option(SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS        "" OFF)
-option(SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS         "" OFF)
-option(SEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING      "" OFF)
-option(SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION "" ON )
+option(SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS                 "" ON )
+option(SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS                  "" OFF)
+option(SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS                   "" OFF)
+option(SEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING                "" OFF)
+option(SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION           "" ON )
+option(SEQUENTIAL_LINE_SEARCH_USE_PARALLELIZED_MULTI_START_SEARCH "" OFF)
 
 ###############################################
 # Handling external libraries
@@ -87,6 +88,9 @@ target_include_directories(SequentialLineSearch PUBLIC ${CMAKE_CURRENT_SOURCE_DI
 target_link_libraries(SequentialLineSearch Eigen3::Eigen mathtoolbox nlopt nlopt-util parallel-util timer)
 if(SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION)
 	target_compile_definitions(SequentialLineSearch PRIVATE SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION)
+endif()
+if(SEQUENTIAL_LINE_SEARCH_USE_PARALLELIZED_MULTI_START_SEARCH)
+	target_compile_definitions(SequentialLineSearch PRIVATE SEQUENTIAL_LINE_SEARCH_USE_PARALLELIZED_MULTI_START_SEARCH)
 endif()
 
 install(FILES ${headers} DESTINATION include/SequentialLineSearch)
