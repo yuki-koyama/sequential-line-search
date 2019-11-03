@@ -117,6 +117,7 @@ VectorXd sequential_line_search::acquisition_function::FindNextPoint(Regressor& 
 
     constexpr unsigned max_num_local_search_iters = 50;
 
+#ifdef SEQUENTIAL_LINE_SEARCH_USE_PARALLELIZED_MULTI_START_SEARCH
     MatrixXd x_stars(D, num_trials);
     VectorXd y_stars(num_trials);
 
@@ -139,6 +140,19 @@ VectorXd sequential_line_search::acquisition_function::FindNextPoint(Regressor& 
     }();
 
     return x_stars.col(best_index);
+#else
+    const VectorXd x_ini = 0.5 * (VectorXd::Random(D) + VectorXd::Ones(D));
+
+    // Find a global solution by the DIRECT method
+    const VectorXd x_global =
+        nloptutil::solve(x_ini, upper, lower, objective, nlopt::GN_DIRECT, &regressor, true, num_trials);
+
+    // Refine the solution by a quasi-Newton method
+    const VectorXd x_local = nloptutil::solve(
+        x_global, upper, lower, objective, nlopt::LD_LBFGS, &regressor, true, max_num_local_search_iters);
+
+    return x_local;
+#endif
 }
 
 vector<VectorXd> sequential_line_search::acquisition_function::FindNextPoints(const Regressor&   regressor,
