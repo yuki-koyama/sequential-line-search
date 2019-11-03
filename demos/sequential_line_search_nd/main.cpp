@@ -31,11 +31,11 @@ namespace
             return std::exp(-(x - mu).squaredNorm() / (sigma * sigma));
         };
 
-        return lambda(x, Eigen::VectorXd::Constant(test_dimension, 0.5), 1.0);
+        return lambda(x, Eigen::VectorXd::Constant(test_dimension, 0.4), 1.0);
     }
 
     // Define an analytic solution of the test function
-    const Eigen::VectorXd analytic_solution = Eigen::VectorXd::Constant(test_dimension, 0.5);
+    const Eigen::VectorXd analytic_solution = Eigen::VectorXd::Constant(test_dimension, 0.4);
 } // namespace
 
 int main(int argc, char* argv[])
