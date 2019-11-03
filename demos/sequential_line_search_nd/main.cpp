@@ -75,11 +75,13 @@ int main(int argc, char* argv[])
                 }
             }
 
-            std::cout << "x: " << optimizer.GetParameters(max_slider_position).transpose() << std::endl;
+            const Eigen::VectorXd max_x = optimizer.GetParameters(max_slider_position);
+
+            std::cout << "x: " << max_x.transpose().format(Eigen::IOFormat(3)) << std::endl;
             std::cout << "y: " << max_y << std::endl;
 
             objective_values(i, trial_index) = max_y;
-            residual_norms(i, trial_index) = (optimizer.GetParameters(max_slider_position) - analytic_solution).norm();
+            residual_norms(i, trial_index)   = (max_x - analytic_solution).norm();
 
             timer::Timer t;
 
@@ -89,8 +91,12 @@ int main(int argc, char* argv[])
             elapsed_times(i, trial_index) = t.get_elapsed_time_in_milliseconds();
         }
 
-        std::cout << std::endl << "Found maximizer: " << optimizer.GetMaximizer().transpose() << std::endl;
-        std::cout << "Found maximum: " << evaluateObjectiveFunction(optimizer.GetMaximizer()) << std::endl << std::endl;
+        const Eigen::VectorXd x_star = optimizer.GetMaximizer();
+        const double          y_star = evaluateObjectiveFunction(x_star);
+
+        std::cout << std::endl;
+        std::cout << "Found maximizer: " << x_star.transpose().format(Eigen::IOFormat(3)) << std::endl;
+        std::cout << "Found maximum: " << y_star << std::endl << std::endl;
     };
 
 #ifdef PARALLEL

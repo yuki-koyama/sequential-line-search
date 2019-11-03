@@ -115,13 +115,15 @@ VectorXd sequential_line_search::acquisition_function::FindNextPoint(Regressor& 
     const VectorXd upper = VectorXd::Constant(D, 1.0);
     const VectorXd lower = VectorXd::Constant(D, 0.0);
 
+    constexpr unsigned max_num_local_search_iters = 50;
+
     MatrixXd x_stars(D, num_trials);
     VectorXd y_stars(num_trials);
 
     const auto perform_local_optimization_from_random_initialization = [&](const int i) {
         const VectorXd x_ini  = 0.5 * (VectorXd::Random(D) + VectorXd::Ones(D));
-        const VectorXd x_star = nloptutil::solve(x_ini, upper, lower, objective, nlopt::LD_LBFGS, &regressor, true, 50);
-
+        const VectorXd x_star = nloptutil::solve(
+            x_ini, upper, lower, objective, nlopt::LD_LBFGS, &regressor, true, max_num_local_search_iters);
         const double y_star = CalculateAcqusitionValue(regressor, x_star);
 
         x_stars.col(i) = x_star;
