@@ -60,13 +60,21 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResu
     const auto& x_prev_max = m_slider->orig_0;
     const auto& x_prev_ei  = m_slider->orig_1;
 
+    // Update the data
     m_data->AddNewPoints(x_chosen, {x_prev_max, x_prev_ei}, true);
 
+    // Perform the MAP estimation
     m_regressor = std::make_shared<PreferenceRegressor>(
         m_data->m_X, m_data->m_D, m_use_map_hyperparameters, m_a, m_r, m_b, m_variance, m_btl_scale);
 
+    // A heuristics to set the computational effort for solving the maximization of the acquisition function. This is
+    // not justified or validated.
+    const int num_dims                = x_chosen.size();
+    const int num_global_search_iters = 5 * num_dims;
+
+    // Find the next search subspace
     const auto x_max = m_regressor->FindArgMax();
-    const auto x_ei  = acquisition_function::FindNextPoint(*m_regressor);
+    const auto x_ei  = acquisition_function::FindNextPoint(*m_regressor, num_global_search_iters);
 
     m_slider = std::make_shared<Slider>(x_max, x_ei, m_use_slider_enlargement);
 }
