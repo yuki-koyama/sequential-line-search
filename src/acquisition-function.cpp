@@ -168,13 +168,13 @@ sequential_line_search::acquisition_function::CalculateAcquisitionValueDerivativ
     return mathtoolbox::GetExpectedImprovementDerivative(x, mu, sigma, x_best, mu_derivative, sigma_derivative);
 }
 
-VectorXd sequential_line_search::acquisition_function::FindNextPoint(Regressor&         regressor,
+VectorXd sequential_line_search::acquisition_function::FindNextPoint(const Regressor&   regressor,
                                                                      const unsigned     num_trials,
                                                                      const FunctionType function_type)
 {
     assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
 
-    const unsigned num_dim = regressor.getX().rows();
+    const unsigned num_dim = regressor.GetNumDims();
 
     RegressorWrapper data = {&regressor};
 
@@ -188,7 +188,7 @@ vector<VectorXd> sequential_line_search::acquisition_function::FindNextPoints(co
 {
     assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
 
-    const unsigned num_dim = regressor.getX().rows();
+    const unsigned num_dim = regressor.GetNumDims();
 
     vector<VectorXd> points;
 

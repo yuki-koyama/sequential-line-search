@@ -28,7 +28,7 @@ namespace sequential_line_search
 
         /// \param num_trials The number of trials of acquisition value maximization. Specifying a large number is
         /// helpful for finding the global maximizer while it increases the computational cost proportional to it.
-        Eigen::VectorXd FindNextPoint(Regressor&         regressor,
+        Eigen::VectorXd FindNextPoint(const Regressor&   regressor,
                                       const unsigned     num_trials    = 20,
                                       const FunctionType function_type = FunctionType::ExpectedImprovement);
 
