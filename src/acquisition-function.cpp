@@ -61,6 +61,61 @@ namespace
 
         return mathtoolbox::GetExpectedImprovement(eigen_x, mu, sigma, x_best);
     }
+
+    VectorXd FindGlobalSolution(nlopt::vfunc       objective,
+                                void*              data,
+                                const unsigned int num_dim,
+                                const unsigned int num_global_trials)
+    {
+        const VectorXd upper = VectorXd::Constant(num_dim, 1.0);
+        const VectorXd lower = VectorXd::Constant(num_dim, 0.0);
+
+        constexpr unsigned max_num_local_search_iters = 50;
+
+#ifdef SEQUENTIAL_LINE_SEARCH_USE_PARALLELIZED_MULTI_START_SEARCH
+        MatrixXd x_stars(num_dim, num_global_trials);
+        VectorXd y_stars(num_global_trials);
+
+        const auto perform_local_optimization_from_random_initialization = [&](const int i) {
+            const VectorXd x_ini  = 0.5 * (VectorXd::Random(num_dim) + VectorXd::Ones(num_dim));
+            const VectorXd x_star = nloptutil::solve(
+                x_ini, upper, lower, objective, nlopt::LD_LBFGS, data, true, max_num_local_search_iters);
+            const double y_star = [&]() {
+                std::vector<double> x_star_std(num_dim);
+                std::vector<double> grad_std;
+                std::memcpy(x_star_std.data(), x_star.data(), sizeof(double) * num_dim);
+
+                return objective(x_star_std, grad_std, data);
+            }();
+
+            x_stars.col(i) = x_star;
+            y_stars(i)     = y_star;
+        };
+
+        parallelutil::queue_based_parallel_for(num_global_trials,
+                                               perform_local_optimization_from_random_initialization);
+
+        const int best_index = [&]() {
+            int index;
+            y_stars.maxCoeff(&index);
+            return index;
+        }();
+
+        return x_stars.col(best_index);
+#else
+        const VectorXd x_ini = 0.5 * (VectorXd::Random(D) + VectorXd::Ones(D));
+
+        // Find a global solution by the DIRECT method
+        const VectorXd x_global =
+            nloptutil::solve(x_ini, upper, lower, objective, nlopt::GN_DIRECT, data, true, num_global_trials);
+
+        // Refine the solution by a quasi-Newton method
+        const VectorXd x_local = nloptutil::solve(
+            x_global, upper, lower, objective, nlopt::LD_LBFGS, data, true, max_num_local_search_iters);
+
+        return x_local;
+#endif
+    }
 } // namespace
 
 double sequential_line_search::acquisition_function::CalculateAcqusitionValue(const Regressor&   regressor,
@@ -110,49 +165,9 @@ VectorXd sequential_line_search::acquisition_function::FindNextPoint(Regressor& 
 {
     assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
 
-    const unsigned D = regressor.getX().rows();
+    const unsigned num_dim = regressor.getX().rows();
 
-    const VectorXd upper = VectorXd::Constant(D, 1.0);
-    const VectorXd lower = VectorXd::Constant(D, 0.0);
-
-    constexpr unsigned max_num_local_search_iters = 50;
-
-#ifdef SEQUENTIAL_LINE_SEARCH_USE_PARALLELIZED_MULTI_START_SEARCH
-    MatrixXd x_stars(D, num_trials);
-    VectorXd y_stars(num_trials);
-
-    const auto perform_local_optimization_from_random_initialization = [&](const int i) {
-        const VectorXd x_ini  = 0.5 * (VectorXd::Random(D) + VectorXd::Ones(D));
-        const VectorXd x_star = nloptutil::solve(
-            x_ini, upper, lower, objective, nlopt::LD_LBFGS, &regressor, true, max_num_local_search_iters);
-        const double y_star = CalculateAcqusitionValue(regressor, x_star);
-
-        x_stars.col(i) = x_star;
-        y_stars(i)     = y_star;
-    };
-
-    parallelutil::queue_based_parallel_for(num_trials, perform_local_optimization_from_random_initialization);
-
-    const int best_index = [&]() {
-        int index;
-        y_stars.maxCoeff(&index);
-        return index;
-    }();
-
-    return x_stars.col(best_index);
-#else
-    const VectorXd x_ini = 0.5 * (VectorXd::Random(D) + VectorXd::Ones(D));
-
-    // Find a global solution by the DIRECT method
-    const VectorXd x_global =
-        nloptutil::solve(x_ini, upper, lower, objective, nlopt::GN_DIRECT, &regressor, true, num_trials);
-
-    // Refine the solution by a quasi-Newton method
-    const VectorXd x_local = nloptutil::solve(
-        x_global, upper, lower, objective, nlopt::LD_LBFGS, &regressor, true, max_num_local_search_iters);
-
-    return x_local;
-#endif
+    return FindGlobalSolution(objective, &regressor, num_dim, num_trials);
 }
 
 vector<VectorXd> sequential_line_search::acquisition_function::FindNextPoints(const Regressor&   regressor,
@@ -162,55 +177,22 @@ vector<VectorXd> sequential_line_search::acquisition_function::FindNextPoints(co
 {
     assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
 
-    const unsigned D = regressor.getX().rows();
-
-    const VectorXd upper = VectorXd::Constant(D, 1.0);
-    const VectorXd lower = VectorXd::Constant(D, 0.0);
+    const unsigned num_dim = regressor.getX().rows();
 
     vector<VectorXd> points;
 
     GaussianProcessRegressor temporary_regressor(
         regressor.getX(), regressor.gety(), regressor.geta(), regressor.getb(), regressor.getr());
 
-    const VectorXd x_best = regressor.PredictMaximumPointFromData();
-
     for (unsigned i = 0; i < num_points; ++i)
     {
+        // Create a data object for the nlopt-style objective function
         pair<const Regressor*, const GaussianProcessRegressor*> data(&regressor, &temporary_regressor);
 
-        const VectorXd x_star = [&]() -> VectorXd {
-            MatrixXd x_stars(D, num_trials);
-            VectorXd y_stars(num_trials);
+        // Find a global solution
+        const VectorXd x_star = FindGlobalSolution(objective_for_multiple_points, &data, num_dim, num_trials);
 
-            const auto perform_local_optimization_from_random_initialization = [&](const int i) {
-                const VectorXd x_ini  = 0.5 * (VectorXd::Random(D) + VectorXd::Ones(D));
-                const VectorXd x_star = nloptutil::solve(
-                    x_ini, upper, lower, objective_for_multiple_points, nlopt::LD_LBFGS, &data, true, 100);
-
-                const double y_star = [&]() {
-                    const auto mu    = [&](const VectorXd& x) { return regressor.PredictMu(x); };
-                    const auto sigma = [&](const VectorXd& x) { return temporary_regressor.PredictSigma(x); };
-
-                    return mathtoolbox::GetExpectedImprovement(x_star, mu, sigma, x_best);
-                }();
-
-                x_stars.col(i) = x_star;
-                y_stars(i)     = y_star;
-            };
-
-            parallelutil::queue_based_parallel_for(num_trials, perform_local_optimization_from_random_initialization);
-
-            const int best_index = [&]() {
-                int index;
-                y_stars.maxCoeff(&index);
-                return index;
-            }();
-
-            return x_stars.col(best_index);
-        }();
-
-        assert(x_star.minCoeff() > 0.0 - 1e-16 && x_star.maxCoeff() < 1.1 + 1e-16);
-
+        // Register the found solution
         points.push_back(x_star);
 
         // If this is not the final iteration, prepare data for the next iteration
@@ -218,9 +200,9 @@ vector<VectorXd> sequential_line_search::acquisition_function::FindNextPoints(co
         {
             const unsigned N = temporary_regressor.getX().cols();
 
-            MatrixXd new_X(D, N + 1);
-            new_X.block(0, 0, D, N) = temporary_regressor.getX();
-            new_X.col(N)            = x_star;
+            MatrixXd new_X(num_dim, N + 1);
+            new_X.block(0, 0, num_dim, N) = temporary_regressor.getX();
+            new_X.col(N)                  = x_star;
 
             VectorXd new_y(temporary_regressor.gety().rows() + 1);
             new_y << temporary_regressor.gety(), temporary_regressor.PredictMu(x_star);
