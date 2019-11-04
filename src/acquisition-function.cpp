@@ -112,7 +112,7 @@ namespace
 
         return x_stars.col(best_index);
 #else
-        const VectorXd x_ini = 0.5 * (VectorXd::Random(D) + VectorXd::Ones(D));
+        const VectorXd x_ini = 0.5 * (VectorXd::Random(num_dim) + VectorXd::Ones(num_dim));
 
         // Find a global solution by the DIRECT method
         const VectorXd x_global =
