@@ -6,20 +6,31 @@
 #include <parallel-util.hpp>
 #include <sequential-line-search/acquisition-function.hpp>
 #include <sequential-line-search/gaussian-process-regressor.hpp>
-#include <utility>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
-using std::pair;
 using std::vector;
 
 namespace
 {
     using namespace sequential_line_search;
 
+    // A wrapper struct for an nlopt-style objective function
+    struct RegressorWrapper
+    {
+        const Regressor* regressor;
+    };
+
+    // A wrapper struct for an nlopt-style objective function
+    struct RegressorPairWrapper
+    {
+        const Regressor* orig_regressor;
+        const Regressor* updated_regressor;
+    };
+
     double objective(const std::vector<double>& x, std::vector<double>& grad, void* data)
     {
-        const Regressor* regressor = static_cast<const Regressor*>(data);
+        const Regressor* regressor = static_cast<RegressorWrapper*>(data)->regressor;
 
         if (!grad.empty())
         {
@@ -34,10 +45,8 @@ namespace
     // Schonlau et al, Global Versus Local Search in Constrained Optimization of Computer Models, 1997.
     double objective_for_multiple_points(const std::vector<double>& x, std::vector<double>& grad, void* data)
     {
-        const Regressor* orig_regressor =
-            static_cast<pair<const Regressor*, const GaussianProcessRegressor*>*>(data)->first;
-        const GaussianProcessRegressor* updated_regressor =
-            static_cast<pair<const Regressor*, const GaussianProcessRegressor*>*>(data)->second;
+        const Regressor* orig_regressor    = static_cast<RegressorPairWrapper*>(data)->orig_regressor;
+        const Regressor* updated_regressor = static_cast<RegressorPairWrapper*>(data)->updated_regressor;
 
         const VectorXd eigen_x = Eigen::Map<const VectorXd>(&x[0], x.size());
 
@@ -167,7 +176,9 @@ VectorXd sequential_line_search::acquisition_function::FindNextPoint(Regressor& 
 
     const unsigned num_dim = regressor.getX().rows();
 
-    return FindGlobalSolution(objective, &regressor, num_dim, num_trials);
+    RegressorWrapper data = {&regressor};
+
+    return FindGlobalSolution(objective, &data, num_dim, num_trials);
 }
 
 vector<VectorXd> sequential_line_search::acquisition_function::FindNextPoints(const Regressor&   regressor,
@@ -187,7 +198,7 @@ vector<VectorXd> sequential_line_search::acquisition_function::FindNextPoints(co
     for (unsigned i = 0; i < num_points; ++i)
     {
         // Create a data object for the nlopt-style objective function
-        pair<const Regressor*, const GaussianProcessRegressor*> data(&regressor, &temporary_regressor);
+        RegressorPairWrapper data{&regressor, &temporary_regressor};
 
         // Find a global solution
         const VectorXd x_star = FindGlobalSolution(objective_for_multiple_points, &data, num_dim, num_trials);
