@@ -193,10 +193,9 @@ vector<VectorXd> sequential_line_search::acquisition_function::FindNextPoints(co
     vector<VectorXd> points;
 
     const VectorXd kernel_hyperparameters = regressor.GetKernelHyperparams();
-    const double   a                      = kernel_hyperparameters[0];
-    const VectorXd r                      = kernel_hyperparameters.segment(1, num_dim + 1);
 
-    GaussianProcessRegressor temporary_regressor(regressor.getX(), regressor.gety(), a, regressor.getb(), r);
+    GaussianProcessRegressor temporary_regressor(
+        regressor.getX(), regressor.gety(), kernel_hyperparameters, regressor.getb());
 
     for (unsigned i = 0; i < num_points; ++i)
     {
@@ -221,7 +220,7 @@ vector<VectorXd> sequential_line_search::acquisition_function::FindNextPoints(co
             VectorXd new_y(temporary_regressor.gety().rows() + 1);
             new_y << temporary_regressor.gety(), temporary_regressor.PredictMu(x_star);
 
-            temporary_regressor = GaussianProcessRegressor(new_X, new_y, a, regressor.getb(), r);
+            temporary_regressor = GaussianProcessRegressor(new_X, new_y, kernel_hyperparameters, regressor.getb());
         }
     }
 

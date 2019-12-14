@@ -202,15 +202,14 @@ namespace sequential_line_search
 
     GaussianProcessRegressor::GaussianProcessRegressor(const Eigen::MatrixXd& X,
                                                        const Eigen::VectorXd& y,
-                                                       double                 a,
-                                                       double                 b,
-                                                       const Eigen::VectorXd& r)
+                                                       const Eigen::VectorXd& kernel_hyperparams,
+                                                       double                 b)
     {
         this->X = X;
         this->y = y;
-        this->a = a;
+        this->a = kernel_hyperparams[0];
         this->b = b;
-        this->r = r;
+        this->r = kernel_hyperparams.segment(1, kernel_hyperparams.size() - 1);
 
         if (X.rows() == 0)
         {
