@@ -5,14 +5,6 @@
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
-namespace
-{
-    inline VectorXd Concat(const double scalar, const VectorXd& vector)
-    {
-        return (VectorXd(vector.size() + 1) << scalar, vector).finished();
-    }
-} // namespace
-
 namespace sequential_line_search
 {
 #ifdef SEQUENTIAL_LINE_SEARCH_USE_ARD_SQUARED_EXP_KERNEL
@@ -40,11 +32,6 @@ VectorXd sequential_line_search::Regressor::PredictMaximumPointFromData() const
     f.maxCoeff(&best_index);
 
     return getX().col(best_index);
-}
-
-VectorXd sequential_line_search::Regressor::GetKernelHyperparams() const
-{
-    return Concat(geta(), getr());
 }
 
 VectorXd

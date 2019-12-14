@@ -61,9 +61,12 @@ namespace sequential_line_search
         // Getter
         const Eigen::MatrixXd& getX() const override { return X; }
         const Eigen::VectorXd& gety() const override { return y; }
-        double                 geta() const override { return a; }
         double                 getb() const override { return b; }
-        const Eigen::VectorXd& getr() const override { return r; }
+
+        Eigen::VectorXd GetKernelHyperparams() const override
+        {
+            return (Eigen::VectorXd(r.size() + 1) << a, r).finished();
+        }
 
         // Default hyperparameters; when MAP is enabled, they are used as initial guesses.
         const double m_default_a;
