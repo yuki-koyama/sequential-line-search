@@ -14,6 +14,10 @@ namespace sequential_line_search
         Eigen::MatrixXd         m_X;
         std::vector<Preference> m_D;
 
+        /// \brief Add a new preference observation.
+        ///
+        /// \details If merge_close_points is true, this method will merge data points (including both existing and new
+        /// ones) that are sufficiently close to each other with the threshold of epsilon.
         void AddNewPoints(const Eigen::VectorXd&              x_preferable,
                           const std::vector<Eigen::VectorXd>& xs_other,
                           const bool                          merge_close_points = true,

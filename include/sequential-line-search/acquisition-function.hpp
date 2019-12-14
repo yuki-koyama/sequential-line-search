@@ -16,6 +16,7 @@ namespace sequential_line_search
         };
 
         /// \brief Calculate the value of the acquisition function value.
+        ///
         /// \param function_type Type of the acquisition function.
         double CalculateAcqusitionValue(const Regressor&       regressor,
                                         const Eigen::VectorXd& x,
@@ -32,9 +33,12 @@ namespace sequential_line_search
                                       const unsigned     num_trials    = 20,
                                       const FunctionType function_type = FunctionType::ExpectedImprovement);
 
-        /// \brief Find the next n sampled points that should be observed. These points are determined using the method
-        /// by Schonlau et al. (1997)
+        /// \brief Find the next n sampled points that should be observed.
+        ///
+        /// \details The points will be determined by the method by Schonlau et al. (1997)
+        ///
         /// \param num_points The number of the sampled points.
+        ///
         /// \param num_trials The number of trials of acquisition value maximization. Specifying a large number is
         /// helpful for finding the global maximizer while it increases the computational cost proportional to it.
         std::vector<Eigen::VectorXd>

@@ -9,12 +9,7 @@ namespace
 {
     inline VectorXd Concat(const double scalar, const VectorXd& vector)
     {
-        VectorXd result(vector.size() + 1);
-
-        result(0)                        = scalar;
-        result.segment(1, vector.size()) = vector;
-
-        return result;
+        return (VectorXd(vector.size() + 1) << scalar, vector).finished();
     }
 } // namespace
 
@@ -53,7 +48,7 @@ VectorXd sequential_line_search::Regressor::GetKernelHyperparams() const
 }
 
 VectorXd
-sequential_line_search::CalcSmallK(const VectorXd& x, const MatrixXd& X, const Eigen::VectorXd& kernel_hyperparameters)
+sequential_line_search::CalcSmallK(const VectorXd& x, const MatrixXd& X, const VectorXd& kernel_hyperparameters)
 {
     const unsigned N = X.cols();
 
@@ -66,9 +61,8 @@ sequential_line_search::CalcSmallK(const VectorXd& x, const MatrixXd& X, const E
     return k;
 }
 
-Eigen::MatrixXd sequential_line_search::CalcLargeKY(const Eigen::MatrixXd& X,
-                                                    const Eigen::VectorXd& kernel_hyperparameters,
-                                                    const double           noise_level)
+MatrixXd
+sequential_line_search::CalcLargeKY(const MatrixXd& X, const VectorXd& kernel_hyperparameters, const double noise_level)
 {
     const unsigned N   = X.cols();
     const MatrixXd K_f = CalcLargeKF(X, kernel_hyperparameters);
@@ -76,8 +70,7 @@ Eigen::MatrixXd sequential_line_search::CalcLargeKY(const Eigen::MatrixXd& X,
     return K_f + noise_level * MatrixXd::Identity(N, N);
 }
 
-Eigen::MatrixXd sequential_line_search::CalcLargeKF(const Eigen::MatrixXd& X,
-                                                    const Eigen::VectorXd& kernel_hyperparameters)
+MatrixXd sequential_line_search::CalcLargeKF(const MatrixXd& X, const VectorXd& kernel_hyperparameters)
 {
     const unsigned N = X.cols();
 
@@ -95,9 +88,9 @@ Eigen::MatrixXd sequential_line_search::CalcLargeKF(const Eigen::MatrixXd& X,
     return C;
 }
 
-Eigen::MatrixXd sequential_line_search::CalcSmallKSmallXDerivative(const Eigen::VectorXd& x,
-                                                                   const Eigen::MatrixXd& X,
-                                                                   const Eigen::VectorXd& kernel_hyperparameters)
+MatrixXd sequential_line_search::CalcSmallKSmallXDerivative(const VectorXd& x,
+                                                            const MatrixXd& X,
+                                                            const VectorXd& kernel_hyperparameters)
 {
     const unsigned N   = X.cols();
     const unsigned dim = X.rows();
@@ -137,9 +130,9 @@ std::vector<MatrixXd> sequential_line_search::CalcLargeKYThetaDerivative(const M
     return tensor;
 }
 
-Eigen::MatrixXd sequential_line_search::CalcLargeKYNoiseLevelDerivative(const Eigen::MatrixXd& X,
-                                                                        const Eigen::VectorXd& kernel_hyperparameters,
-                                                                        const double           noise_level)
+MatrixXd sequential_line_search::CalcLargeKYNoiseLevelDerivative(const MatrixXd& X,
+                                                                 const VectorXd& kernel_hyperparameters,
+                                                                 const double    noise_level)
 {
     return MatrixXd::Identity(X.cols(), X.cols());
 }
