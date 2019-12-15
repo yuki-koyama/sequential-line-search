@@ -294,8 +294,7 @@ VectorXd sequential_line_search::PreferenceRegressor::PredictSigmaDerivative(con
     return -(1.0 / sigma) * k_x_derivative * m_K_llt.solve(k);
 }
 
-void sequential_line_search::PreferenceRegressor::PerformMapEstimation(
-    const PreferenceRegressor* previous_iter_regressor)
+void sequential_line_search::PreferenceRegressor::PerformMapEstimation()
 {
     const unsigned M = X.cols();
     const unsigned d = X.rows();
@@ -320,24 +319,6 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation(
         x_ini.segment(M + 2, d) = VectorXd::Constant(d, m_default_r);
     }
 
-    // Use the MAP estimated values in previous regression as initial values
-    if (previous_iter_regressor != nullptr)
-    {
-        // y: goodness values
-        for (unsigned i = 0; i < M; ++i)
-        {
-            x_ini(i) = previous_iter_regressor->PredictMu(X.col(i));
-        }
-
-        // a, r, b: kernel hyperparameters
-        if (m_use_map_hyperparameters)
-        {
-            x_ini(M + 0)            = previous_iter_regressor->a;
-            x_ini(M + 1)            = previous_iter_regressor->b;
-            x_ini.segment(M + 2, d) = previous_iter_regressor->r;
-        }
-    }
-
     // Calculate kernel matrices if hyperparameters are not estimated by the MAP estimation
     if (!m_use_map_hyperparameters)
     {
@@ -350,7 +331,7 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation(
     }
 
 #ifdef VERBOSE
-    timer::Timer t("PreferenceRegressor::compute_MAP");
+    timer::Timer t("PreferenceRegressor::PerformMapEstimation");
 #endif
 
     const VectorXd x_opt = nloptutil::solve(x_ini, upper, lower, objective, nlopt::LD_TNEWTON, this, true, 100);

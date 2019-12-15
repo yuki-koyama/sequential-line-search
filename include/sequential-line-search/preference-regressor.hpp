@@ -80,7 +80,7 @@ namespace sequential_line_search
         const double m_btl_scale;
 
     private:
-        void PerformMapEstimation(const PreferenceRegressor* previous_iter_regressor = nullptr);
+        void PerformMapEstimation();
     };
 } // namespace sequential_line_search
 
