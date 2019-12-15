@@ -16,7 +16,7 @@ namespace sequential_line_search
         GaussianProcessRegressor(const Eigen::MatrixXd& X,
                                  const Eigen::VectorXd& y,
                                  const Eigen::VectorXd& kernel_hyperparams,
-                                 double                 b);
+                                 double                 noise_hyperparam);
 
         double PredictMu(const Eigen::VectorXd& x) const override;
         double PredictSigma(const Eigen::VectorXd& x) const override;
@@ -36,7 +36,7 @@ namespace sequential_line_search
 
         /// \brief A hyperparameter about noise level of ARD.
         /// \details Derived from MAP or specified directly.
-        double b;
+        double m_noise_hyperparam;
 
         /// \brief A hyperparameter about length scales of ARD.
         /// \details Derived from MAP or specified directly.
@@ -49,12 +49,13 @@ namespace sequential_line_search
         // Getter
         const Eigen::MatrixXd& getX() const override { return X; }
         const Eigen::VectorXd& gety() const override { return y; }
-        double                 getb() const override { return b; }
 
         Eigen::VectorXd GetKernelHyperparams() const override
         {
             return (Eigen::VectorXd(r.size() + 1) << a, r).finished();
         }
+
+        double GetNoiseHyperparam() const override { return m_noise_hyperparam; }
 
     private:
         void PerformMapEstimation();

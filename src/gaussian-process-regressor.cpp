@@ -196,27 +196,27 @@ namespace sequential_line_search
 
         PerformMapEstimation();
 
-        C     = CalcLargeKY(X, Concat(a, r), b);
+        C     = CalcLargeKY(X, Concat(a, r), m_noise_hyperparam);
         C_inv = C.inverse();
     }
 
     GaussianProcessRegressor::GaussianProcessRegressor(const Eigen::MatrixXd& X,
                                                        const Eigen::VectorXd& y,
                                                        const Eigen::VectorXd& kernel_hyperparams,
-                                                       double                 b)
+                                                       double                 noise_hyperparam)
     {
-        this->X = X;
-        this->y = y;
-        this->a = kernel_hyperparams[0];
-        this->b = b;
-        this->r = kernel_hyperparams.segment(1, kernel_hyperparams.size() - 1);
+        this->X                  = X;
+        this->y                  = y;
+        this->a                  = kernel_hyperparams[0];
+        this->m_noise_hyperparam = noise_hyperparam;
+        this->r                  = kernel_hyperparams.segment(1, kernel_hyperparams.size() - 1);
 
         if (X.rows() == 0)
         {
             return;
         }
 
-        C     = CalcLargeKY(X, Concat(a, r), b);
+        C     = CalcLargeKY(X, Concat(a, r), noise_hyperparam);
         C_inv = C.inverse();
     }
 
@@ -270,8 +270,8 @@ namespace sequential_line_search
         const VectorXd x_glo = nloptutil::solve(x_ini, upper, lower, objective, nlopt::GN_DIRECT, &data, true, 300);
         const VectorXd x_loc = nloptutil::solve(x_glo, upper, lower, objective, nlopt::LD_TNEWTON, &data, true, 1000);
 
-        a = x_loc(0);
-        b = x_loc(1);
-        r = x_loc.block(2, 0, D, 1);
+        a                  = x_loc(0);
+        m_noise_hyperparam = x_loc(1);
+        r                  = x_loc.block(2, 0, D, 1);
     }
 } // namespace sequential_line_search

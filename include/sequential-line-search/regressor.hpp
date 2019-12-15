@@ -20,10 +20,10 @@ namespace sequential_line_search
         virtual Eigen::VectorXd PredictSigmaDerivative(const Eigen::VectorXd& x) const = 0;
 
         virtual Eigen::VectorXd GetKernelHyperparams() const = 0;
+        virtual double          GetNoiseHyperparam() const   = 0;
 
         virtual const Eigen::MatrixXd& getX() const = 0;
         virtual const Eigen::VectorXd& gety() const = 0;
-        virtual double                 getb() const = 0;
 
         Eigen::VectorXd PredictMaximumPointFromData() const;
     };

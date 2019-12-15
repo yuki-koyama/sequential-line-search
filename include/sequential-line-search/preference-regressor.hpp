@@ -44,7 +44,7 @@ namespace sequential_line_search
         /// \brief Noise level hyperparameter
         ///
         /// \details This value is either derived by the MAP estimation or copied from the default values
-        double b;
+        double m_noise_hyperparam;
 
         /// \brief Kernel hyperparameters
         ///
@@ -63,10 +63,10 @@ namespace sequential_line_search
         // Getter
         const Eigen::MatrixXd& getX() const override { return m_X; }
         const Eigen::VectorXd& gety() const override { return m_y; }
-        double                 getb() const override { return b; }
 
         // TODO: Return reference instead of copy
         Eigen::VectorXd GetKernelHyperparams() const override { return m_kernel_hyperparams; }
+        double          GetNoiseHyperparam() const override { return m_noise_hyperparam; }
 
         // Default hyperparameters; when MAP is enabled, they are used as initial guesses.
         const double m_default_a;

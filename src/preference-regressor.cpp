@@ -263,7 +263,7 @@ sequential_line_search::PreferenceRegressor::PreferenceRegressor(const MatrixXd&
 
     PerformMapEstimation();
 
-    m_K     = CalcLargeKY(X, m_kernel_hyperparams, b);
+    m_K     = CalcLargeKY(X, m_kernel_hyperparams, m_noise_hyperparam);
     m_K_llt = LLT<MatrixXd>(m_K);
 }
 
@@ -320,7 +320,7 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation()
 #ifdef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
         x_ini(M + 1) = 0.5 * (upper(M + 1) + lower(M + 1));
 #else
-        x_ini(M + 1) = m_default_b;
+        x_ini(M + 1)       = m_default_b;
 #endif
         x_ini.segment(M + 2, d) = VectorXd::Constant(d, m_default_r);
     }
@@ -329,9 +329,9 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation()
     if (!m_use_map_hyperparameters)
     {
         m_kernel_hyperparams = Concat(m_default_a, VectorXd::Constant(d, m_default_r));
-        b                    = m_default_b;
+        m_noise_hyperparam   = m_default_b;
 
-        m_K     = CalcLargeKY(m_X, m_kernel_hyperparams, b);
+        m_K     = CalcLargeKY(m_X, m_kernel_hyperparams, m_noise_hyperparam);
         m_K_llt = LLT<MatrixXd>(m_K);
     }
 
@@ -347,9 +347,9 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation()
 
         m_kernel_hyperparams = Concat(x_opt(M + 0), x_opt.segment(M + 2, d));
 #ifdef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
-        b = b_fixed;
+        m_noise_hyperparam = b_fixed;
 #else
-        b            = x_opt(M + 1);
+        m_noise_hyperparam = x_opt(M + 1);
 #endif
 
 #ifdef VERBOSE
