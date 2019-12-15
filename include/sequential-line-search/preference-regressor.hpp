@@ -41,10 +41,15 @@ namespace sequential_line_search
         Eigen::MatrixXd         m_X;
         std::vector<Preference> m_D;
 
-        // Hyperparameters either derived by the MAP estimation or copied from the default values
-        double          a; ///< ARD hyperparameter about signal level.
-        double          b; ///< ARD hyperparameter about noise level.
-        Eigen::VectorXd r; ///< ARD hyperparameter about length scales.
+        /// \brief Noise level hyperparameter
+        ///
+        /// \details This value is either derived by the MAP estimation or copied from the default values
+        double b;
+
+        /// \brief Kernel hyperparameters
+        ///
+        /// \details These values are either derived by the MAP estimation or copied from the default values
+        Eigen::VectorXd m_kernel_hyperparams;
 
         /// \brief Kernel matrix calculated in the MAP estimation procedure.
         Eigen::MatrixXd m_K;
@@ -60,10 +65,8 @@ namespace sequential_line_search
         const Eigen::VectorXd& gety() const override { return m_y; }
         double                 getb() const override { return b; }
 
-        Eigen::VectorXd GetKernelHyperparams() const override
-        {
-            return (Eigen::VectorXd(r.size() + 1) << a, r).finished();
-        }
+        // TODO: Return reference instead of copy
+        Eigen::VectorXd GetKernelHyperparams() const override { return m_kernel_hyperparams; }
 
         // Default hyperparameters; when MAP is enabled, they are used as initial guesses.
         const double m_default_a;

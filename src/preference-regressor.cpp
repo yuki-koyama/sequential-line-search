@@ -263,33 +263,39 @@ sequential_line_search::PreferenceRegressor::PreferenceRegressor(const MatrixXd&
 
     PerformMapEstimation();
 
-    m_K     = CalcLargeKY(X, Concat(a, r), b);
+    m_K     = CalcLargeKY(X, m_kernel_hyperparams, b);
     m_K_llt = LLT<MatrixXd>(m_K);
 }
 
 double sequential_line_search::PreferenceRegressor::PredictMu(const VectorXd& x) const
 {
-    const VectorXd k = CalcSmallK(x, m_X, Concat(a, r));
+    const VectorXd k = CalcSmallK(x, m_X, m_kernel_hyperparams);
     return k.transpose() * m_K_llt.solve(m_y);
 }
 
 double sequential_line_search::PreferenceRegressor::PredictSigma(const VectorXd& x) const
 {
-    const VectorXd k = CalcSmallK(x, m_X, Concat(a, r));
-    return std::sqrt(a - k.transpose() * m_K_llt.solve(k));
+    const VectorXd k = CalcSmallK(x, m_X, m_kernel_hyperparams);
+
+    // This code assumes that the kernel is either ARD squared exponential or ARD Matern and the first hyperparameter
+    // represents the intensity of the kernel.
+    assert(m_kernel_hyperparams.size() == x.size() + 1);
+    const double intensity = m_kernel_hyperparams[0];
+
+    return std::sqrt(intensity - k.transpose() * m_K_llt.solve(k));
 }
 
 VectorXd sequential_line_search::PreferenceRegressor::PredictMuDerivative(const VectorXd& x) const
 {
     // TODO: Incorporate a mean function
-    const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, m_X, Concat(a, r));
+    const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, m_X, m_kernel_hyperparams);
     return k_x_derivative * m_K_llt.solve(m_y);
 }
 
 VectorXd sequential_line_search::PreferenceRegressor::PredictSigmaDerivative(const VectorXd& x) const
 {
-    const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, m_X, Concat(a, r));
-    const VectorXd k              = CalcSmallK(x, m_X, Concat(a, r));
+    const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, m_X, m_kernel_hyperparams);
+    const VectorXd k              = CalcSmallK(x, m_X, m_kernel_hyperparams);
     const double   sigma          = PredictSigma(x);
     return -(1.0 / sigma) * k_x_derivative * m_K_llt.solve(k);
 }
@@ -322,11 +328,10 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation()
     // Calculate kernel matrices if hyperparameters are not estimated by the MAP estimation
     if (!m_use_map_hyperparameters)
     {
-        a = m_default_a;
-        r = VectorXd::Constant(d, m_default_r);
-        b = m_default_b;
+        m_kernel_hyperparams = Concat(m_default_a, VectorXd::Constant(d, m_default_r));
+        b                    = m_default_b;
 
-        m_K     = CalcLargeKY(m_X, Concat(a, r), b);
+        m_K     = CalcLargeKY(m_X, m_kernel_hyperparams, b);
         m_K_llt = LLT<MatrixXd>(m_K);
     }
 
@@ -340,13 +345,12 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation()
     {
         m_y = x_opt.segment(0, M);
 
-        a = x_opt(M + 0);
+        m_kernel_hyperparams = Concat(x_opt(M + 0), x_opt.segment(M + 2, d));
 #ifdef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
         b = b_fixed;
 #else
         b            = x_opt(M + 1);
 #endif
-        r = x_opt.block(M + 2, 0, d, 1);
 
 #ifdef VERBOSE
         std::cout << "Learned hyperparameters ... ";
