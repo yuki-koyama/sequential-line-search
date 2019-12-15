@@ -61,18 +61,18 @@ MatrixXd sequential_line_search::CalcLargeKF(const MatrixXd& X, const VectorXd& 
 {
     const unsigned N = X.cols();
 
-    MatrixXd C(N, N);
+    MatrixXd K_f(N, N);
     for (unsigned i = 0; i < N; ++i)
     {
         for (unsigned j = i; j < N; ++j)
         {
             const double value = kernel(X.col(i), X.col(j), kernel_hyperparameters);
 
-            C(i, j) = value;
-            C(j, i) = value;
+            K_f(i, j) = value;
+            K_f(j, i) = value;
         }
     }
-    return C;
+    return K_f;
 }
 
 MatrixXd sequential_line_search::CalcSmallKSmallXDerivative(const VectorXd& x,
