@@ -119,8 +119,8 @@ namespace
     {
         const PreferenceRegressor* regressor = static_cast<PreferenceRegressor*>(data);
 
-        const MatrixXd&                X = regressor->X;
-        const std::vector<Preference>& D = regressor->D;
+        const MatrixXd&                X = regressor->m_X;
+        const std::vector<Preference>& D = regressor->m_D;
         const unsigned                 M = X.cols();
         const VectorXd                 y = Eigen::Map<const VectorXd>(&x[0], M);
 
@@ -248,8 +248,8 @@ sequential_line_search::PreferenceRegressor::PreferenceRegressor(const MatrixXd&
                                                                  const double                   variance,
                                                                  const double                   btl_scale)
     : m_use_map_hyperparameters(use_map_hyperparameters),
-      X(X),
-      D(D),
+      m_X(X),
+      m_D(D),
       m_default_a(default_a),
       m_default_r(default_r),
       m_default_b(default_b),
@@ -269,35 +269,35 @@ sequential_line_search::PreferenceRegressor::PreferenceRegressor(const MatrixXd&
 
 double sequential_line_search::PreferenceRegressor::PredictMu(const VectorXd& x) const
 {
-    const VectorXd k = CalcSmallK(x, X, Concat(a, r));
-    return k.transpose() * m_K_llt.solve(y);
+    const VectorXd k = CalcSmallK(x, m_X, Concat(a, r));
+    return k.transpose() * m_K_llt.solve(m_y);
 }
 
 double sequential_line_search::PreferenceRegressor::PredictSigma(const VectorXd& x) const
 {
-    const VectorXd k = CalcSmallK(x, X, Concat(a, r));
+    const VectorXd k = CalcSmallK(x, m_X, Concat(a, r));
     return std::sqrt(a - k.transpose() * m_K_llt.solve(k));
 }
 
 VectorXd sequential_line_search::PreferenceRegressor::PredictMuDerivative(const VectorXd& x) const
 {
     // TODO: Incorporate a mean function
-    const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, Concat(a, r));
-    return k_x_derivative * m_K_llt.solve(y);
+    const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, m_X, Concat(a, r));
+    return k_x_derivative * m_K_llt.solve(m_y);
 }
 
 VectorXd sequential_line_search::PreferenceRegressor::PredictSigmaDerivative(const VectorXd& x) const
 {
-    const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, Concat(a, r));
-    const VectorXd k              = CalcSmallK(x, X, Concat(a, r));
+    const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, m_X, Concat(a, r));
+    const VectorXd k              = CalcSmallK(x, m_X, Concat(a, r));
     const double   sigma          = PredictSigma(x);
     return -(1.0 / sigma) * k_x_derivative * m_K_llt.solve(k);
 }
 
 void sequential_line_search::PreferenceRegressor::PerformMapEstimation()
 {
-    const unsigned M = X.cols();
-    const unsigned d = X.rows();
+    const unsigned M = m_X.cols();
+    const unsigned d = m_X.rows();
 
     // When hyperparameters are estimated jointly, the number of the optimization variables increases by "2 + d"
     const unsigned opt_dim = m_use_map_hyperparameters ? M + 2 + d : M;
@@ -326,7 +326,7 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation()
         r = VectorXd::Constant(d, m_default_r);
         b = m_default_b;
 
-        m_K     = CalcLargeKY(X, Concat(a, r), b);
+        m_K     = CalcLargeKY(m_X, Concat(a, r), b);
         m_K_llt = LLT<MatrixXd>(m_K);
     }
 
@@ -338,7 +338,7 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation()
 
     if (m_use_map_hyperparameters)
     {
-        y = x_opt.segment(0, M);
+        m_y = x_opt.segment(0, M);
 
         a = x_opt(M + 0);
 #ifdef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
@@ -355,7 +355,7 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation()
     }
     else
     {
-        y = x_opt;
+        m_y = x_opt;
     }
 
 #ifdef VERBOSE
@@ -366,24 +366,24 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation()
 VectorXd sequential_line_search::PreferenceRegressor::FindArgMax() const
 {
     int i;
-    y.maxCoeff(&i);
-    return X.col(i);
+    m_y.maxCoeff(&i);
+    return m_X.col(i);
 }
 
 void sequential_line_search::PreferenceRegressor::DampData(const std::string& dir_path, const std::string& prefix) const
 {
     // Export X using CSV
-    utils::ExportMatrixToCsv(dir_path + "/" + prefix + "X.csv", X);
+    utils::ExportMatrixToCsv(dir_path + "/" + prefix + "X.csv", m_X);
 
     // Export D using CSV
     std::ofstream ofs_D(dir_path + "/" + prefix + "D.csv");
-    for (unsigned i = 0; i < D.size(); ++i)
+    for (unsigned i = 0; i < m_D.size(); ++i)
     {
-        for (unsigned j = 0; j < D[i].size(); ++j)
+        for (unsigned j = 0; j < m_D[i].size(); ++j)
         {
-            ofs_D << D[i][j];
+            ofs_D << m_D[i][j];
 
-            if (j + 1 != D[i].size())
+            if (j + 1 != m_D[i].size())
             {
                 ofs_D << ",";
             }

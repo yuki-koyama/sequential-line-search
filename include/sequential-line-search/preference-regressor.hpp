@@ -38,29 +38,26 @@ namespace sequential_line_search
         Eigen::VectorXd FindArgMax() const;
 
         // Data
-        Eigen::MatrixXd         X;
-        std::vector<Preference> D;
-
-        // Goodness values derived by the MAP estimation
-        Eigen::VectorXd y;
+        Eigen::MatrixXd         m_X;
+        std::vector<Preference> m_D;
 
         // Hyperparameters either derived by the MAP estimation or copied from the default values
         double          a; ///< ARD hyperparameter about signal level.
         double          b; ///< ARD hyperparameter about noise level.
         Eigen::VectorXd r; ///< ARD hyperparameter about length scales.
 
-        // Kernel matrix calculated in the MAP estimation procedure
+        /// \brief Kernel matrix calculated in the MAP estimation procedure.
         Eigen::MatrixXd m_K;
 
-        // Kernel matrix stored as a Cholesky-decomposed form
+        /// \brief Kernel matrix stored as a Cholesky-decomposed form.
         Eigen::LLT<Eigen::MatrixXd> m_K_llt;
 
         // IO
         void DampData(const std::string& dir_path, const std::string& prefix = "") const;
 
         // Getter
-        const Eigen::MatrixXd& getX() const override { return X; }
-        const Eigen::VectorXd& gety() const override { return y; }
+        const Eigen::MatrixXd& getX() const override { return m_X; }
+        const Eigen::VectorXd& gety() const override { return m_y; }
         double                 getb() const override { return b; }
 
         Eigen::VectorXd GetKernelHyperparams() const override
@@ -80,6 +77,9 @@ namespace sequential_line_search
         const double m_btl_scale;
 
     private:
+        /// \brief Goodness values derived by the MAP estimation.
+        Eigen::VectorXd m_y;
+
         void PerformMapEstimation();
     };
 } // namespace sequential_line_search
