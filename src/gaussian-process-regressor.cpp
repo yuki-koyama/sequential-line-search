@@ -2,6 +2,7 @@
 #include <cmath>
 #include <iostream>
 #include <mathtoolbox/constants.hpp>
+#include <mathtoolbox/log-determinant.hpp>
 #include <mathtoolbox/probability-distributions.hpp>
 #include <nlopt-util.hpp>
 #include <sequential-line-search/gaussian-process-regressor.hpp>
@@ -63,20 +64,20 @@ namespace
     }
 
     double calc_grad_b(const MatrixXd& X,
-                       const MatrixXd& C_inv,
+                       const MatrixXd& K_y_inv,
                        const VectorXd& y,
                        const double    a,
                        const double    b,
                        const VectorXd& r)
     {
-        const MatrixXd C_grad_b = CalcLargeKYNoiseLevelDerivative(X, Concat(a, r), b);
-        const double   term1    = +0.5 * y.transpose() * C_inv * C_grad_b * C_inv * y;
-        const double   term2    = -0.5 * (C_inv * C_grad_b).trace();
+        const MatrixXd K_y_grad_b = CalcLargeKYNoiseLevelDerivative(X, Concat(a, r), b);
+        const double   term1      = +0.5 * y.transpose() * K_y_inv * K_y_grad_b * K_y_inv * y;
+        const double   term2      = -0.5 * (K_y_inv * K_y_grad_b).trace();
         return term1 + term2 + (use_log_normal_prior ? calc_grad_b_prior(b) : 0.0);
     }
 
     VectorXd
-    calc_grad_theta(const MatrixXd& X, const MatrixXd& C_inv, const VectorXd& y, const VectorXd& kernel_hyperparams)
+    calc_grad_theta(const MatrixXd& X, const MatrixXd& K_y_inv, const VectorXd& y, const VectorXd& kernel_hyperparams)
     {
         const std::vector<MatrixXd> tensor = CalcLargeKYThetaDerivative(X, kernel_hyperparams);
 
@@ -85,8 +86,8 @@ namespace
         {
             const MatrixXd& K_y_grad_r_i = tensor[i];
 
-            const double term1 = +0.5 * y.transpose() * C_inv * K_y_grad_r_i * C_inv * y;
-            const double term2 = -0.5 * (C_inv * K_y_grad_r_i).trace();
+            const double term1 = +0.5 * y.transpose() * K_y_inv * K_y_grad_r_i * K_y_inv * y;
+            const double term2 = -0.5 * (K_y_inv * K_y_grad_r_i).trace();
 
             const double prior =
                 use_log_normal_prior
@@ -102,7 +103,7 @@ namespace
     }
 
     VectorXd calc_grad(const MatrixXd& X,
-                       const MatrixXd& C_inv,
+                       const MatrixXd& K_y_inv,
                        const VectorXd& y,
                        const double    a,
                        const double    b,
@@ -112,10 +113,10 @@ namespace
 
         VectorXd grad(D + 2);
 
-        const VectorXd grad_theta = calc_grad_theta(X, C_inv, y, Concat(a, r));
+        const VectorXd grad_theta = calc_grad_theta(X, K_y_inv, y, Concat(a, r));
 
         grad(0)            = grad_theta(0);
-        grad(1)            = calc_grad_b(X, C_inv, y, a, b, r);
+        grad(1)            = calc_grad_b(X, K_y_inv, y, a, b, r);
         grad.segment(2, D) = grad_theta.segment(1, D);
 
         return grad;
@@ -145,13 +146,13 @@ namespace
         const double   b = x[1];
         const VectorXd r = Eigen::Map<const VectorXd>(&x[2], x.size() - 2);
 
-        const MatrixXd C     = CalcLargeKY(X, Concat(a, r), b);
-        const MatrixXd C_inv = C.inverse();
+        const MatrixXd K_y     = CalcLargeKY(X, Concat(a, r), b);
+        const MatrixXd K_y_inv = K_y.inverse();
 
         // When the algorithm is gradient-based, compute the gradient vector
         if (grad.size() == x.size())
         {
-            const VectorXd g = calc_grad(X, C_inv, y, a, b, r);
+            const VectorXd g = calc_grad(X, K_y_inv, y, a, b, r);
             for (unsigned i = 0; i < g.rows(); ++i)
             {
                 grad[i] = g(i);
@@ -161,8 +162,8 @@ namespace
         // Constant
         constexpr double prod_of_two_and_pi = 2.0 * mathtoolbox::constants::pi;
 
-        const double term1 = -0.5 * y.transpose() * C_inv * y;
-        const double term2 = -0.5 * std::log(C.determinant());
+        const double term1 = -0.5 * y.transpose() * K_y_inv * y;
+        const double term2 = -0.5 * mathtoolbox::CalcLogDetOfSymmetricPositiveDefiniteMatrix(K_y);
         const double term3 = -0.5 * N * std::log(prod_of_two_and_pi);
 
         // Computing the regularization terms from a prior assumptions
@@ -184,11 +185,8 @@ namespace
 
 namespace sequential_line_search
 {
-    GaussianProcessRegressor::GaussianProcessRegressor(const MatrixXd& X, const VectorXd& y)
+    GaussianProcessRegressor::GaussianProcessRegressor(const MatrixXd& X, const VectorXd& y) : m_X(X), m_y(y)
     {
-        this->X = X;
-        this->y = y;
-
         if (X.rows() == 0)
         {
             return;
@@ -196,63 +194,64 @@ namespace sequential_line_search
 
         PerformMapEstimation();
 
-        C     = CalcLargeKY(X, Concat(a, r), b);
-        C_inv = C.inverse();
+        m_K_y     = CalcLargeKY(X, m_kernel_hyperparams, m_noise_hyperparam);
+        m_K_y_inv = m_K_y.inverse();
     }
 
     GaussianProcessRegressor::GaussianProcessRegressor(const Eigen::MatrixXd& X,
                                                        const Eigen::VectorXd& y,
                                                        const Eigen::VectorXd& kernel_hyperparams,
-                                                       double                 b)
+                                                       double                 noise_hyperparam)
+        : m_X(X), m_y(y), m_kernel_hyperparams(kernel_hyperparams), m_noise_hyperparam(noise_hyperparam)
     {
-        this->X = X;
-        this->y = y;
-        this->a = kernel_hyperparams[0];
-        this->b = b;
-        this->r = kernel_hyperparams.segment(1, kernel_hyperparams.size() - 1);
-
         if (X.rows() == 0)
         {
             return;
         }
 
-        C     = CalcLargeKY(X, Concat(a, r), b);
-        C_inv = C.inverse();
+        m_K_y     = CalcLargeKY(X, m_kernel_hyperparams, m_noise_hyperparam);
+        m_K_y_inv = m_K_y.inverse();
     }
 
     double GaussianProcessRegressor::PredictMu(const VectorXd& x) const
     {
         // TODO: Incorporate a mean function
-        const VectorXd k = CalcSmallK(x, X, Concat(a, r));
-        return k.transpose() * C_inv * y;
+        const VectorXd k = CalcSmallK(x, m_X, m_kernel_hyperparams);
+        return k.transpose() * m_K_y_inv * m_y;
     }
 
     double GaussianProcessRegressor::PredictSigma(const VectorXd& x) const
     {
-        const VectorXd k = CalcSmallK(x, X, Concat(a, r));
-        return std::sqrt(a - k.transpose() * C_inv * k);
+        const VectorXd k = CalcSmallK(x, m_X, m_kernel_hyperparams);
+
+        // This code assumes that the kernel is either ARD squared exponential or ARD Matern and the first
+        // hyperparameter represents the intensity of the kernel.
+        assert(m_kernel_hyperparams.size() == x.size() + 1);
+        const double intensity = m_kernel_hyperparams[0];
+
+        return std::sqrt(intensity - k.transpose() * m_K_y_inv * k);
     }
 
     Eigen::VectorXd GaussianProcessRegressor::PredictMuDerivative(const Eigen::VectorXd& x) const
     {
         // TODO: Incorporate a mean function
-        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, Concat(a, r));
-        return k_x_derivative * C_inv * y;
+        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, m_X, m_kernel_hyperparams);
+        return k_x_derivative * m_K_y_inv * m_y;
     }
 
     Eigen::VectorXd GaussianProcessRegressor::PredictSigmaDerivative(const Eigen::VectorXd& x) const
     {
-        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, Concat(a, r));
-        const VectorXd k              = CalcSmallK(x, X, Concat(a, r));
+        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, m_X, m_kernel_hyperparams);
+        const VectorXd k              = CalcSmallK(x, m_X, m_kernel_hyperparams);
         const double   sigma          = PredictSigma(x);
-        return -(1.0 / sigma) * k_x_derivative * C_inv * k;
+        return -(1.0 / sigma) * k_x_derivative * m_K_y_inv * k;
     }
 
     void GaussianProcessRegressor::PerformMapEstimation()
     {
-        const unsigned D = X.rows();
+        const unsigned D = m_X.rows();
 
-        Data data{X, y};
+        Data data{m_X, m_y};
 
         const VectorXd x_ini = [&]() {
             VectorXd x(D + 2);
@@ -270,8 +269,7 @@ namespace sequential_line_search
         const VectorXd x_glo = nloptutil::solve(x_ini, upper, lower, objective, nlopt::GN_DIRECT, &data, true, 300);
         const VectorXd x_loc = nloptutil::solve(x_glo, upper, lower, objective, nlopt::LD_TNEWTON, &data, true, 1000);
 
-        a = x_loc(0);
-        b = x_loc(1);
-        r = x_loc.block(2, 0, D, 1);
+        m_kernel_hyperparams = Concat(x_loc(0), x_loc.segment(2, D));
+        m_noise_hyperparam   = x_loc(1);
     }
 } // namespace sequential_line_search

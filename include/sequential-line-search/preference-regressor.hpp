@@ -19,12 +19,12 @@ namespace sequential_line_search
     public:
         PreferenceRegressor(const Eigen::MatrixXd&         X,
                             const std::vector<Preference>& D,
-                            const bool                     use_map_hyperparameters = false,
-                            const double                   default_a               = 0.500,
-                            const double                   default_r               = 0.500,
-                            const double                   default_b               = 0.005,
-                            const double                   variance                = 0.250,
-                            const double                   btl_scale               = 0.010);
+                            const bool                     use_map_hyperparams               = false,
+                            const double                   default_a                         = 0.500,
+                            const double                   default_r                         = 0.500,
+                            const double                   default_b                         = 0.005,
+                            const double                   kernel_hyperparams_prior_variance = 0.250,
+                            const double                   btl_scale                         = 0.010);
 
         double PredictMu(const Eigen::VectorXd& x) const override;
         double PredictSigma(const Eigen::VectorXd& x) const override;
@@ -32,7 +32,7 @@ namespace sequential_line_search
         Eigen::VectorXd PredictMuDerivative(const Eigen::VectorXd& x) const override;
         Eigen::VectorXd PredictSigmaDerivative(const Eigen::VectorXd& x) const override;
 
-        const bool m_use_map_hyperparameters;
+        const bool m_use_map_hyperparams;
 
         /// \brief Find the data point that is likely to have the largest value from the so-far observed data points.
         Eigen::VectorXd FindArgMax() const;
@@ -44,7 +44,7 @@ namespace sequential_line_search
         /// \brief Noise level hyperparameter
         ///
         /// \details This value is either derived by the MAP estimation or copied from the default values
-        double b;
+        double m_noise_hyperparam;
 
         /// \brief Kernel hyperparameters
         ///
@@ -61,12 +61,11 @@ namespace sequential_line_search
         void DampData(const std::string& dir_path, const std::string& prefix = "") const;
 
         // Getter
-        const Eigen::MatrixXd& getX() const override { return m_X; }
-        const Eigen::VectorXd& gety() const override { return m_y; }
-        double                 getb() const override { return b; }
+        const Eigen::MatrixXd& GetLargeX() const override { return m_X; }
+        const Eigen::VectorXd& GetSmallY() const override { return m_y; }
 
-        // TODO: Return reference instead of copy
-        Eigen::VectorXd GetKernelHyperparams() const override { return m_kernel_hyperparams; }
+        const Eigen::VectorXd& GetKernelHyperparams() const override { return m_kernel_hyperparams; }
+        double                 GetNoiseHyperparam() const override { return m_noise_hyperparam; }
 
         // Default hyperparameters; when MAP is enabled, they are used as initial guesses.
         const double m_default_a;
@@ -74,7 +73,7 @@ namespace sequential_line_search
         const double m_default_b;
 
         /// \brief Variance of the prior distribution. Used only when MAP is enabled.
-        const double m_variance;
+        const double m_kernel_hyperparams_prior_variance;
 
         /// \brief Scale parameter in the BTL model
         const double m_btl_scale;

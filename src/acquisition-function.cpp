@@ -133,7 +133,7 @@ double sequential_line_search::acquisition_function::CalculateAcqusitionValue(co
 {
     assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
 
-    if (regressor.gety().rows() == 0)
+    if (regressor.GetSmallY().rows() == 0)
     {
         return 0.0;
     }
@@ -153,7 +153,7 @@ sequential_line_search::acquisition_function::CalculateAcquisitionValueDerivativ
 {
     assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
 
-    if (regressor.gety().rows() == 0)
+    if (regressor.GetSmallY().rows() == 0)
     {
         return VectorXd::Zero(x.size());
     }
@@ -195,7 +195,7 @@ vector<VectorXd> sequential_line_search::acquisition_function::FindNextPoints(co
     const VectorXd kernel_hyperparameters = regressor.GetKernelHyperparams();
 
     GaussianProcessRegressor temporary_regressor(
-        regressor.getX(), regressor.gety(), kernel_hyperparameters, regressor.getb());
+        regressor.GetLargeX(), regressor.GetSmallY(), kernel_hyperparameters, regressor.GetNoiseHyperparam());
 
     for (unsigned i = 0; i < num_points; ++i)
     {
@@ -211,16 +211,17 @@ vector<VectorXd> sequential_line_search::acquisition_function::FindNextPoints(co
         // If this is not the final iteration, prepare data for the next iteration
         if (points.size() != num_points)
         {
-            const unsigned N = temporary_regressor.getX().cols();
+            const unsigned N = temporary_regressor.GetLargeX().cols();
 
             MatrixXd new_X(num_dim, N + 1);
-            new_X.block(0, 0, num_dim, N) = temporary_regressor.getX();
+            new_X.block(0, 0, num_dim, N) = temporary_regressor.GetLargeX();
             new_X.col(N)                  = x_star;
 
-            VectorXd new_y(temporary_regressor.gety().rows() + 1);
-            new_y << temporary_regressor.gety(), temporary_regressor.PredictMu(x_star);
+            VectorXd new_y(temporary_regressor.GetSmallY().rows() + 1);
+            new_y << temporary_regressor.GetSmallY(), temporary_regressor.PredictMu(x_star);
 
-            temporary_regressor = GaussianProcessRegressor(new_X, new_y, kernel_hyperparameters, regressor.getb());
+            temporary_regressor =
+                GaussianProcessRegressor(new_X, new_y, kernel_hyperparameters, regressor.GetNoiseHyperparam());
         }
     }
 

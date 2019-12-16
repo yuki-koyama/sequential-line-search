@@ -16,7 +16,7 @@ namespace sequential_line_search
         GaussianProcessRegressor(const Eigen::MatrixXd& X,
                                  const Eigen::VectorXd& y,
                                  const Eigen::VectorXd& kernel_hyperparams,
-                                 double                 b);
+                                 double                 noise_hyperparam);
 
         double PredictMu(const Eigen::VectorXd& x) const override;
         double PredictSigma(const Eigen::VectorXd& x) const override;
@@ -24,40 +24,35 @@ namespace sequential_line_search
         Eigen::VectorXd PredictMuDerivative(const Eigen::VectorXd& x) const override;
         Eigen::VectorXd PredictSigmaDerivative(const Eigen::VectorXd& x) const override;
 
-        /// \brief Data points.
-        Eigen::MatrixXd X;
-
-        /// \brief Values on data points.
-        Eigen::VectorXd y;
-
-        /// \brief A hyperparameter about signal level of ARD.
-        /// \details Derived from MAP or specified directly.
-        double a;
-
-        /// \brief A hyperparameter about noise level of ARD.
-        /// \details Derived from MAP or specified directly.
-        double b;
-
-        /// \brief A hyperparameter about length scales of ARD.
-        /// \details Derived from MAP or specified directly.
-        Eigen::VectorXd r;
-
         // Can be derived after MAP
-        Eigen::MatrixXd C;
-        Eigen::MatrixXd C_inv;
+        Eigen::MatrixXd m_K_y;
+        Eigen::MatrixXd m_K_y_inv;
 
         // Getter
-        const Eigen::MatrixXd& getX() const override { return X; }
-        const Eigen::VectorXd& gety() const override { return y; }
-        double                 getb() const override { return b; }
+        const Eigen::MatrixXd& GetLargeX() const override { return m_X; }
+        const Eigen::VectorXd& GetSmallY() const override { return m_y; }
 
-        Eigen::VectorXd GetKernelHyperparams() const override
-        {
-            return (Eigen::VectorXd(r.size() + 1) << a, r).finished();
-        }
+        const Eigen::VectorXd& GetKernelHyperparams() const override { return m_kernel_hyperparams; }
+        double                 GetNoiseHyperparam() const override { return m_noise_hyperparam; }
 
     private:
         void PerformMapEstimation();
+
+        /// \brief Data points.
+        Eigen::MatrixXd m_X;
+
+        /// \brief Values on data points.
+        Eigen::VectorXd m_y;
+
+        /// \brief Kernel hyperparameters
+        ///
+        /// \details Derived from MAP or specified directly.
+        Eigen::VectorXd m_kernel_hyperparams;
+
+        /// \brief A hyperparameter about noise level of ARD.
+        ///
+        /// \details Derived from MAP or specified directly.
+        double m_noise_hyperparam;
     };
 } // namespace sequential_line_search
 

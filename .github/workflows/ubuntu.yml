@@ -1,0 +1,29 @@
+name: Ubuntu
+
+on: [push]
+
+jobs:
+  build-test:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-16.04, ubuntu-18.04]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: install-build-dependencies
+      run: sudo apt-get install libeigen3-dev qt5-default
+    - name: submodule
+      run: git submodule update --init --recursive
+    - name: build-test-python
+      run: |
+        cmake -DSEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS=OFF -DSEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS=OFF -DSEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS=OFF -DSEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING=ON .
+        make
+    - name: build-test-apps
+      run: |
+        cmake -DSEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS=ON -DSEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS=ON -DSEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS=ON -DSEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING=ON .
+        make
+    - name: ctest
+      run: ctest
