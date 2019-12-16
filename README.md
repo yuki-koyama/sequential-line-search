@@ -2,6 +2,8 @@
 
 ![](https://github.com/yuki-koyama/sequential-line-search/workflows/macOS/badge.svg)
 ![](https://github.com/yuki-koyama/sequential-line-search/workflows/Ubuntu/badge.svg)
+![](https://github.com/yuki-koyama/sequential-line-search/workflows/macOS-python/badge.svg)
+![](https://github.com/yuki-koyama/sequential-line-search/workflows/Ubuntu-python/badge.svg)
 ![GitHub](https://img.shields.io/github/license/yuki-koyama/sequential-line-search)
 
 This repository provides a C++ library to perform the **sequential line search** method (which is a variant of **Bayesian optimization**).
@@ -69,10 +71,10 @@ To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DE
 
 To enable python binding, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING` should be set `ON`.
 
-## How to Compile and Run
+## How to Compile and Run (C++)
 
 We use [cmake](https://cmake.org/) for managing the source codes. You can compile the core module and the demo applications at once by, for example,
-```
+```bash
 git clone https://github.com/yuki-koyama/sequential-line-search.git --recursive
 cd sequential-line-search
 mkdir build
@@ -85,7 +87,28 @@ Then you can run the applications by, for example,
 ./demos/sequential_line_search_nd/SequentialLineSearchNd
 ```
 
-We tested on macOS (10.13 and 10.14) only. We are aware that the visual demos cannot be built as it is in other OSs; some OpenGL paths etc. need to be resolved. Pull requests welcome.
+We tested on macOS (10.15) only. We are aware that the visual demos cannot be built as it is in other OSs; some OpenGL paths etc. need to be resolved. Pull requests welcome.
+
+## How to Install (Python)
+
+pySequentialLineSearch is a subset of Python bindings of the C++ library. Tested on Python `3.6`, `3.7`, and `3.8`.
+
+It can be installed via PyPI:
+```bash
+pip install git+https://github.com/yuki-koyama/sequential-line-search
+```
+
+### Prerequisites
+
+macOS
+```
+brew install cmake eigen
+```
+
+Ubuntu 16.04/18.04
+```
+sudo apt install cmake libeigen3-dev
+```
 
 ## Examples
 
@@ -148,7 +171,7 @@ def ask_human_for_slider_manipulation(slider_ends):
     return slider_position
 
 def main():
-    optimizer = pySequentialLineSearch.sequential_line_search_optimizer(6)
+    optimizer = pySequentialLineSearch.SequentialLineSearchOptimizer(6)
 
     for i in range(15):
         slider_ends = optimizer.get_slider_ends()
