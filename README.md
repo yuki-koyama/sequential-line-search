@@ -169,7 +169,22 @@ if __name__ == '__main__':
 
 ### Gaussian Process Kernel Hyperparameters
 
-The optimizer API takes a boolean named `use_MAP_hyperparameters` as input. If this is `true`, the optimizer calculates the kernel hyperparameters for every iteration via the MAP estimation, as described in [Koyama et al. SIGGRAPH 2017]. If this is `false`, the optimizer just uses default values, making the optimization much more efficient.
+The optimizer API takes a boolean named `use_map_hyperparameters` as input. If this is `true`, the optimizer calculates the kernel hyperparameters for every iteration via the MAP estimation, as described in [Koyama et al. SIGGRAPH 2017]. If this is `false`, the optimizer just uses default values, making the optimization more efficient.
+
+### Finding Maximizer of Acquisition Function
+
+Finding the global maximizer of the acquisition function is a difficult problem since it often has multiple local maxima and is high-dimensional.
+
+This implementation offers two approaches for this problem:
+
+- The first option is to perform DIRECT (a derivative-free global optimization algorithm) and then refine the solution using L-BFGS (a gradient-based local optimization algorithm).
+- The second option is to perform L-BFGS multiple times with many different initial solutions and then pick up the best solution.
+
+See `src/acquisition-function.cpp` for details.
+
+### Search Space
+
+This implementation assumes that the search space is always [0, 1]^D. When you want to handle a different search space, you need to normalize the target space into [0, 1]^D manually.
 
 ## License
 
