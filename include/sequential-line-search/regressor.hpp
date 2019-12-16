@@ -11,7 +11,7 @@ namespace sequential_line_search
     public:
         virtual ~Regressor() {}
 
-        unsigned GetNumDims() const { return getX().rows(); }
+        unsigned GetNumDims() const { return GetLargeX().rows(); }
 
         virtual double PredictMu(const Eigen::VectorXd& x) const    = 0;
         virtual double PredictSigma(const Eigen::VectorXd& x) const = 0;
@@ -22,8 +22,8 @@ namespace sequential_line_search
         virtual const Eigen::VectorXd& GetKernelHyperparams() const = 0;
         virtual double                 GetNoiseHyperparam() const   = 0;
 
-        virtual const Eigen::MatrixXd& getX() const = 0;
-        virtual const Eigen::VectorXd& gety() const = 0;
+        virtual const Eigen::MatrixXd& GetLargeX() const = 0;
+        virtual const Eigen::VectorXd& GetSmallY() const = 0;
 
         Eigen::VectorXd PredictMaximumPointFromData() const;
     };

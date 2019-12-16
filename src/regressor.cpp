@@ -20,18 +20,18 @@ namespace sequential_line_search
 
 VectorXd sequential_line_search::Regressor::PredictMaximumPointFromData() const
 {
-    const int num_data_points = getX().cols();
+    const int num_data_points = GetLargeX().cols();
 
     VectorXd f(num_data_points);
     for (int i = 0; i < num_data_points; ++i)
     {
-        f(i) = PredictMu(getX().col(i));
+        f(i) = PredictMu(GetLargeX().col(i));
     }
 
     int best_index;
     f.maxCoeff(&best_index);
 
-    return getX().col(best_index);
+    return GetLargeX().col(best_index);
 }
 
 VectorXd

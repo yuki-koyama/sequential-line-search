@@ -29,8 +29,8 @@ namespace sequential_line_search
         Eigen::MatrixXd m_K_y_inv;
 
         // Getter
-        const Eigen::MatrixXd& getX() const override { return m_X; }
-        const Eigen::VectorXd& gety() const override { return m_y; }
+        const Eigen::MatrixXd& GetLargeX() const override { return m_X; }
+        const Eigen::VectorXd& GetSmallY() const override { return m_y; }
 
         const Eigen::VectorXd& GetKernelHyperparams() const override { return m_kernel_hyperparams; }
         double                 GetNoiseHyperparam() const override { return m_noise_hyperparam; }
