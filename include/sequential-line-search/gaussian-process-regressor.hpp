@@ -30,17 +30,15 @@ namespace sequential_line_search
         /// \brief Values on data points.
         Eigen::VectorXd y;
 
-        /// \brief A hyperparameter about signal level of ARD.
+        /// \brief Kernel hyperparameters
+        ///
         /// \details Derived from MAP or specified directly.
-        double a;
+        Eigen::VectorXd m_kernel_hyperparams;
 
         /// \brief A hyperparameter about noise level of ARD.
+        ///
         /// \details Derived from MAP or specified directly.
         double m_noise_hyperparam;
-
-        /// \brief A hyperparameter about length scales of ARD.
-        /// \details Derived from MAP or specified directly.
-        Eigen::VectorXd r;
 
         // Can be derived after MAP
         Eigen::MatrixXd C;
@@ -50,10 +48,7 @@ namespace sequential_line_search
         const Eigen::MatrixXd& getX() const override { return X; }
         const Eigen::VectorXd& gety() const override { return y; }
 
-        Eigen::VectorXd GetKernelHyperparams() const override
-        {
-            return (Eigen::VectorXd(r.size() + 1) << a, r).finished();
-        }
+        Eigen::VectorXd GetKernelHyperparams() const override { return m_kernel_hyperparams; }
 
         double GetNoiseHyperparam() const override { return m_noise_hyperparam; }
 

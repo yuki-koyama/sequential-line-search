@@ -196,7 +196,7 @@ namespace sequential_line_search
 
         PerformMapEstimation();
 
-        C     = CalcLargeKY(X, Concat(a, r), m_noise_hyperparam);
+        C     = CalcLargeKY(X, m_kernel_hyperparams, m_noise_hyperparam);
         C_inv = C.inverse();
     }
 
@@ -205,45 +205,50 @@ namespace sequential_line_search
                                                        const Eigen::VectorXd& kernel_hyperparams,
                                                        double                 noise_hyperparam)
     {
-        this->X                  = X;
-        this->y                  = y;
-        this->a                  = kernel_hyperparams[0];
-        this->m_noise_hyperparam = noise_hyperparam;
-        this->r                  = kernel_hyperparams.segment(1, kernel_hyperparams.size() - 1);
+        this->X                    = X;
+        this->y                    = y;
+        this->m_kernel_hyperparams = kernel_hyperparams;
+        this->m_noise_hyperparam   = noise_hyperparam;
 
         if (X.rows() == 0)
         {
             return;
         }
 
-        C     = CalcLargeKY(X, Concat(a, r), noise_hyperparam);
+        C     = CalcLargeKY(X, m_kernel_hyperparams, m_noise_hyperparam);
         C_inv = C.inverse();
     }
 
     double GaussianProcessRegressor::PredictMu(const VectorXd& x) const
     {
         // TODO: Incorporate a mean function
-        const VectorXd k = CalcSmallK(x, X, Concat(a, r));
+        const VectorXd k = CalcSmallK(x, X, m_kernel_hyperparams);
         return k.transpose() * C_inv * y;
     }
 
     double GaussianProcessRegressor::PredictSigma(const VectorXd& x) const
     {
-        const VectorXd k = CalcSmallK(x, X, Concat(a, r));
-        return std::sqrt(a - k.transpose() * C_inv * k);
+        const VectorXd k = CalcSmallK(x, X, m_kernel_hyperparams);
+
+        // This code assumes that the kernel is either ARD squared exponential or ARD Matern and the first
+        // hyperparameter represents the intensity of the kernel.
+        assert(m_kernel_hyperparams.size() == x.size() + 1);
+        const double intensity = m_kernel_hyperparams[0];
+
+        return std::sqrt(intensity - k.transpose() * C_inv * k);
     }
 
     Eigen::VectorXd GaussianProcessRegressor::PredictMuDerivative(const Eigen::VectorXd& x) const
     {
         // TODO: Incorporate a mean function
-        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, Concat(a, r));
+        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, m_kernel_hyperparams);
         return k_x_derivative * C_inv * y;
     }
 
     Eigen::VectorXd GaussianProcessRegressor::PredictSigmaDerivative(const Eigen::VectorXd& x) const
     {
-        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, Concat(a, r));
-        const VectorXd k              = CalcSmallK(x, X, Concat(a, r));
+        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, m_kernel_hyperparams);
+        const VectorXd k              = CalcSmallK(x, X, m_kernel_hyperparams);
         const double   sigma          = PredictSigma(x);
         return -(1.0 / sigma) * k_x_derivative * C_inv * k;
     }
@@ -270,8 +275,7 @@ namespace sequential_line_search
         const VectorXd x_glo = nloptutil::solve(x_ini, upper, lower, objective, nlopt::GN_DIRECT, &data, true, 300);
         const VectorXd x_loc = nloptutil::solve(x_glo, upper, lower, objective, nlopt::LD_TNEWTON, &data, true, 1000);
 
-        a                  = x_loc(0);
-        m_noise_hyperparam = x_loc(1);
-        r                  = x_loc.block(2, 0, D, 1);
+        m_kernel_hyperparams = Concat(x_loc(0), x_loc.segment(2, D));
+        m_noise_hyperparam   = x_loc(1);
     }
 } // namespace sequential_line_search
