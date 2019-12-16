@@ -63,20 +63,20 @@ namespace
     }
 
     double calc_grad_b(const MatrixXd& X,
-                       const MatrixXd& C_inv,
+                       const MatrixXd& K_y_inv,
                        const VectorXd& y,
                        const double    a,
                        const double    b,
                        const VectorXd& r)
     {
         const MatrixXd C_grad_b = CalcLargeKYNoiseLevelDerivative(X, Concat(a, r), b);
-        const double   term1    = +0.5 * y.transpose() * C_inv * C_grad_b * C_inv * y;
-        const double   term2    = -0.5 * (C_inv * C_grad_b).trace();
+        const double   term1    = +0.5 * y.transpose() * K_y_inv * C_grad_b * K_y_inv * y;
+        const double   term2    = -0.5 * (K_y_inv * C_grad_b).trace();
         return term1 + term2 + (use_log_normal_prior ? calc_grad_b_prior(b) : 0.0);
     }
 
     VectorXd
-    calc_grad_theta(const MatrixXd& X, const MatrixXd& C_inv, const VectorXd& y, const VectorXd& kernel_hyperparams)
+    calc_grad_theta(const MatrixXd& X, const MatrixXd& K_y_inv, const VectorXd& y, const VectorXd& kernel_hyperparams)
     {
         const std::vector<MatrixXd> tensor = CalcLargeKYThetaDerivative(X, kernel_hyperparams);
 
@@ -85,8 +85,8 @@ namespace
         {
             const MatrixXd& K_y_grad_r_i = tensor[i];
 
-            const double term1 = +0.5 * y.transpose() * C_inv * K_y_grad_r_i * C_inv * y;
-            const double term2 = -0.5 * (C_inv * K_y_grad_r_i).trace();
+            const double term1 = +0.5 * y.transpose() * K_y_inv * K_y_grad_r_i * K_y_inv * y;
+            const double term2 = -0.5 * (K_y_inv * K_y_grad_r_i).trace();
 
             const double prior =
                 use_log_normal_prior
@@ -102,7 +102,7 @@ namespace
     }
 
     VectorXd calc_grad(const MatrixXd& X,
-                       const MatrixXd& C_inv,
+                       const MatrixXd& K_y_inv,
                        const VectorXd& y,
                        const double    a,
                        const double    b,
@@ -112,10 +112,10 @@ namespace
 
         VectorXd grad(D + 2);
 
-        const VectorXd grad_theta = calc_grad_theta(X, C_inv, y, Concat(a, r));
+        const VectorXd grad_theta = calc_grad_theta(X, K_y_inv, y, Concat(a, r));
 
         grad(0)            = grad_theta(0);
-        grad(1)            = calc_grad_b(X, C_inv, y, a, b, r);
+        grad(1)            = calc_grad_b(X, K_y_inv, y, a, b, r);
         grad.segment(2, D) = grad_theta.segment(1, D);
 
         return grad;
