@@ -36,8 +36,8 @@ namespace sequential_line_search
         /// \details When the MAP estimation is enabled, the specified kernel hyperparameters will be used as the median
         /// of the prior distribution and the initial solution of the estimation. When the MAP estimation is not
         /// enabled, these values will be directly used.
-        void SetHyperparameters(const double a,
-                                const double r,
+        void SetHyperparameters(const double kernel_signal_variance,
+                                const double kernel_length_scale,
                                 const double noise_level,
                                 const double kernel_hyperparams_prior_variance,
                                 const double btl_scale);
@@ -70,8 +70,8 @@ namespace sequential_line_search
         std::shared_ptr<Slider>                m_slider;
         std::shared_ptr<PreferenceDataManager> m_data;
 
-        double m_a;
-        double m_r;
+        double m_kernel_signal_variance;
+        double m_kernel_length_scale;
         double m_noise_level;
         double m_kernel_hyperparams_prior_variance;
         double m_btl_scale;

@@ -29,8 +29,8 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
 
     optimizer_class.def("set_hyperparameters",
                         &SequentialLineSearchOptimizer::SetHyperparameters,
-                        "a"_a,
-                        "r"_a,
+                        "kernel_signal_variance"_a,
+                        "kernel_length_scale"_a,
                         "noise_level"_a,
                         "kernel_hyperparams_prior_variance"_a,
                         "btl_scale"_a);

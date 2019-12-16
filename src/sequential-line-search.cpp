@@ -28,8 +28,8 @@ sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptim
     const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>& initial_slider_generator)
     : m_use_slider_enlargement(use_slider_enlargement),
       m_use_map_hyperparams(use_map_hyperparams),
-      m_a(0.500),
-      m_r(0.500),
+      m_kernel_signal_variance(0.500),
+      m_kernel_length_scale(0.500),
       m_noise_level(0.005),
       m_kernel_hyperparams_prior_variance(0.250),
       m_btl_scale(0.010)
@@ -42,14 +42,14 @@ sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptim
 }
 
 void sequential_line_search::SequentialLineSearchOptimizer::SetHyperparameters(
-    const double a,
-    const double r,
+    const double kernel_signal_variance,
+    const double kernel_length_scale,
     const double noise_level,
     const double kernel_hyperparams_prior_variance,
     const double btl_scale)
 {
-    m_a                                 = a;
-    m_r                                 = r;
+    m_kernel_signal_variance            = kernel_signal_variance;
+    m_kernel_length_scale               = kernel_length_scale;
     m_noise_level                       = noise_level;
     m_kernel_hyperparams_prior_variance = kernel_hyperparams_prior_variance;
     m_btl_scale                         = btl_scale;
@@ -68,8 +68,8 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResu
     m_regressor = std::make_shared<PreferenceRegressor>(m_data->m_X,
                                                         m_data->m_D,
                                                         m_use_map_hyperparams,
-                                                        m_a,
-                                                        m_r,
+                                                        m_kernel_signal_variance,
+                                                        m_kernel_length_scale,
                                                         m_noise_level,
                                                         m_kernel_hyperparams_prior_variance,
                                                         m_btl_scale);
