@@ -25,14 +25,14 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
     optimizer_class.def(py::init<const int, const bool, const bool>(),
                         "num_dims"_a,
                         "use_slider_enlargement"_a = true,
-                        "use_map_hyperparams"_a     = true);
+                        "use_map_hyperparams"_a    = true);
 
     optimizer_class.def("set_hyperparameters",
                         &SequentialLineSearchOptimizer::SetHyperparameters,
                         "a"_a,
                         "r"_a,
-                        "b"_a,
-                        "variance"_a,
+                        "noise_level"_a,
+                        "kernel_hyperparams_prior_variance"_a,
                         "btl_scale"_a);
 
     optimizer_class.def(

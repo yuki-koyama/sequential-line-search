@@ -38,8 +38,8 @@ namespace sequential_line_search
         /// enabled, these values will be directly used.
         void SetHyperparameters(const double a,
                                 const double r,
-                                const double b,
-                                const double variance,
+                                const double noise_level,
+                                const double kernel_hyperparams_prior_variance,
                                 const double btl_scale);
 
         /// \brief Submit the result of user-performed line search and go to the next iteration step.
@@ -72,8 +72,8 @@ namespace sequential_line_search
 
         double m_a;
         double m_r;
-        double m_b;
-        double m_variance;
+        double m_noise_level;
+        double m_kernel_hyperparams_prior_variance;
         double m_btl_scale;
     };
 } // namespace sequential_line_search

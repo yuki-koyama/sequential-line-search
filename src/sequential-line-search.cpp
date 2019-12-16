@@ -30,8 +30,8 @@ sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptim
       m_use_map_hyperparams(use_map_hyperparams),
       m_a(0.500),
       m_r(0.500),
-      m_b(0.005),
-      m_variance(0.250),
+      m_noise_level(0.005),
+      m_kernel_hyperparams_prior_variance(0.250),
       m_btl_scale(0.010)
 {
     const auto slider_ends = initial_slider_generator(num_dims);
@@ -41,17 +41,18 @@ sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptim
     m_slider    = std::make_shared<Slider>(std::get<0>(slider_ends), std::get<1>(slider_ends), false);
 }
 
-void sequential_line_search::SequentialLineSearchOptimizer::SetHyperparameters(const double a,
-                                                                               const double r,
-                                                                               const double b,
-                                                                               const double variance,
-                                                                               const double btl_scale)
+void sequential_line_search::SequentialLineSearchOptimizer::SetHyperparameters(
+    const double a,
+    const double r,
+    const double noise_level,
+    const double kernel_hyperparams_prior_variance,
+    const double btl_scale)
 {
-    m_a         = a;
-    m_r         = r;
-    m_b         = b;
-    m_variance  = variance;
-    m_btl_scale = btl_scale;
+    m_a                                 = a;
+    m_r                                 = r;
+    m_noise_level                       = noise_level;
+    m_kernel_hyperparams_prior_variance = kernel_hyperparams_prior_variance;
+    m_btl_scale                         = btl_scale;
 }
 
 void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResult(const double slider_position)
@@ -64,8 +65,14 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResu
     m_data->AddNewPoints(x_chosen, {x_prev_max, x_prev_ei}, true);
 
     // Perform the MAP estimation
-    m_regressor = std::make_shared<PreferenceRegressor>(
-        m_data->m_X, m_data->m_D, m_use_map_hyperparams, m_a, m_r, m_b, m_variance, m_btl_scale);
+    m_regressor = std::make_shared<PreferenceRegressor>(m_data->m_X,
+                                                        m_data->m_D,
+                                                        m_use_map_hyperparams,
+                                                        m_a,
+                                                        m_r,
+                                                        m_noise_level,
+                                                        m_kernel_hyperparams_prior_variance,
+                                                        m_btl_scale);
 
     // A heuristics to set the computational effort for solving the maximization of the acquisition function. This is
     // not justified or validated.
