@@ -17,18 +17,36 @@ namespace sequential_line_search
     class SequentialLineSearchOptimizer
     {
     public:
-        SequentialLineSearchOptimizer(const int  dimension,
-                                      const bool use_slider_enlargement  = true,
-                                      const bool use_map_hyperparameters = true,
+        /// \brief Construct an optimizer instance.
+        ///
+        /// \param use_slider_enlargement When this is set true, slider spaces will be enlarged in post-processing. See
+        /// [Koyama+17] for details.
+        ///
+        /// \param use_map_hyperparams When this is set true, the optimizer always perform the MAP estimation for the
+        /// GPR kernel hyperparameters. When this is set false, the optimizer performs the MAP estimation only for
+        /// goodness values.
+        SequentialLineSearchOptimizer(const int  num_dims,
+                                      const bool use_slider_enlargement = true,
+                                      const bool use_map_hyperparams    = true,
                                       const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>&
                                           initial_slider_generator = GenerateRandomSliderEnds);
 
+        /// \brief Specify (kernel and other) hyperparameter values.
+        ///
+        /// \details When the MAP estimation is enabled, the specified kernel hyperparameters will be used as the median
+        /// of the prior distribution and the initial solution of the estimation. When the MAP estimation is not
+        /// enabled, these values will be directly used.
         void SetHyperparameters(const double a,
                                 const double r,
                                 const double b,
                                 const double variance,
                                 const double btl_scale);
 
+        /// \brief Submit the result of user-performed line search and go to the next iteration step.
+        ///
+        /// \param slider_position The position of the chosen point in the slider space. It should be represented in [0,
+        /// 1], where 0 means that the chosen position is the first end-point of the slider and 1 means that it is the
+        /// second end-point.
         void SubmitLineSearchResult(const double slider_position);
 
         std::pair<Eigen::VectorXd, Eigen::VectorXd> GetSliderEnds() const;
@@ -46,7 +64,7 @@ namespace sequential_line_search
 
     private:
         const bool m_use_slider_enlargement;
-        const bool m_use_map_hyperparameters;
+        const bool m_use_map_hyperparams;
 
         std::shared_ptr<PreferenceRegressor>   m_regressor;
         std::shared_ptr<Slider>                m_slider;
