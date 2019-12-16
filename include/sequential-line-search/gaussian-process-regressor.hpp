@@ -24,25 +24,25 @@ namespace sequential_line_search
         Eigen::VectorXd PredictMuDerivative(const Eigen::VectorXd& x) const override;
         Eigen::VectorXd PredictSigmaDerivative(const Eigen::VectorXd& x) const override;
 
-        /// \brief Data points.
-        Eigen::MatrixXd X;
-
-        /// \brief Values on data points.
-        Eigen::VectorXd y;
-
         // Can be derived after MAP
         Eigen::MatrixXd C;
         Eigen::MatrixXd C_inv;
 
         // Getter
-        const Eigen::MatrixXd& getX() const override { return X; }
-        const Eigen::VectorXd& gety() const override { return y; }
+        const Eigen::MatrixXd& getX() const override { return m_X; }
+        const Eigen::VectorXd& gety() const override { return m_y; }
 
         const Eigen::VectorXd& GetKernelHyperparams() const override { return m_kernel_hyperparams; }
         double                 GetNoiseHyperparam() const override { return m_noise_hyperparam; }
 
     private:
         void PerformMapEstimation();
+
+        /// \brief Data points.
+        Eigen::MatrixXd m_X;
+
+        /// \brief Values on data points.
+        Eigen::VectorXd m_y;
 
         /// \brief Kernel hyperparameters
         ///

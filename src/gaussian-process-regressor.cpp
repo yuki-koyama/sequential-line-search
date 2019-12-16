@@ -184,11 +184,8 @@ namespace
 
 namespace sequential_line_search
 {
-    GaussianProcessRegressor::GaussianProcessRegressor(const MatrixXd& X, const VectorXd& y)
+    GaussianProcessRegressor::GaussianProcessRegressor(const MatrixXd& X, const VectorXd& y) : m_X(X), m_y(y)
     {
-        this->X = X;
-        this->y = y;
-
         if (X.rows() == 0)
         {
             return;
@@ -204,12 +201,8 @@ namespace sequential_line_search
                                                        const Eigen::VectorXd& y,
                                                        const Eigen::VectorXd& kernel_hyperparams,
                                                        double                 noise_hyperparam)
+        : m_X(X), m_y(y), m_kernel_hyperparams(kernel_hyperparams), m_noise_hyperparam(noise_hyperparam)
     {
-        this->X                    = X;
-        this->y                    = y;
-        this->m_kernel_hyperparams = kernel_hyperparams;
-        this->m_noise_hyperparam   = noise_hyperparam;
-
         if (X.rows() == 0)
         {
             return;
@@ -222,13 +215,13 @@ namespace sequential_line_search
     double GaussianProcessRegressor::PredictMu(const VectorXd& x) const
     {
         // TODO: Incorporate a mean function
-        const VectorXd k = CalcSmallK(x, X, m_kernel_hyperparams);
-        return k.transpose() * C_inv * y;
+        const VectorXd k = CalcSmallK(x, m_X, m_kernel_hyperparams);
+        return k.transpose() * C_inv * m_y;
     }
 
     double GaussianProcessRegressor::PredictSigma(const VectorXd& x) const
     {
-        const VectorXd k = CalcSmallK(x, X, m_kernel_hyperparams);
+        const VectorXd k = CalcSmallK(x, m_X, m_kernel_hyperparams);
 
         // This code assumes that the kernel is either ARD squared exponential or ARD Matern and the first
         // hyperparameter represents the intensity of the kernel.
@@ -241,23 +234,23 @@ namespace sequential_line_search
     Eigen::VectorXd GaussianProcessRegressor::PredictMuDerivative(const Eigen::VectorXd& x) const
     {
         // TODO: Incorporate a mean function
-        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, m_kernel_hyperparams);
-        return k_x_derivative * C_inv * y;
+        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, m_X, m_kernel_hyperparams);
+        return k_x_derivative * C_inv * m_y;
     }
 
     Eigen::VectorXd GaussianProcessRegressor::PredictSigmaDerivative(const Eigen::VectorXd& x) const
     {
-        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, X, m_kernel_hyperparams);
-        const VectorXd k              = CalcSmallK(x, X, m_kernel_hyperparams);
+        const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, m_X, m_kernel_hyperparams);
+        const VectorXd k              = CalcSmallK(x, m_X, m_kernel_hyperparams);
         const double   sigma          = PredictSigma(x);
         return -(1.0 / sigma) * k_x_derivative * C_inv * k;
     }
 
     void GaussianProcessRegressor::PerformMapEstimation()
     {
-        const unsigned D = X.rows();
+        const unsigned D = m_X.rows();
 
-        Data data{X, y};
+        Data data{m_X, m_y};
 
         const VectorXd x_ini = [&]() {
             VectorXd x(D + 2);
