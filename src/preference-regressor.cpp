@@ -124,13 +124,13 @@ namespace
         const unsigned                 M = X.cols();
         const VectorXd                 y = Eigen::Map<const VectorXd>(&x[0], M);
 
-        const double a = (regressor->m_use_map_hyperparameters) ? x[M + 0] : regressor->m_default_a;
+        const double a = (regressor->m_use_map_hyperparams) ? x[M + 0] : regressor->m_default_a;
 #ifdef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
         const double b = b_fixed;
 #else
         const double b = (regressor->m_use_map_hyperparameters) ? x[M + 1] : regressor->m_default_b;
 #endif
-        const VectorXd r = (regressor->m_use_map_hyperparameters)
+        const VectorXd r = (regressor->m_use_map_hyperparams)
                                ? VectorXd(Eigen::Map<const VectorXd>(&x[M + 2], X.rows()))
                                : VectorXd::Constant(X.rows(), regressor->m_default_r);
 
@@ -146,8 +146,8 @@ namespace
         constexpr double prod_of_two_and_pi = 2.0 * mathtoolbox::constants::pi;
 
         // Kernel matrix
-        const MatrixXd      K = regressor->m_use_map_hyperparameters ? CalcLargeKY(X, Concat(a, r), b) : regressor->m_K;
-        const LLT<MatrixXd> K_llt = regressor->m_use_map_hyperparameters ? LLT<MatrixXd>(K) : regressor->m_K_llt;
+        const MatrixXd      K     = regressor->m_use_map_hyperparams ? CalcLargeKY(X, Concat(a, r), b) : regressor->m_K;
+        const LLT<MatrixXd> K_llt = regressor->m_use_map_hyperparams ? LLT<MatrixXd>(K) : regressor->m_K_llt;
 
         // Log likelihood of y distribution
         const VectorXd K_inv_y   = K_llt.solve(y);
@@ -160,14 +160,14 @@ namespace
         assert(!std::isnan(obj));
 
         // Priors for Gaussian process hyperparameters
-        if (regressor->m_use_map_hyperparameters)
+        if (regressor->m_use_map_hyperparams)
         {
             const double a_prior = regressor->m_default_a;
 #ifndef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
             const double b_prior = regressor->m_default_b;
 #endif
             const double r_prior  = regressor->m_default_r;
-            const double variance = regressor->m_variance;
+            const double variance = regressor->m_kernel_hyperparams_prior_variance;
 
             obj += mathtoolbox::GetLogOfLogNormalDist(a, std::log(a_prior), variance);
 #ifndef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
@@ -208,17 +208,18 @@ namespace
 
             Eigen::Map<VectorXd>(&grad[0], grad_y.rows()) = grad_y;
 
-            if (regressor->m_use_map_hyperparameters)
+            if (regressor->m_use_map_hyperparams)
             {
-                const VectorXd grad_theta = CalcObjectiveThetaDerivative(y,
-                                                                         K_llt,
-                                                                         K_inv_y,
-                                                                         X,
-                                                                         Concat(a, r),
-                                                                         regressor->m_default_a,
-                                                                         regressor->m_variance,
-                                                                         regressor->m_default_r,
-                                                                         regressor->m_variance);
+                const VectorXd grad_theta =
+                    CalcObjectiveThetaDerivative(y,
+                                                 K_llt,
+                                                 K_inv_y,
+                                                 X,
+                                                 Concat(a, r),
+                                                 regressor->m_default_a,
+                                                 regressor->m_kernel_hyperparams_prior_variance,
+                                                 regressor->m_default_r,
+                                                 regressor->m_kernel_hyperparams_prior_variance);
 
                 grad[M + 0] = grad_theta(0);
 #ifdef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
@@ -241,19 +242,19 @@ namespace
 
 sequential_line_search::PreferenceRegressor::PreferenceRegressor(const MatrixXd&                X,
                                                                  const std::vector<Preference>& D,
-                                                                 bool                           use_map_hyperparameters,
+                                                                 bool                           use_map_hyperparams,
                                                                  const double                   default_a,
                                                                  const double                   default_r,
                                                                  const double                   default_b,
-                                                                 const double                   variance,
-                                                                 const double                   btl_scale)
-    : m_use_map_hyperparameters(use_map_hyperparameters),
+                                                                 const double kernel_hyperparams_prior_variance,
+                                                                 const double btl_scale)
+    : m_use_map_hyperparams(use_map_hyperparams),
       m_X(X),
       m_D(D),
       m_default_a(default_a),
       m_default_r(default_r),
       m_default_b(default_b),
-      m_variance(variance),
+      m_kernel_hyperparams_prior_variance(kernel_hyperparams_prior_variance),
       m_btl_scale(btl_scale)
 {
     if (X.cols() == 0 || D.size() == 0)
@@ -306,14 +307,14 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation()
     const unsigned d = m_X.rows();
 
     // When hyperparameters are estimated jointly, the number of the optimization variables increases by "2 + d"
-    const unsigned opt_dim = m_use_map_hyperparameters ? M + 2 + d : M;
+    const unsigned opt_dim = m_use_map_hyperparams ? M + 2 + d : M;
 
     VectorXd upper = VectorXd::Constant(opt_dim, +1e+01);
     VectorXd lower = VectorXd::Constant(opt_dim, -1e+01);
     VectorXd x_ini = VectorXd::Constant(opt_dim, 0.0);
 
     // Set bounding conditions for hyperparameters if necessary
-    if (m_use_map_hyperparameters)
+    if (m_use_map_hyperparams)
     {
         lower.segment(M, 2 + d) = VectorXd::Constant(2 + d, 1e-05);
         x_ini(M + 0)            = m_default_a;
@@ -326,7 +327,7 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation()
     }
 
     // Calculate kernel matrices if hyperparameters are not estimated by the MAP estimation
-    if (!m_use_map_hyperparameters)
+    if (!m_use_map_hyperparams)
     {
         m_kernel_hyperparams = Concat(m_default_a, VectorXd::Constant(d, m_default_r));
         m_noise_hyperparam   = m_default_b;
@@ -341,7 +342,7 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation()
 
     const VectorXd x_opt = nloptutil::solve(x_ini, upper, lower, objective, nlopt::LD_TNEWTON, this, true, 100);
 
-    if (m_use_map_hyperparameters)
+    if (m_use_map_hyperparams)
     {
         m_y = x_opt.segment(0, M);
 
