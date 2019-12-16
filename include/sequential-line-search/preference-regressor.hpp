@@ -64,9 +64,8 @@ namespace sequential_line_search
         const Eigen::MatrixXd& getX() const override { return m_X; }
         const Eigen::VectorXd& gety() const override { return m_y; }
 
-        // TODO: Return reference instead of copy
-        Eigen::VectorXd GetKernelHyperparams() const override { return m_kernel_hyperparams; }
-        double          GetNoiseHyperparam() const override { return m_noise_hyperparam; }
+        const Eigen::VectorXd& GetKernelHyperparams() const override { return m_kernel_hyperparams; }
+        double                 GetNoiseHyperparam() const override { return m_noise_hyperparam; }
 
         // Default hyperparameters; when MAP is enabled, they are used as initial guesses.
         const double m_default_a;

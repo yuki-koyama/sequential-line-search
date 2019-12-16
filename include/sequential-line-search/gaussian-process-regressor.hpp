@@ -30,6 +30,20 @@ namespace sequential_line_search
         /// \brief Values on data points.
         Eigen::VectorXd y;
 
+        // Can be derived after MAP
+        Eigen::MatrixXd C;
+        Eigen::MatrixXd C_inv;
+
+        // Getter
+        const Eigen::MatrixXd& getX() const override { return X; }
+        const Eigen::VectorXd& gety() const override { return y; }
+
+        const Eigen::VectorXd& GetKernelHyperparams() const override { return m_kernel_hyperparams; }
+        double                 GetNoiseHyperparam() const override { return m_noise_hyperparam; }
+
+    private:
+        void PerformMapEstimation();
+
         /// \brief Kernel hyperparameters
         ///
         /// \details Derived from MAP or specified directly.
@@ -39,21 +53,6 @@ namespace sequential_line_search
         ///
         /// \details Derived from MAP or specified directly.
         double m_noise_hyperparam;
-
-        // Can be derived after MAP
-        Eigen::MatrixXd C;
-        Eigen::MatrixXd C_inv;
-
-        // Getter
-        const Eigen::MatrixXd& getX() const override { return X; }
-        const Eigen::VectorXd& gety() const override { return y; }
-
-        Eigen::VectorXd GetKernelHyperparams() const override { return m_kernel_hyperparams; }
-
-        double GetNoiseHyperparam() const override { return m_noise_hyperparam; }
-
-    private:
-        void PerformMapEstimation();
     };
 } // namespace sequential_line_search
 
