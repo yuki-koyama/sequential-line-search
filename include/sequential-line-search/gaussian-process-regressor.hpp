@@ -25,8 +25,8 @@ namespace sequential_line_search
         Eigen::VectorXd PredictSigmaDerivative(const Eigen::VectorXd& x) const override;
 
         // Can be derived after MAP
-        Eigen::MatrixXd C;
-        Eigen::MatrixXd C_inv;
+        Eigen::MatrixXd m_K_y;
+        Eigen::MatrixXd m_K_y_inv;
 
         // Getter
         const Eigen::MatrixXd& getX() const override { return m_X; }

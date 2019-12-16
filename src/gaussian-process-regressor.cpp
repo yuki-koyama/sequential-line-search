@@ -145,13 +145,13 @@ namespace
         const double   b = x[1];
         const VectorXd r = Eigen::Map<const VectorXd>(&x[2], x.size() - 2);
 
-        const MatrixXd C     = CalcLargeKY(X, Concat(a, r), b);
-        const MatrixXd C_inv = C.inverse();
+        const MatrixXd K_y     = CalcLargeKY(X, Concat(a, r), b);
+        const MatrixXd K_y_inv = K_y.inverse();
 
         // When the algorithm is gradient-based, compute the gradient vector
         if (grad.size() == x.size())
         {
-            const VectorXd g = calc_grad(X, C_inv, y, a, b, r);
+            const VectorXd g = calc_grad(X, K_y_inv, y, a, b, r);
             for (unsigned i = 0; i < g.rows(); ++i)
             {
                 grad[i] = g(i);
@@ -161,8 +161,8 @@ namespace
         // Constant
         constexpr double prod_of_two_and_pi = 2.0 * mathtoolbox::constants::pi;
 
-        const double term1 = -0.5 * y.transpose() * C_inv * y;
-        const double term2 = -0.5 * std::log(C.determinant());
+        const double term1 = -0.5 * y.transpose() * K_y_inv * y;
+        const double term2 = -0.5 * std::log(K_y.determinant());
         const double term3 = -0.5 * N * std::log(prod_of_two_and_pi);
 
         // Computing the regularization terms from a prior assumptions
@@ -193,8 +193,8 @@ namespace sequential_line_search
 
         PerformMapEstimation();
 
-        C     = CalcLargeKY(X, m_kernel_hyperparams, m_noise_hyperparam);
-        C_inv = C.inverse();
+        m_K_y     = CalcLargeKY(X, m_kernel_hyperparams, m_noise_hyperparam);
+        m_K_y_inv = m_K_y.inverse();
     }
 
     GaussianProcessRegressor::GaussianProcessRegressor(const Eigen::MatrixXd& X,
@@ -208,15 +208,15 @@ namespace sequential_line_search
             return;
         }
 
-        C     = CalcLargeKY(X, m_kernel_hyperparams, m_noise_hyperparam);
-        C_inv = C.inverse();
+        m_K_y     = CalcLargeKY(X, m_kernel_hyperparams, m_noise_hyperparam);
+        m_K_y_inv = m_K_y.inverse();
     }
 
     double GaussianProcessRegressor::PredictMu(const VectorXd& x) const
     {
         // TODO: Incorporate a mean function
         const VectorXd k = CalcSmallK(x, m_X, m_kernel_hyperparams);
-        return k.transpose() * C_inv * m_y;
+        return k.transpose() * m_K_y_inv * m_y;
     }
 
     double GaussianProcessRegressor::PredictSigma(const VectorXd& x) const
@@ -228,14 +228,14 @@ namespace sequential_line_search
         assert(m_kernel_hyperparams.size() == x.size() + 1);
         const double intensity = m_kernel_hyperparams[0];
 
-        return std::sqrt(intensity - k.transpose() * C_inv * k);
+        return std::sqrt(intensity - k.transpose() * m_K_y_inv * k);
     }
 
     Eigen::VectorXd GaussianProcessRegressor::PredictMuDerivative(const Eigen::VectorXd& x) const
     {
         // TODO: Incorporate a mean function
         const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, m_X, m_kernel_hyperparams);
-        return k_x_derivative * C_inv * m_y;
+        return k_x_derivative * m_K_y_inv * m_y;
     }
 
     Eigen::VectorXd GaussianProcessRegressor::PredictSigmaDerivative(const Eigen::VectorXd& x) const
@@ -243,7 +243,7 @@ namespace sequential_line_search
         const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, m_X, m_kernel_hyperparams);
         const VectorXd k              = CalcSmallK(x, m_X, m_kernel_hyperparams);
         const double   sigma          = PredictSigma(x);
-        return -(1.0 / sigma) * k_x_derivative * C_inv * k;
+        return -(1.0 / sigma) * k_x_derivative * m_K_y_inv * k;
     }
 
     void GaussianProcessRegressor::PerformMapEstimation()
