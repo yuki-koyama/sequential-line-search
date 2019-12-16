@@ -150,7 +150,7 @@ def ask_human_for_slider_manipulation(slider_ends):
     return slider_position
 
 def main():
-    optimizer = pySequentialLineSearch.sequential_line_search_optimizer(6)
+    optimizer = pySequentialLineSearch.SequentialLineSearchOptimizer(6)
 
     for i in range(15):
         slider_ends = optimizer.get_slider_ends()
