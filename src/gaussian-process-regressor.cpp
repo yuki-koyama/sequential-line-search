@@ -2,6 +2,7 @@
 #include <cmath>
 #include <iostream>
 #include <mathtoolbox/constants.hpp>
+#include <mathtoolbox/log-determinant.hpp>
 #include <mathtoolbox/probability-distributions.hpp>
 #include <nlopt-util.hpp>
 #include <sequential-line-search/gaussian-process-regressor.hpp>
@@ -69,9 +70,9 @@ namespace
                        const double    b,
                        const VectorXd& r)
     {
-        const MatrixXd C_grad_b = CalcLargeKYNoiseLevelDerivative(X, Concat(a, r), b);
-        const double   term1    = +0.5 * y.transpose() * K_y_inv * C_grad_b * K_y_inv * y;
-        const double   term2    = -0.5 * (K_y_inv * C_grad_b).trace();
+        const MatrixXd K_y_grad_b = CalcLargeKYNoiseLevelDerivative(X, Concat(a, r), b);
+        const double   term1      = +0.5 * y.transpose() * K_y_inv * K_y_grad_b * K_y_inv * y;
+        const double   term2      = -0.5 * (K_y_inv * K_y_grad_b).trace();
         return term1 + term2 + (use_log_normal_prior ? calc_grad_b_prior(b) : 0.0);
     }
 
@@ -162,7 +163,7 @@ namespace
         constexpr double prod_of_two_and_pi = 2.0 * mathtoolbox::constants::pi;
 
         const double term1 = -0.5 * y.transpose() * K_y_inv * y;
-        const double term2 = -0.5 * std::log(K_y.determinant());
+        const double term2 = -0.5 * mathtoolbox::CalcLogDetOfSymmetricPositiveDefiniteMatrix(K_y);
         const double term3 = -0.5 * N * std::log(prod_of_two_and_pi);
 
         // Computing the regularization terms from a prior assumptions
