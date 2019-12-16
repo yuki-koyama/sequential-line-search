@@ -2,6 +2,8 @@
 
 ![](https://github.com/yuki-koyama/sequential-line-search/workflows/macOS/badge.svg)
 ![](https://github.com/yuki-koyama/sequential-line-search/workflows/Ubuntu/badge.svg)
+![](https://github.com/yuki-koyama/sequential-line-search/workflows/macOS-python/badge.svg)
+![](https://github.com/yuki-koyama/sequential-line-search/workflows/Ubuntu-python/badge.svg)
 ![GitHub](https://img.shields.io/github/license/yuki-koyama/sequential-line-search)
 
 This repository provides a C++ library to perform the **sequential line search** method (which is a variant of **Bayesian optimization**).
