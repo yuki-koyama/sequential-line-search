@@ -1,12 +1,12 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.3)
 
 project(SequentialLineSearch CXX)
+
 if(SEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING)
 	set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_BUILD_TYPE Release)
 
 # Append possible paths to Qt5 for macOS
 if(APPLE AND EXISTS /usr/local/opt/qt5)
