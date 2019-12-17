@@ -28,10 +28,10 @@ sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptim
     const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>& initial_slider_generator)
     : m_use_slider_enlargement(use_slider_enlargement),
       m_use_map_hyperparams(use_map_hyperparams),
-      m_kernel_signal_variance(0.500),
+      m_kernel_signal_var(0.500),
       m_kernel_length_scale(0.500),
       m_noise_level(0.005),
-      m_kernel_hyperparams_prior_variance(0.250),
+      m_kernel_hyperparams_prior_var(0.250),
       m_btl_scale(0.010)
 {
     const auto slider_ends = initial_slider_generator(num_dims);
@@ -41,18 +41,17 @@ sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptim
     m_slider    = std::make_shared<Slider>(std::get<0>(slider_ends), std::get<1>(slider_ends), false);
 }
 
-void sequential_line_search::SequentialLineSearchOptimizer::SetHyperparameters(
-    const double kernel_signal_variance,
-    const double kernel_length_scale,
-    const double noise_level,
-    const double kernel_hyperparams_prior_variance,
-    const double btl_scale)
+void sequential_line_search::SequentialLineSearchOptimizer::SetHyperparams(const double kernel_signal_var,
+                                                                           const double kernel_length_scale,
+                                                                           const double noise_level,
+                                                                           const double kernel_hyperparams_prior_var,
+                                                                           const double btl_scale)
 {
-    m_kernel_signal_variance            = kernel_signal_variance;
-    m_kernel_length_scale               = kernel_length_scale;
-    m_noise_level                       = noise_level;
-    m_kernel_hyperparams_prior_variance = kernel_hyperparams_prior_variance;
-    m_btl_scale                         = btl_scale;
+    m_kernel_signal_var            = kernel_signal_var;
+    m_kernel_length_scale          = kernel_length_scale;
+    m_noise_level                  = noise_level;
+    m_kernel_hyperparams_prior_var = kernel_hyperparams_prior_var;
+    m_btl_scale                    = btl_scale;
 }
 
 void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResult(const double slider_position)
@@ -68,10 +67,10 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResu
     m_regressor = std::make_shared<PreferenceRegressor>(m_data->m_X,
                                                         m_data->m_D,
                                                         m_use_map_hyperparams,
-                                                        m_kernel_signal_variance,
+                                                        m_kernel_signal_var,
                                                         m_kernel_length_scale,
                                                         m_noise_level,
-                                                        m_kernel_hyperparams_prior_variance,
+                                                        m_kernel_hyperparams_prior_var,
                                                         m_btl_scale);
 
     // A heuristics to set the computational effort for solving the maximization of the acquisition function. This is

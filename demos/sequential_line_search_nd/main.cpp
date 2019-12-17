@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
         sequential_line_search::SequentialLineSearchOptimizer optimizer(
             test_dimension, use_slider_enlargement, use_MAP_hyperparams);
 
-        optimizer.SetHyperparameters(a, r, b, variance, btl_scale);
+        optimizer.SetHyperparams(a, r, b, variance, btl_scale);
 
         std::cout << "========================" << std::endl;
         std::cout << "Trial " << trial_index + 1 << std::endl;
