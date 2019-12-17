@@ -60,7 +60,7 @@ setup(
     long_description="",
     long_description_content_type="text/markdown",
     ext_modules=[CMakeExtension("pySequentialLineSearch")],
-    url="https://github.com/yuki-koyama/mathtoolbox",
+    url="https://github.com/yuki-koyama/sequential-line-search",
     packages=find_packages(),
     install_requires=["numpy"],
     classifiers=[
