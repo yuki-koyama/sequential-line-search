@@ -125,7 +125,8 @@ void MainWindow::on_actionBatch_visualization_triggered()
             for (int j = ui->horizontalSlider->minimum(); j < ui->horizontalSlider->maximum(); ++j)
             {
                 ui->horizontalSlider->setValue(j);
-                const double y = core.evaluateObjectiveFunction(core.optimizer->GetParameters(obtainSliderPosition()));
+                const double y =
+                    core.evaluateObjectiveFunction(core.optimizer->CalcPointFromSliderPosition(obtainSliderPosition()));
                 if (y > max_y)
                 {
                     max_y      = y;

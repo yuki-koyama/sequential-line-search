@@ -56,9 +56,9 @@ void sequential_line_search::SequentialLineSearchOptimizer::SetHyperparams(const
 
 void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResult(const double slider_position)
 {
-    const auto  x_chosen   = GetParameters(slider_position);
-    const auto& x_prev_max = m_slider->orig_0;
-    const auto& x_prev_ei  = m_slider->orig_1;
+    const auto  x_chosen   = CalcPointFromSliderPosition(slider_position);
+    const auto& x_prev_max = m_slider->original_end_0;
+    const auto& x_prev_ei  = m_slider->original_end_1;
 
     // Update the data
     m_data->AddNewPoints(x_chosen, {x_prev_max, x_prev_ei}, true);
@@ -90,14 +90,15 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> sequential_line_search::SequentialLi
     return {m_slider->end_0, m_slider->end_1};
 }
 
-Eigen::VectorXd sequential_line_search::SequentialLineSearchOptimizer::GetParameters(const double slider_position) const
+Eigen::VectorXd
+sequential_line_search::SequentialLineSearchOptimizer::CalcPointFromSliderPosition(const double slider_position) const
 {
     return m_slider->GetValue(slider_position);
 }
 
 Eigen::VectorXd sequential_line_search::SequentialLineSearchOptimizer::GetMaximizer() const
 {
-    return m_slider->orig_0;
+    return m_slider->original_end_0;
 }
 
 double

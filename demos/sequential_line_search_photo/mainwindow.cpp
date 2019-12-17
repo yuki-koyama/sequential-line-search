@@ -125,7 +125,7 @@ double MainWindow::obtainSliderPosition() const
 
 void MainWindow::updateRawSliders()
 {
-    const VectorXd x = core.optimizer->GetParameters(obtainSliderPosition());
+    const VectorXd x = core.optimizer->CalcPointFromSliderPosition(obtainSliderPosition());
     for (unsigned i = 0; i < core.dim; ++i)
     {
         QSlider* slider = sliders[i];
@@ -169,7 +169,7 @@ void MainWindow::on_horizontalSlider_valueChanged(int /*value*/)
     updateRawSliders();
 
     // Update the parameters for preview
-    const VectorXd      x = core.optimizer->GetParameters(obtainSliderPosition());
+    const VectorXd      x = core.optimizer->CalcPointFromSliderPosition(obtainSliderPosition());
     std::vector<double> parameters(6, 0.5);
     if (core.dim == 2)
     {
@@ -210,7 +210,7 @@ void MainWindow::on_actionExport_photos_on_slider_triggered()
     {
         const unsigned        val             = m + (i - 1) * (M - m) / (n - 1);
         const double          slider_position = static_cast<double>(val - m) / static_cast<double>(M - m);
-        const Eigen::VectorXd x               = core.optimizer->GetParameters(slider_position);
+        const Eigen::VectorXd x               = core.optimizer->CalcPointFromSliderPosition(slider_position);
         const QImage          enhanced        = ImageModifier::modifyImage(enhancer_widget->getImage(), x);
         enhanced.save(QString((dir + "/full_" + std::to_string(i) + ".png").c_str()));
         enhanced.scaledToWidth(w, Qt::SmoothTransformation)

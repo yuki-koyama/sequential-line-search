@@ -40,7 +40,9 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
 
     optimizer_class.def("get_slider_ends", &SequentialLineSearchOptimizer::GetSliderEnds);
 
-    optimizer_class.def("get_parameters", &SequentialLineSearchOptimizer::GetParameters, "slider_position"_a);
+    optimizer_class.def("calc_point_from_slider_position",
+                        &SequentialLineSearchOptimizer::CalcPointFromSliderPosition,
+                        "slider_position"_a);
 
     optimizer_class.def("get_maximizer", &SequentialLineSearchOptimizer::GetMaximizer);
 

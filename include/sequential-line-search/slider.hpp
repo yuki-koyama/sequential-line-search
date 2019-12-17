@@ -19,8 +19,8 @@ namespace sequential_line_search
         Eigen::VectorXd end_0;
         Eigen::VectorXd end_1;
 
-        Eigen::VectorXd orig_0;
-        Eigen::VectorXd orig_1;
+        Eigen::VectorXd original_end_0;
+        Eigen::VectorXd original_end_1;
     };
 } // namespace sequential_line_search
 

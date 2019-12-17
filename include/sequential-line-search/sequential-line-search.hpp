@@ -50,8 +50,8 @@ namespace sequential_line_search
         void SubmitLineSearchResult(const double slider_position);
 
         std::pair<Eigen::VectorXd, Eigen::VectorXd> GetSliderEnds() const;
-        Eigen::VectorXd                             GetParameters(const double slider_position) const;
 
+        Eigen::VectorXd CalcPointFromSliderPosition(const double slider_position) const;
         Eigen::VectorXd GetMaximizer() const;
 
         double GetPreferenceValueMean(const Eigen::VectorXd& parameter) const;

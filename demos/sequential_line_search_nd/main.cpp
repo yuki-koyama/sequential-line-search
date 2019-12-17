@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
             double max_y               = -1e+10;
             for (double slider_position = 0.0; slider_position <= 1.0; slider_position += search_epsilon)
             {
-                const double y = evaluateObjectiveFunction(optimizer.GetParameters(slider_position));
+                const double y = evaluateObjectiveFunction(optimizer.CalcPointFromSliderPosition(slider_position));
                 if (y > max_y)
                 {
                     max_y               = y;
@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
                 }
             }
 
-            const Eigen::VectorXd max_x = optimizer.GetParameters(max_slider_position);
+            const Eigen::VectorXd max_x = optimizer.CalcPointFromSliderPosition(max_slider_position);
 
             std::cout << "x: " << max_x.transpose().format(Eigen::IOFormat(3)) << std::endl;
             std::cout << "y: " << max_y << std::endl;

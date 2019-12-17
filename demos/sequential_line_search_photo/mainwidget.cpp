@@ -106,7 +106,7 @@ void MainWidget::paintEvent(QPaintEvent* event)
     // Draw slider tick position
     if (draw_slider_tick)
     {
-        const VectorXd x = core.optimizer->GetParameters(core.mainWindow->obtainSliderPosition());
+        const VectorXd x = core.optimizer->CalcPointFromSliderPosition(core.mainWindow->obtainSliderPosition());
         painter.setPen(slider_back_pen);
         painter.drawEllipse(QPointF(x(0) * w, x(1) * h), knob_back_radius, knob_back_radius);
         painter.setPen(sliderPen);

@@ -126,17 +126,17 @@ sequential_line_search::Slider::Slider(const Eigen::VectorXd& end_0,
                                        const bool             enlarge,
                                        const double           scale,
                                        const double           minimum_length)
-    : orig_0(end_0), orig_1(end_1)
+    : original_end_0(end_0), original_end_1(end_1)
 {
     if (enlarge)
     {
-        const auto ends = EnlargeSliderEnds(orig_0, orig_1, scale, minimum_length);
-        this->end_0     = ends.first;
-        this->end_1     = ends.second;
+        const auto ends = EnlargeSliderEnds(original_end_0, original_end_1, scale, minimum_length);
+        this->end_0     = std::get<0>(ends);
+        this->end_1     = std::get<1>(ends);
     }
     else
     {
-        this->end_0 = orig_0;
-        this->end_1 = orig_1;
+        this->end_0 = original_end_0;
+        this->end_1 = original_end_1;
     }
 }
