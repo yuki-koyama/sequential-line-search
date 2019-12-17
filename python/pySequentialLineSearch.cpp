@@ -46,15 +46,13 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
 
     optimizer_class.def("get_maximizer", &SequentialLineSearchOptimizer::GetMaximizer);
 
-    optimizer_class.def(
-        "get_preference_value_mean", &SequentialLineSearchOptimizer::GetPreferenceValueMean, "parameter"_a);
-
-    optimizer_class.def("get_preference_value_standard_deviation",
-                        &SequentialLineSearchOptimizer::GetPreferenceValueStandardDeviation,
-                        "parameter"_a);
+    optimizer_class.def("get_preference_value_mean", &SequentialLineSearchOptimizer::GetPreferenceValueMean, "point"_a);
 
     optimizer_class.def(
-        "get_expected_improvement_value", &SequentialLineSearchOptimizer::GetExpectedImprovementValue, "parameter"_a);
+        "get_preference_value_stdev", &SequentialLineSearchOptimizer::GetPreferenceValueStdev, "point"_a);
+
+    optimizer_class.def(
+        "get_expected_improvement_value", &SequentialLineSearchOptimizer::GetExpectedImprovementValue, "point"_a);
 
     optimizer_class.def("get_raw_data_points", &SequentialLineSearchOptimizer::GetRawDataPoints);
 

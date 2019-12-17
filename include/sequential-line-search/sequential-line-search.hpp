@@ -61,9 +61,9 @@ namespace sequential_line_search
         /// \brief Get the point that has the highest value among the observed points.
         Eigen::VectorXd GetMaximizer() const;
 
-        double GetPreferenceValueMean(const Eigen::VectorXd& parameter) const;
-        double GetPreferenceValueStandardDeviation(const Eigen::VectorXd& parameter) const;
-        double GetExpectedImprovementValue(const Eigen::VectorXd& parameter) const;
+        double GetPreferenceValueMean(const Eigen::VectorXd& point) const;
+        double GetPreferenceValueStdev(const Eigen::VectorXd& point) const;
+        double GetExpectedImprovementValue(const Eigen::VectorXd& point) const;
 
         const Eigen::MatrixXd& GetRawDataPoints() const;
 

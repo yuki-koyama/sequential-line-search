@@ -101,22 +101,21 @@ Eigen::VectorXd sequential_line_search::SequentialLineSearchOptimizer::GetMaximi
     return m_slider->original_end_0;
 }
 
+double sequential_line_search::SequentialLineSearchOptimizer::GetPreferenceValueMean(const Eigen::VectorXd& point) const
+{
+    return (m_regressor == nullptr) ? 0.0 : m_regressor->PredictMu(point);
+}
+
 double
-sequential_line_search::SequentialLineSearchOptimizer::GetPreferenceValueMean(const Eigen::VectorXd& parameter) const
+sequential_line_search::SequentialLineSearchOptimizer::GetPreferenceValueStdev(const Eigen::VectorXd& point) const
 {
-    return (m_regressor == nullptr) ? 0.0 : m_regressor->PredictMu(parameter);
+    return (m_regressor == nullptr) ? 0.0 : m_regressor->PredictSigma(point);
 }
 
-double sequential_line_search::SequentialLineSearchOptimizer::GetPreferenceValueStandardDeviation(
-    const Eigen::VectorXd& parameter) const
+double
+sequential_line_search::SequentialLineSearchOptimizer::GetExpectedImprovementValue(const Eigen::VectorXd& point) const
 {
-    return (m_regressor == nullptr) ? 0.0 : m_regressor->PredictSigma(parameter);
-}
-
-double sequential_line_search::SequentialLineSearchOptimizer::GetExpectedImprovementValue(
-    const Eigen::VectorXd& parameter) const
-{
-    return (m_regressor == nullptr) ? 0.0 : acquisition_function::CalculateAcqusitionValue(*m_regressor, parameter);
+    return (m_regressor == nullptr) ? 0.0 : acquisition_function::CalculateAcqusitionValue(*m_regressor, point);
 }
 
 const Eigen::MatrixXd& sequential_line_search::SequentialLineSearchOptimizer::GetRawDataPoints() const
