@@ -1,5 +1,5 @@
-#ifndef GAUSSIAN_PROCESS_REGRESSOR_H
-#define GAUSSIAN_PROCESS_REGRESSOR_H
+#ifndef SEQUENTIAL_LINE_SEARCH_GAUSSIAN_PROCESS_REGRESSOR_HPP
+#define SEQUENTIAL_LINE_SEARCH_GAUSSIAN_PROCESS_REGRESSOR_HPP
 
 #include <Eigen/Core>
 #include <sequential-line-search/regressor.hpp>
@@ -56,4 +56,4 @@ namespace sequential_line_search
     };
 } // namespace sequential_line_search
 
-#endif // GAUSSIAN_PROCESS_REGRESSOR_H
+#endif // SEQUENTIAL_LINE_SEARCH_GAUSSIAN_PROCESS_REGRESSOR_HPP

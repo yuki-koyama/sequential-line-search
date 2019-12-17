@@ -1,5 +1,5 @@
-#ifndef acquisition_function_h
-#define acquisition_function_h
+#ifndef SEQUENTIAL_LINE_SEARCH_ACQUISITION_FUNCTION_HPP
+#define SEQUENTIAL_LINE_SEARCH_ACQUISITION_FUNCTION_HPP
 
 #include <Eigen/Core>
 #include <memory>
@@ -49,4 +49,4 @@ namespace sequential_line_search
     } // namespace acquisition_function
 } // namespace sequential_line_search
 
-#endif // acquisition_function_h
+#endif // SEQUENTIAL_LINE_SEARCH_ACQUISITION_FUNCTION_HPP

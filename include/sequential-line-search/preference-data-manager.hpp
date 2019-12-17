@@ -1,5 +1,5 @@
-#ifndef SEQUENTIAL_LINE_SEARCH_PREFERENCE_DATA_MANAGER_H
-#define SEQUENTIAL_LINE_SEARCH_PREFERENCE_DATA_MANAGER_H
+#ifndef SEQUENTIAL_LINE_SEARCH_PREFERENCE_DATA_MANAGER_HPP
+#define SEQUENTIAL_LINE_SEARCH_PREFERENCE_DATA_MANAGER_HPP
 
 #include <Eigen/Core>
 #include <sequential-line-search/preference.hpp>
@@ -25,4 +25,4 @@ namespace sequential_line_search
     };
 } // namespace sequential_line_search
 
-#endif // SEQUENTIAL_LINE_SEARCH_PREFERENCE_DATA_MANAGER_H
+#endif // SEQUENTIAL_LINE_SEARCH_PREFERENCE_DATA_MANAGER_HPP

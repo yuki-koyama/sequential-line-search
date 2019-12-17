@@ -1,5 +1,5 @@
-#ifndef SLIDER_H
-#define SLIDER_H
+#ifndef SEQUENTIAL_LINE_SEARCH_SLIDER_HPP
+#define SEQUENTIAL_LINE_SEARCH_SLIDER_HPP
 
 #include <Eigen/Core>
 
@@ -24,4 +24,4 @@ namespace sequential_line_search
     };
 } // namespace sequential_line_search
 
-#endif // SLIDER_H
+#endif // SEQUENTIAL_LINE_SEARCH_SLIDER_HPP

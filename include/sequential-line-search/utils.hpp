@@ -1,5 +1,5 @@
-#ifndef utils_h
-#define utils_h
+#ifndef SEQUENTIAL_LINE_SEARCH_UTILS_HPP
+#define SEQUENTIAL_LINE_SEARCH_UTILS_HPP
 
 #include <Eigen/Core>
 #include <Eigen/LU>
@@ -64,4 +64,4 @@ namespace sequential_line_search
     } // namespace utils
 } // namespace sequential_line_search
 
-#endif // utils_h
+#endif // SEQUENTIAL_LINE_SEARCH_UTILS_HPP

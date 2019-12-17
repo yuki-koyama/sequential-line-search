@@ -1,5 +1,5 @@
-#ifndef PREFERENCE_H
-#define PREFERENCE_H
+#ifndef SEQUENTIAL_LINE_SEARCH_PREFERENCE_HPP
+#define SEQUENTIAL_LINE_SEARCH_PREFERENCE_HPP
 
 #include <vector>
 
@@ -20,4 +20,4 @@ namespace sequential_line_search
     };
 } // namespace sequential_line_search
 
-#endif // PREFERENCE_H
+#endif // SEQUENTIAL_LINE_SEARCH_PREFERENCE_HPP

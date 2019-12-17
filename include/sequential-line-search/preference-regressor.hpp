@@ -1,5 +1,5 @@
-#ifndef PREFERENCE_REGRESSOR_H
-#define PREFERENCE_REGRESSOR_H
+#ifndef SEQUENTIAL_LINE_SEARCH_PREFERENCE_REGRESSOR_HPP
+#define SEQUENTIAL_LINE_SEARCH_PREFERENCE_REGRESSOR_HPP
 
 #include <Eigen/Cholesky>
 #include <Eigen/Core>
@@ -86,4 +86,4 @@ namespace sequential_line_search
     };
 } // namespace sequential_line_search
 
-#endif // PREFERENCE_REGRESSOR_H
+#endif // SEQUENTIAL_LINE_SEARCH_PREFERENCE_REGRESSOR_HPP

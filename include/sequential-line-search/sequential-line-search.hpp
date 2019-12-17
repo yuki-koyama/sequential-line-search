@@ -1,5 +1,5 @@
-#ifndef sequential_line_search_h
-#define sequential_line_search_h
+#ifndef SEQUENTIAL_LINE_SEARCH_SEQUENTIAL_LINE_SEARCH_HPP
+#define SEQUENTIAL_LINE_SEARCH_SEQUENTIAL_LINE_SEARCH_HPP
 
 #include <Eigen/Core>
 #include <memory>
@@ -78,4 +78,4 @@ namespace sequential_line_search
     };
 } // namespace sequential_line_search
 
-#endif // sequential_line_search_h
+#endif // SEQUENTIAL_LINE_SEARCH_SEQUENTIAL_LINE_SEARCH_HPP
