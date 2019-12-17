@@ -67,8 +67,8 @@ namespace
         return sum;
     }
 
-    /// \brief Given a pair of slider ends, this function enlarges the slider by a specified scale
-    ///        but considering the bounding box constraint.
+    /// \brief Given a pair of slider ends, this function enlarges the slider by a specified scale but considering the
+    /// bounding box constraint.
     pair<VectorXd, VectorXd>
     EnlargeSliderEnds(const VectorXd& x_1, const VectorXd& x_2, const double scale, const double minimum_length)
     {

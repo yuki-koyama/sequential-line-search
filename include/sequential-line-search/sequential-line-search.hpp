@@ -49,9 +49,16 @@ namespace sequential_line_search
         /// second end-point.
         void SubmitLineSearchResult(const double slider_position);
 
+        /// \brief Get the slider end-points.
+        ///
+        /// \details When the slider enlargement is not enabled, the first end-point is the maximizer among the observed
+        /// points, and the second one is the maximizer of the acquisition function.
         std::pair<Eigen::VectorXd, Eigen::VectorXd> GetSliderEnds() const;
 
+        /// \brief Calculate data point from a slider position.
         Eigen::VectorXd CalcPointFromSliderPosition(const double slider_position) const;
+
+        /// \brief Get the point that has the highest value among the observed points.
         Eigen::VectorXd GetMaximizer() const;
 
         double GetPreferenceValueMean(const Eigen::VectorXd& parameter) const;
