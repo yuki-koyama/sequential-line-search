@@ -24,7 +24,7 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
 
     optimizer_class.def(py::init<const int, const bool, const bool>(),
                         "num_dims"_a,
-                        "use_slider_enlargement"_a = true,
+                        "use_slider_enlargement"_a = false,
                         "use_map_hyperparams"_a    = true);
 
     optimizer_class.def("set_hyperparams",
