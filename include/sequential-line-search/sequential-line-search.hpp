@@ -14,6 +14,9 @@ namespace sequential_line_search
     std::pair<Eigen::VectorXd, Eigen::VectorXd> GenerateRandomSliderEnds(const int num_dims);
     std::pair<Eigen::VectorXd, Eigen::VectorXd> GenerateCenteredFixedLengthRandomSliderEnds(const int num_dims);
 
+    /// \brief Optimizer class for performing sequential line search
+    ///
+    /// \details This class assumes that the search space is [0, 1]^{D}
     class SequentialLineSearchOptimizer
     {
     public:
