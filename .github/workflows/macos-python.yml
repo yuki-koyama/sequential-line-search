@@ -28,4 +28,5 @@ jobs:
         brew tap homebrew/cask-fonts && brew cask install font-linux-biolinum
     - name: test
       run: |
-        python ./python-examples/test.py
+        python ./python-examples/simple.py
+        python ./python-examples/custom-initial-slider.py

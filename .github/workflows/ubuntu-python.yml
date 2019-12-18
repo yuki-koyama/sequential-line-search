@@ -29,4 +29,5 @@ jobs:
         sudo apt-get install fonts-linuxlibertine
     - name: test
       run: |
-        python ./python-examples/test.py
+        python ./python-examples/simple.py
+        python ./python-examples/custom-initial-slider.py

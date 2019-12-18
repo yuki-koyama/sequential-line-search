@@ -27,9 +27,23 @@ def ask_human_for_slider_manipulation(
     return t_max
 
 
-# A typical implementation of sequential line search procedure
+# A custom generator of a slider for the first iteration
+def generate_initial_slider(num_dims: int) -> Tuple[np.ndarray, np.ndarray]:
+    end_0 = np.random.uniform(low=0.0, high=1.0, size=(num_dims, ))
+    end_1 = np.random.uniform(low=0.0, high=1.0, size=(num_dims, ))
+    return end_0, end_1
+
+
+# An implementation of sequential line search procedure
 def main():
-    optimizer = pySequentialLineSearch.SequentialLineSearchOptimizer(5)
+    optimizer = pySequentialLineSearch.SequentialLineSearchOptimizer(
+        num_dims=5,
+        use_map_hyperparams=True,
+        initial_slider_generator=generate_initial_slider)
+
+    optimizer.set_hyperparams(kernel_signal_var=0.50,
+                              kernel_length_scale=0.10,
+                              kernel_hyperparams_prior_var=0.10)
 
     for i in range(30):
         slider_ends = optimizer.get_slider_ends()
