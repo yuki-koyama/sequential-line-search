@@ -18,14 +18,14 @@ namespace sequential_line_search
         /// \brief Calculate the value of the acquisition function value.
         ///
         /// \param function_type Type of the acquisition function.
-        double CalculateAcqusitionValue(const Regressor&       regressor,
-                                        const Eigen::VectorXd& x,
-                                        const FunctionType     function_type = FunctionType::ExpectedImprovement);
+        double CalcAcqusitionValue(const Regressor&       regressor,
+                                   const Eigen::VectorXd& x,
+                                   const FunctionType     function_type = FunctionType::ExpectedImprovement);
 
         Eigen::VectorXd
-        CalculateAcquisitionValueDerivative(const Regressor&       regressor,
-                                            const Eigen::VectorXd& x,
-                                            const FunctionType     function_type = FunctionType::ExpectedImprovement);
+        CalcAcquisitionValueDerivative(const Regressor&       regressor,
+                                       const Eigen::VectorXd& x,
+                                       const FunctionType     function_type = FunctionType::ExpectedImprovement);
 
         /// \param num_global_search_iters The number of trials of acquisition value maximization. Specifying a large
         /// number is helpful for finding the global maximizer while it increases the computational cost proportional to

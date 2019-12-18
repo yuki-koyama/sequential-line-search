@@ -115,7 +115,7 @@ sequential_line_search::SequentialLineSearchOptimizer::GetPreferenceValueStdev(c
 double
 sequential_line_search::SequentialLineSearchOptimizer::GetExpectedImprovementValue(const Eigen::VectorXd& point) const
 {
-    return (m_regressor == nullptr) ? 0.0 : acquisition_function::CalculateAcqusitionValue(*m_regressor, point);
+    return (m_regressor == nullptr) ? 0.0 : acquisition_function::CalcAcqusitionValue(*m_regressor, point);
 }
 
 const Eigen::MatrixXd& sequential_line_search::SequentialLineSearchOptimizer::GetRawDataPoints() const

@@ -34,12 +34,12 @@ namespace
 
         if (!grad.empty())
         {
-            const VectorXd derivative = acquisition_function::CalculateAcquisitionValueDerivative(
+            const VectorXd derivative = acquisition_function::CalcAcquisitionValueDerivative(
                 *regressor, Eigen::Map<const VectorXd>(&x[0], x.size()));
             std::memcpy(grad.data(), derivative.data(), sizeof(double) * derivative.size());
         }
 
-        return acquisition_function::CalculateAcqusitionValue(*regressor, Eigen::Map<const VectorXd>(&x[0], x.size()));
+        return acquisition_function::CalcAcqusitionValue(*regressor, Eigen::Map<const VectorXd>(&x[0], x.size()));
     }
 
     // Schonlau et al, Global Versus Local Search in Constrained Optimization of Computer Models, 1997.
@@ -126,9 +126,9 @@ namespace
     }
 } // namespace
 
-double sequential_line_search::acquisition_function::CalculateAcqusitionValue(const Regressor&   regressor,
-                                                                              const VectorXd&    x,
-                                                                              const FunctionType function_type)
+double sequential_line_search::acquisition_function::CalcAcqusitionValue(const Regressor&   regressor,
+                                                                         const VectorXd&    x,
+                                                                         const FunctionType function_type)
 {
     assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
 
@@ -145,10 +145,9 @@ double sequential_line_search::acquisition_function::CalculateAcqusitionValue(co
     return mathtoolbox::GetExpectedImprovement(x, mu, sigma, x_best);
 }
 
-VectorXd
-sequential_line_search::acquisition_function::CalculateAcquisitionValueDerivative(const Regressor&   regressor,
-                                                                                  const VectorXd&    x,
-                                                                                  const FunctionType function_type)
+VectorXd sequential_line_search::acquisition_function::CalcAcquisitionValueDerivative(const Regressor&   regressor,
+                                                                                      const VectorXd&    x,
+                                                                                      const FunctionType function_type)
 {
     assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
 
