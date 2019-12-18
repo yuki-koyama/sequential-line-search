@@ -50,7 +50,15 @@ namespace sequential_line_search
         /// \param slider_position The position of the chosen point in the slider space. It should be represented in [0,
         /// 1], where 0 means that the chosen position is the first end-point of the slider and 1 means that it is the
         /// second end-point.
+        ///
+        /// \details The computational effort for finding the global maximizer of the acquisition function will be
+        /// automatically set by a naive heuristics.
         void SubmitLineSearchResult(const double slider_position);
+
+        /// \brief Submit the result of user-performed line search and go to the next iteration step.
+        void SubmitLineSearchResult(const double slider_position,
+                                    const int    num_global_search_iters,
+                                    const int    num_local_search_iters);
 
         /// \brief Get the slider end-points.
         ///

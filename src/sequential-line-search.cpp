@@ -56,6 +56,19 @@ void sequential_line_search::SequentialLineSearchOptimizer::SetHyperparams(const
 
 void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResult(const double slider_position)
 {
+    // A heuristics to set the computational effort for solving the maximization of the acquisition function. This is
+    // not justified or validated.
+    const int num_dims                = GetMaximizer().size();
+    const int num_global_search_iters = 50 * num_dims;
+    const int num_local_search_iters  = 10 * num_dims;
+
+    SubmitLineSearchResult(slider_position, num_global_search_iters, num_local_search_iters);
+}
+
+void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResult(const double slider_position,
+                                                                                   const int    num_global_search_iters,
+                                                                                   const int    num_local_search_iters)
+{
     const auto  x_chosen   = CalcPointFromSliderPosition(slider_position);
     const auto& x_prev_max = m_slider->original_end_0;
     const auto& x_prev_ei  = m_slider->original_end_1;
@@ -72,12 +85,6 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResu
                                                         m_noise_level,
                                                         m_kernel_hyperparams_prior_var,
                                                         m_btl_scale);
-
-    // A heuristics to set the computational effort for solving the maximization of the acquisition function. This is
-    // not justified or validated.
-    const int num_dims                = x_chosen.size();
-    const int num_global_search_iters = 50 * num_dims;
-    const int num_local_search_iters  = 10 * num_dims;
 
     // Find the next search subspace
     const auto x_max = m_regressor->FindArgMax();
