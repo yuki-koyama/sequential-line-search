@@ -27,11 +27,13 @@ namespace sequential_line_search
                                             const Eigen::VectorXd& x,
                                             const FunctionType     function_type = FunctionType::ExpectedImprovement);
 
-        /// \param num_trials The number of trials of acquisition value maximization. Specifying a large number is
-        /// helpful for finding the global maximizer while it increases the computational cost proportional to it.
+        /// \param num_global_search_iters The number of trials of acquisition value maximization. Specifying a large
+        /// number is helpful for finding the global maximizer while it increases the computational cost proportional to
+        /// it.
         Eigen::VectorXd FindNextPoint(const Regressor&   regressor,
-                                      const unsigned     num_trials    = 20,
-                                      const FunctionType function_type = FunctionType::ExpectedImprovement);
+                                      const unsigned     num_global_search_iters = 100,
+                                      const unsigned     num_local_search_iters  = 50,
+                                      const FunctionType function_type           = FunctionType::ExpectedImprovement);
 
         /// \brief Find the next n sampled points that should be observed.
         ///
@@ -39,13 +41,15 @@ namespace sequential_line_search
         ///
         /// \param num_points The number of the sampled points.
         ///
-        /// \param num_trials The number of trials of acquisition value maximization. Specifying a large number is
-        /// helpful for finding the global maximizer while it increases the computational cost proportional to it.
+        /// \param num_global_search_iters The number of trials of acquisition value maximization. Specifying a large
+        /// number is helpful for finding the global maximizer while it increases the computational cost proportional to
+        /// it.
         std::vector<Eigen::VectorXd>
         FindNextPoints(const Regressor&   regressor,
                        const unsigned     num_points,
-                       const unsigned     num_trials    = 20,
-                       const FunctionType function_type = FunctionType::ExpectedImprovement);
+                       const unsigned     num_global_search_iters = 100,
+                       const unsigned     num_local_search_iters  = 50,
+                       const FunctionType function_type           = FunctionType::ExpectedImprovement);
     } // namespace acquisition_function
 } // namespace sequential_line_search
 
