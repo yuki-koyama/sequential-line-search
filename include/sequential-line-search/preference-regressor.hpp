@@ -19,12 +19,12 @@ namespace sequential_line_search
     public:
         PreferenceRegressor(const Eigen::MatrixXd&         X,
                             const std::vector<Preference>& D,
-                            const bool                     use_map_hyperparams               = false,
-                            const double                   default_a                         = 0.500,
-                            const double                   default_r                         = 0.500,
-                            const double                   default_b                         = 0.005,
-                            const double                   kernel_hyperparams_prior_variance = 0.250,
-                            const double                   btl_scale                         = 0.010);
+                            const bool                     use_map_hyperparams          = false,
+                            const double                   default_a                    = 0.500,
+                            const double                   default_r                    = 0.500,
+                            const double                   default_b                    = 0.005,
+                            const double                   kernel_hyperparams_prior_var = 0.250,
+                            const double                   btl_scale                    = 0.010);
 
         double PredictMu(const Eigen::VectorXd& x) const override;
         double PredictSigma(const Eigen::VectorXd& x) const override;
@@ -73,7 +73,7 @@ namespace sequential_line_search
         const double m_default_b;
 
         /// \brief Variance of the prior distribution. Used only when MAP is enabled.
-        const double m_kernel_hyperparams_prior_variance;
+        const double m_kernel_hyperparams_prior_var;
 
         /// \brief Scale parameter in the BTL model
         const double m_btl_scale;

@@ -167,7 +167,7 @@ namespace
             const double b_prior = regressor->m_default_b;
 #endif
             const double r_prior  = regressor->m_default_r;
-            const double variance = regressor->m_kernel_hyperparams_prior_variance;
+            const double variance = regressor->m_kernel_hyperparams_prior_var;
 
             obj += mathtoolbox::GetLogOfLogNormalDist(a, std::log(a_prior), variance);
 #ifndef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
@@ -210,16 +210,15 @@ namespace
 
             if (regressor->m_use_map_hyperparams)
             {
-                const VectorXd grad_theta =
-                    CalcObjectiveThetaDerivative(y,
-                                                 K_llt,
-                                                 K_inv_y,
-                                                 X,
-                                                 Concat(a, r),
-                                                 regressor->m_default_a,
-                                                 regressor->m_kernel_hyperparams_prior_variance,
-                                                 regressor->m_default_r,
-                                                 regressor->m_kernel_hyperparams_prior_variance);
+                const VectorXd grad_theta = CalcObjectiveThetaDerivative(y,
+                                                                         K_llt,
+                                                                         K_inv_y,
+                                                                         X,
+                                                                         Concat(a, r),
+                                                                         regressor->m_default_a,
+                                                                         regressor->m_kernel_hyperparams_prior_var,
+                                                                         regressor->m_default_r,
+                                                                         regressor->m_kernel_hyperparams_prior_var);
 
                 grad[M + 0] = grad_theta(0);
 #ifdef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
@@ -246,7 +245,7 @@ sequential_line_search::PreferenceRegressor::PreferenceRegressor(const MatrixXd&
                                                                  const double                   default_a,
                                                                  const double                   default_r,
                                                                  const double                   default_b,
-                                                                 const double kernel_hyperparams_prior_variance,
+                                                                 const double kernel_hyperparams_prior_var,
                                                                  const double btl_scale)
     : m_use_map_hyperparams(use_map_hyperparams),
       m_X(X),
@@ -254,7 +253,7 @@ sequential_line_search::PreferenceRegressor::PreferenceRegressor(const MatrixXd&
       m_default_a(default_a),
       m_default_r(default_r),
       m_default_b(default_b),
-      m_kernel_hyperparams_prior_variance(kernel_hyperparams_prior_variance),
+      m_kernel_hyperparams_prior_var(kernel_hyperparams_prior_var),
       m_btl_scale(btl_scale)
 {
     if (X.cols() == 0 || D.size() == 0)
