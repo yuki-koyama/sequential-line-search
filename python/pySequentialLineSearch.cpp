@@ -27,6 +27,15 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
                         "use_slider_enlargement"_a = false,
                         "use_map_hyperparams"_a    = true);
 
+    optimizer_class.def(py::init<const int,
+                                 const bool,
+                                 const bool,
+                                 const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>&>(),
+                        "num_dims"_a,
+                        "use_slider_enlargement"_a = false,
+                        "use_map_hyperparams"_a    = true,
+                        "initial_slider_generator"_a);
+
     optimizer_class.def("set_hyperparams",
                         &SequentialLineSearchOptimizer::SetHyperparams,
                         "kernel_signal_var"_a            = 0.500,
