@@ -58,16 +58,18 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResu
 {
     // A heuristics to set the computational effort for solving the maximization of the acquisition function. This is
     // not justified or validated.
-    const int num_dims                = GetMaximizer().size();
-    const int num_global_search_iters = 50 * num_dims;
-    const int num_local_search_iters  = 10 * num_dims;
+    const int num_dims                 = GetMaximizer().size();
+    const int num_map_estimation_iters = 100;
+    const int num_global_search_iters  = 50 * num_dims;
+    const int num_local_search_iters   = 10 * num_dims;
 
-    SubmitLineSearchResult(slider_position, num_global_search_iters, num_local_search_iters);
+    SubmitLineSearchResult(slider_position, num_map_estimation_iters, num_global_search_iters, num_local_search_iters);
 }
 
 void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResult(const double slider_position,
-                                                                                   const int    num_global_search_iters,
-                                                                                   const int    num_local_search_iters)
+                                                                                   const int num_map_estimation_iters,
+                                                                                   const int num_global_search_iters,
+                                                                                   const int num_local_search_iters)
 {
     const auto  x_chosen   = CalcPointFromSliderPosition(slider_position);
     const auto& x_prev_max = m_slider->original_end_0;
@@ -84,7 +86,8 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResu
                                                         m_kernel_length_scale,
                                                         m_noise_level,
                                                         m_kernel_hyperparams_prior_var,
-                                                        m_btl_scale);
+                                                        m_btl_scale,
+                                                        num_map_estimation_iters);
 
     // Find the next search subspace
     const auto x_max = m_regressor->FindArgMax();

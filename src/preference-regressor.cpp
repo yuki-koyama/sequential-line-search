@@ -245,8 +245,9 @@ sequential_line_search::PreferenceRegressor::PreferenceRegressor(const MatrixXd&
                                                                  const double                   default_a,
                                                                  const double                   default_r,
                                                                  const double                   default_b,
-                                                                 const double kernel_hyperparams_prior_var,
-                                                                 const double btl_scale)
+                                                                 const double   kernel_hyperparams_prior_var,
+                                                                 const double   btl_scale,
+                                                                 const unsigned num_map_estimation_iters)
     : m_use_map_hyperparams(use_map_hyperparams),
       m_X(X),
       m_D(D),
@@ -261,7 +262,7 @@ sequential_line_search::PreferenceRegressor::PreferenceRegressor(const MatrixXd&
         return;
     }
 
-    PerformMapEstimation();
+    PerformMapEstimation(num_map_estimation_iters);
 
     m_K     = CalcLargeKY(X, m_kernel_hyperparams, m_noise_hyperparam);
     m_K_llt = LLT<MatrixXd>(m_K);
@@ -300,7 +301,7 @@ VectorXd sequential_line_search::PreferenceRegressor::PredictSigmaDerivative(con
     return -(1.0 / sigma) * k_x_derivative * m_K_llt.solve(k);
 }
 
-void sequential_line_search::PreferenceRegressor::PerformMapEstimation()
+void sequential_line_search::PreferenceRegressor::PerformMapEstimation(const unsigned num_iters)
 {
     const unsigned M = m_X.cols();
     const unsigned d = m_X.rows();
@@ -339,7 +340,7 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation()
     timer::Timer t("PreferenceRegressor::PerformMapEstimation");
 #endif
 
-    const VectorXd x_opt = nloptutil::solve(x_ini, upper, lower, objective, nlopt::LD_TNEWTON, this, true, 100);
+    const VectorXd x_opt = nloptutil::solve(x_ini, upper, lower, objective, nlopt::LD_TNEWTON, this, true, num_iters);
 
     if (m_use_map_hyperparams)
     {

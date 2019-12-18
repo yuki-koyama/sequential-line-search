@@ -24,7 +24,8 @@ namespace sequential_line_search
                             const double                   default_r                    = 0.500,
                             const double                   default_b                    = 0.005,
                             const double                   kernel_hyperparams_prior_var = 0.250,
-                            const double                   btl_scale                    = 0.010);
+                            const double                   btl_scale                    = 0.010,
+                            const unsigned                 num_map_estimation_iters     = 100);
 
         double PredictMu(const Eigen::VectorXd& x) const override;
         double PredictSigma(const Eigen::VectorXd& x) const override;
@@ -82,7 +83,7 @@ namespace sequential_line_search
         /// \brief Goodness values derived by the MAP estimation.
         Eigen::VectorXd m_y;
 
-        void PerformMapEstimation();
+        void PerformMapEstimation(const unsigned num_iters);
     };
 } // namespace sequential_line_search
 
