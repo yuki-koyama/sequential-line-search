@@ -76,11 +76,13 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResu
     // A heuristics to set the computational effort for solving the maximization of the acquisition function. This is
     // not justified or validated.
     const int num_dims                = x_chosen.size();
-    const int num_global_search_iters = 5 * num_dims;
+    const int num_global_search_iters = 50 * num_dims;
+    const int num_local_search_iters  = 10 * num_dims;
 
     // Find the next search subspace
     const auto x_max = m_regressor->FindArgMax();
-    const auto x_ei  = acquisition_function::FindNextPoint(*m_regressor, num_global_search_iters);
+    const auto x_ei =
+        acquisition_function::FindNextPoint(*m_regressor, num_global_search_iters, num_local_search_iters);
 
     m_slider = std::make_shared<Slider>(x_max, x_ei, m_use_slider_enlargement);
 }
