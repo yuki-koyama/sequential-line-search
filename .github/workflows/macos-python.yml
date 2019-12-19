@@ -30,3 +30,4 @@ jobs:
       run: |
         python ./python-examples/simple.py
         python ./python-examples/custom-initial-slider.py
+        python ./python-examples/map-vs-fixed-hyperparams.py
