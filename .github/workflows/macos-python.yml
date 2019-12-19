@@ -26,7 +26,7 @@ jobs:
       run: |
         pip install matplotlib seaborn scipy
         brew tap homebrew/cask-fonts && brew cask install font-linux-biolinum
-        brew cask install mactex-no-gui
+        brew cask install mactex-no-gui && sudo tlmgr update --self --all
     - name: test
       run: |
         python ./python-examples/simple.py

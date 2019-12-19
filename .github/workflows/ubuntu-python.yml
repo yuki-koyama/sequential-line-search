@@ -27,7 +27,7 @@ jobs:
       run: |
         pip install matplotlib seaborn scipy
         sudo apt-get install -y fonts-linuxlibertine
-        sudo apt-get --no-install-recommends install -y texlive-latex-extra texlive-fonts-recommended
+        sudo apt-get --no-install-recommends install -y texlive-latex-extra texlive-fonts-extra
     - name: test
       run: |
         python ./python-examples/simple.py
