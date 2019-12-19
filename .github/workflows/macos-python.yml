@@ -34,4 +34,6 @@ jobs:
         python ./python-examples/simple.py
         python ./python-examples/custom-initial-slider.py
         echo $PATH
+        export PATH=$PATH:/Library/TeX/texbin
+        echo $PATH
         python ./python-examples/map-vs-fixed-hyperparams.py
