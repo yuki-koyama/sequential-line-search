@@ -26,14 +26,10 @@ jobs:
       run: |
         pip install matplotlib seaborn scipy
         brew tap homebrew/cask-fonts && brew cask install font-linux-biolinum
-        brew cask install mactex-no-gui && export PATH=$PATH:/Library/TeX/texbin
-        which latex
-        echo $PATH
+        brew cask install mactex-no-gui
     - name: test
       run: |
+        export PATH=$PATH:/Library/TeX/texbin
         python ./python-examples/simple.py
         python ./python-examples/custom-initial-slider.py
-        echo $PATH
-        export PATH=$PATH:/Library/TeX/texbin
-        echo $PATH
         python ./python-examples/map-vs-fixed-hyperparams.py
