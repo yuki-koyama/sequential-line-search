@@ -26,10 +26,10 @@ jobs:
       run: |
         pip install matplotlib seaborn scipy
         brew tap homebrew/cask-fonts && brew cask install font-linux-biolinum
-        brew cask install mactex-no-gui && export PATH=$PATH:/usr/local/texlive/2018/bin/x86_64-darwin
-        which latex
+        brew cask install mactex-no-gui
     - name: test
       run: |
+        export PATH=$PATH:/Library/TeX/texbin
         python ./python-examples/simple.py
         python ./python-examples/custom-initial-slider.py
         python ./python-examples/map-vs-fixed-hyperparams.py

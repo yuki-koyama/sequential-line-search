@@ -123,6 +123,7 @@ for index_num_dims, num_dims in enumerate(num_dims_set):
 # Set up the plot design
 sns.set()
 sns.set_context()
+
 plt.rcParams['text.usetex'] = True
 plt.rcParams['text.latex.preamble'] = [
     r"\usepackage{libertine}",
