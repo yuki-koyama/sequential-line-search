@@ -28,6 +28,7 @@ jobs:
         brew tap homebrew/cask-fonts && brew cask install font-linux-biolinum
         brew cask install mactex-no-gui && export PATH=$PATH:/Library/TeX/texbin
         which latex
+        echo $PATH
     - name: test
       run: |
         python ./python-examples/simple.py
