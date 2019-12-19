@@ -26,6 +26,7 @@ jobs:
       run: |
         pip install matplotlib seaborn scipy
         brew tap homebrew/cask-fonts && brew cask install font-linux-biolinum
+        brew cask install basictex
     - name: test
       run: |
         python ./python-examples/simple.py
