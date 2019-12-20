@@ -313,10 +313,12 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation(const uns
     VectorXd lower = VectorXd::Constant(opt_dim, -1e+01);
     VectorXd x_ini = VectorXd::Constant(opt_dim, 0.0);
 
-    // Set bounding conditions for hyperparameters if necessary
     if (m_use_map_hyperparams)
     {
-        lower.segment(M, 2 + d) = VectorXd::Constant(2 + d, 1e-05);
+        // Set bounding conditions for hyperparameters
+        lower.segment(M, 2 + d) = VectorXd::Constant(2 + d, 1e-08);
+
+        // Set initial solutions for hyperparameters
         x_ini(M + 0)            = m_default_a;
 #ifdef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
         x_ini(M + 1) = 0.5 * (upper(M + 1) + lower(M + 1));
@@ -324,6 +326,9 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation(const uns
         x_ini(M + 1)       = m_default_b;
 #endif
         x_ini.segment(M + 2, d) = VectorXd::Constant(d, m_default_r);
+
+        // Ensure that the initial solution is in the bounding box
+        x_ini = x_ini.cwiseMax(lower).cwiseMin(upper);
     }
 
     // Calculate kernel matrices if hyperparameters are not estimated by the MAP estimation
