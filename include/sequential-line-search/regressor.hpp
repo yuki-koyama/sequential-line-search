@@ -6,9 +6,16 @@
 
 namespace sequential_line_search
 {
+    enum class KernelType
+    {
+        ArdSquaredExponentialKernel,
+        ArdMatern52Kernel,
+    };
+
     class Regressor
     {
     public:
+        Regressor(const KernelType kernel_type);
         virtual ~Regressor() {}
 
         unsigned GetNumDims() const { return GetLargeX().rows(); }

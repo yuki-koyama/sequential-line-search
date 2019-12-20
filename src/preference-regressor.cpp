@@ -249,7 +249,8 @@ sequential_line_search::PreferenceRegressor::PreferenceRegressor(const MatrixXd&
                                                                  const double   kernel_hyperparams_prior_var,
                                                                  const double   btl_scale,
                                                                  const unsigned num_map_estimation_iters)
-    : m_use_map_hyperparams(use_map_hyperparams),
+    : Regressor(KernelType::ArdMatern52Kernel),
+      m_use_map_hyperparams(use_map_hyperparams),
       m_X(X),
       m_D(D),
       m_default_a(default_a),

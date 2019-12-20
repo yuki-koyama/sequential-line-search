@@ -18,6 +18,10 @@ namespace sequential_line_search
 #endif
 } // namespace sequential_line_search
 
+sequential_line_search::Regressor::Regressor(const KernelType kernel_type)
+{
+}
+
 VectorXd sequential_line_search::Regressor::PredictMaximumPointFromData() const
 {
     const int num_data_points = GetLargeX().cols();

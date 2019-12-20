@@ -185,7 +185,8 @@ namespace
 
 namespace sequential_line_search
 {
-    GaussianProcessRegressor::GaussianProcessRegressor(const MatrixXd& X, const VectorXd& y) : m_X(X), m_y(y)
+    GaussianProcessRegressor::GaussianProcessRegressor(const MatrixXd& X, const VectorXd& y)
+        : Regressor(KernelType::ArdMatern52Kernel), m_X(X), m_y(y)
     {
         if (X.rows() == 0)
         {
@@ -202,7 +203,11 @@ namespace sequential_line_search
                                                        const Eigen::VectorXd& y,
                                                        const Eigen::VectorXd& kernel_hyperparams,
                                                        double                 noise_hyperparam)
-        : m_X(X), m_y(y), m_kernel_hyperparams(kernel_hyperparams), m_noise_hyperparam(noise_hyperparam)
+        : Regressor(KernelType::ArdMatern52Kernel),
+          m_X(X),
+          m_y(y),
+          m_kernel_hyperparams(kernel_hyperparams),
+          m_noise_hyperparam(noise_hyperparam)
     {
         if (X.rows() == 0)
         {
