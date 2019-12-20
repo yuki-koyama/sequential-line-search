@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <mathtoolbox/constants.hpp>
+#include <mathtoolbox/log-determinant.hpp>
 #include <mathtoolbox/probability-distributions.hpp>
 #include <nlopt-util.hpp>
 #include <sequential-line-search/preference-regressor.hpp>
@@ -151,7 +152,7 @@ namespace
 
         // Log likelihood of y distribution
         const VectorXd K_inv_y   = K_llt.solve(y);
-        const double   log_det_K = 2.0 * K_llt.matrixL().toDenseMatrix().diagonal().array().log().sum();
+        const double   log_det_K = mathtoolbox::CalcLogDetOfSymmetricPositiveDefiniteMatrix(K_llt);
         const double   term1     = -0.5 * y.transpose() * K_inv_y;
         const double   term2     = -0.5 * log_det_K;
         const double   term3     = -0.5 * M * std::log(prod_of_two_and_pi);
@@ -319,7 +320,7 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation(const uns
         lower.segment(M, 2 + d) = VectorXd::Constant(2 + d, 1e-08);
 
         // Set initial solutions for hyperparameters
-        x_ini(M + 0)            = m_default_a;
+        x_ini(M + 0) = m_default_a;
 #ifdef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
         x_ini(M + 1) = 0.5 * (upper(M + 1) + lower(M + 1));
 #else
