@@ -12,6 +12,14 @@ namespace sequential_line_search
         ArdMatern52Kernel,
     };
 
+    using Kernel                   = double (*)(const Eigen::VectorXd&, const Eigen::VectorXd&, const Eigen::VectorXd&);
+    using KernelThetaDerivative    = Eigen::VectorXd (*)(const Eigen::VectorXd&,
+                                                      const Eigen::VectorXd&,
+                                                      const Eigen::VectorXd&);
+    using KernelFirstArgDerivative = Eigen::VectorXd (*)(const Eigen::VectorXd&,
+                                                         const Eigen::VectorXd&,
+                                                         const Eigen::VectorXd&);
+
     class Regressor
     {
     public:
@@ -34,14 +42,10 @@ namespace sequential_line_search
 
         Eigen::VectorXd PredictMaximumPointFromData() const;
 
-    private:
-        double (*m_kernel)(const Eigen::VectorXd&, const Eigen::VectorXd&, const Eigen::VectorXd&);
-        Eigen::VectorXd (*m_kernel_theta_derivative)(const Eigen::VectorXd&,
-                                                     const Eigen::VectorXd&,
-                                                     const Eigen::VectorXd&);
-        Eigen::VectorXd (*m_kernel_first_arg_derivative)(const Eigen::VectorXd&,
-                                                         const Eigen::VectorXd&,
-                                                         const Eigen::VectorXd&);
+    protected:
+        Kernel                   m_kernel;
+        KernelThetaDerivative    m_kernel_theta_derivative;
+        KernelFirstArgDerivative m_kernel_first_arg_derivative;
     };
 
     // k
