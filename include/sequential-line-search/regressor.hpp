@@ -49,24 +49,31 @@ namespace sequential_line_search
     };
 
     // k
-    Eigen::VectorXd
-    CalcSmallK(const Eigen::VectorXd& x, const Eigen::MatrixXd& X, const Eigen::VectorXd& kernel_hyperparameters);
+    Eigen::VectorXd CalcSmallK(const Eigen::VectorXd& x,
+                               const Eigen::MatrixXd& X,
+                               const Eigen::VectorXd& kernel_hyperparameters,
+                               const Kernel           kernel);
 
     // K_y = K_f + sigma^{2} I
-    Eigen::MatrixXd
-    CalcLargeKY(const Eigen::MatrixXd& X, const Eigen::VectorXd& kernel_hyperparameters, const double noise_level);
+    Eigen::MatrixXd CalcLargeKY(const Eigen::MatrixXd& X,
+                                const Eigen::VectorXd& kernel_hyperparameters,
+                                const double           noise_level,
+                                const Kernel           kernel);
 
     // K_f
-    Eigen::MatrixXd CalcLargeKF(const Eigen::MatrixXd& X, const Eigen::VectorXd& kernel_hyperparameters);
+    Eigen::MatrixXd
+    CalcLargeKF(const Eigen::MatrixXd& X, const Eigen::VectorXd& kernel_hyperparameters, const Kernel kernel);
 
     // partial k / partial x
-    Eigen::MatrixXd CalcSmallKSmallXDerivative(const Eigen::VectorXd& x,
-                                               const Eigen::MatrixXd& X,
-                                               const Eigen::VectorXd& kernel_hyperparameters);
+    Eigen::MatrixXd CalcSmallKSmallXDerivative(const Eigen::VectorXd&         x,
+                                               const Eigen::MatrixXd&         X,
+                                               const Eigen::VectorXd&         kernel_hyperparameters,
+                                               const KernelFirstArgDerivative kernel_first_arg_derivative);
 
     // partial K_y / partial theta
-    std::vector<Eigen::MatrixXd> CalcLargeKYThetaDerivative(const Eigen::MatrixXd& X,
-                                                            const Eigen::VectorXd& kernel_hyperparameters);
+    std::vector<Eigen::MatrixXd> CalcLargeKYThetaDerivative(const Eigen::MatrixXd&      X,
+                                                            const Eigen::VectorXd&      kernel_hyperparameters,
+                                                            const KernelThetaDerivative kernel_theta_derivative);
 
     // partial K_y / partial sigma^{2}
     Eigen::MatrixXd CalcLargeKYNoiseLevelDerivative(const Eigen::MatrixXd& X,
