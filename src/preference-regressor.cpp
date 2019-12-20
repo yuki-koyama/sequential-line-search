@@ -128,7 +128,7 @@ namespace
 #ifdef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
         const double b = b_fixed;
 #else
-        const double b = (regressor->m_use_map_hyperparameters) ? x[M + 1] : regressor->m_default_b;
+        const double b = (regressor->m_use_map_hyperparams) ? x[M + 1] : regressor->m_default_b;
 #endif
         const VectorXd r = (regressor->m_use_map_hyperparams)
                                ? VectorXd(Eigen::Map<const VectorXd>(&x[M + 2], X.rows()))
@@ -225,7 +225,7 @@ namespace
                 grad[M + 1] = 0.0;
 #else
                 grad[M + 1] = CalcObjectiveNoiseLevelDerivative(
-                    y, K_llt, K_inv_y, X, a, b, r, regressor->m_default_b, regressor->m_variance);
+                    y, K_llt, K_inv_y, X, a, b, r, regressor->m_default_b, regressor->m_kernel_hyperparams_prior_var);
 #endif
                 const VectorXd grad_r = grad_theta.segment(1, r.size());
                 for (unsigned i = 0; i < grad_r.size(); ++i)
