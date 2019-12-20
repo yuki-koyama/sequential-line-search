@@ -250,10 +250,11 @@ sequential_line_search::PreferenceRegressor::PreferenceRegressor(const MatrixXd&
                                                                  const double                   default_a,
                                                                  const double                   default_r,
                                                                  const double                   default_b,
-                                                                 const double   kernel_hyperparams_prior_var,
-                                                                 const double   btl_scale,
-                                                                 const unsigned num_map_estimation_iters)
-    : Regressor(KernelType::ArdMatern52Kernel),
+                                                                 const double     kernel_hyperparams_prior_var,
+                                                                 const double     btl_scale,
+                                                                 const unsigned   num_map_estimation_iters,
+                                                                 const KernelType kernel_type)
+    : Regressor(kernel_type),
       m_use_map_hyperparams(use_map_hyperparams),
       m_X(X),
       m_D(D),
