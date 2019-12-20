@@ -42,6 +42,10 @@ namespace sequential_line_search
 
         Eigen::VectorXd PredictMaximumPointFromData() const;
 
+        Kernel                   GetKernel() const { return m_kernel; }
+        KernelThetaDerivative    GetKernelThetaDerivative() const { return m_kernel_theta_derivative; }
+        KernelFirstArgDerivative GetKernelFirstArgDerivative() const { return m_kernel_first_arg_derivative; }
+
     protected:
         Kernel                   m_kernel;
         KernelThetaDerivative    m_kernel_theta_derivative;
