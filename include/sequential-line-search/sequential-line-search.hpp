@@ -29,7 +29,7 @@ namespace sequential_line_search
         /// GPR kernel hyperparameters. When this is set false, the optimizer performs the MAP estimation only for
         /// goodness values.
         SequentialLineSearchOptimizer(const int  num_dims,
-                                      const bool use_slider_enlargement = false,
+                                      const bool use_slider_enlargement = true,
                                       const bool use_map_hyperparams    = true,
                                       const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>&
                                           initial_slider_generator = GenerateRandomSliderEnds);
