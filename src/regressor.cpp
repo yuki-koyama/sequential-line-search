@@ -20,6 +20,23 @@ namespace sequential_line_search
 
 sequential_line_search::Regressor::Regressor(const KernelType kernel_type)
 {
+    switch (kernel_type)
+    {
+        case KernelType::ArdSquaredExponentialKernel:
+        {
+            m_kernel                      = mathtoolbox::GetArdSquaredExpKernel;
+            m_kernel_theta_derivative     = mathtoolbox::GetArdSquaredExpKernelThetaDerivative;
+            m_kernel_first_arg_derivative = mathtoolbox::GetArdSquaredExpKernelFirstArgDerivative;
+            break;
+        }
+        case KernelType::ArdMatern52Kernel:
+        {
+            m_kernel                      = mathtoolbox::GetArdMatern52Kernel;
+            m_kernel_theta_derivative     = mathtoolbox::GetArdMatern52KernelThetaDerivative;
+            m_kernel_first_arg_derivative = mathtoolbox::GetArdMatern52KernelFirstArgDerivative;
+            break;
+        }
+    }
 }
 
 VectorXd sequential_line_search::Regressor::PredictMaximumPointFromData() const

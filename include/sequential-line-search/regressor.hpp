@@ -33,6 +33,15 @@ namespace sequential_line_search
         virtual const Eigen::VectorXd& GetSmallY() const = 0;
 
         Eigen::VectorXd PredictMaximumPointFromData() const;
+
+    private:
+        double (*m_kernel)(const Eigen::VectorXd&, const Eigen::VectorXd&, const Eigen::VectorXd&);
+        Eigen::VectorXd (*m_kernel_theta_derivative)(const Eigen::VectorXd&,
+                                                     const Eigen::VectorXd&,
+                                                     const Eigen::VectorXd&);
+        Eigen::VectorXd (*m_kernel_first_arg_derivative)(const Eigen::VectorXd&,
+                                                         const Eigen::VectorXd&,
+                                                         const Eigen::VectorXd&);
     };
 
     // k
