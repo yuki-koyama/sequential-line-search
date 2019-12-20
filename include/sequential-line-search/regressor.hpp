@@ -2,24 +2,11 @@
 #define SEQUENTIAL_LINE_SEARCH_REGRESSOR_HPP
 
 #include <Eigen/Core>
+#include <sequential-line-search/kernel-type.hpp>
 #include <vector>
 
 namespace sequential_line_search
 {
-    enum class KernelType
-    {
-        ArdSquaredExponentialKernel,
-        ArdMatern52Kernel,
-    };
-
-    using Kernel                   = double (*)(const Eigen::VectorXd&, const Eigen::VectorXd&, const Eigen::VectorXd&);
-    using KernelThetaDerivative    = Eigen::VectorXd (*)(const Eigen::VectorXd&,
-                                                      const Eigen::VectorXd&,
-                                                      const Eigen::VectorXd&);
-    using KernelFirstArgDerivative = Eigen::VectorXd (*)(const Eigen::VectorXd&,
-                                                         const Eigen::VectorXd&,
-                                                         const Eigen::VectorXd&);
-
     class Regressor
     {
     public:
