@@ -3,6 +3,7 @@
 
 #include <Eigen/Core>
 #include <memory>
+#include <sequential-line-search/kernel-type.hpp>
 #include <utility>
 
 namespace sequential_line_search
@@ -28,9 +29,10 @@ namespace sequential_line_search
         /// \param use_map_hyperparams When this is set true, the optimizer always perform the MAP estimation for the
         /// GPR kernel hyperparameters. When this is set false, the optimizer performs the MAP estimation only for
         /// goodness values.
-        SequentialLineSearchOptimizer(const int  num_dims,
-                                      const bool use_slider_enlargement = true,
-                                      const bool use_map_hyperparams    = true,
+        SequentialLineSearchOptimizer(const int        num_dims,
+                                      const bool       use_slider_enlargement = true,
+                                      const bool       use_map_hyperparams    = true,
+                                      const KernelType kernel_type            = KernelType::ArdMatern52Kernel,
                                       const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>&
                                           initial_slider_generator = GenerateRandomSliderEnds);
 
@@ -94,6 +96,8 @@ namespace sequential_line_search
         double m_noise_level;
         double m_kernel_hyperparams_prior_var;
         double m_btl_scale;
+
+        const KernelType m_kernel_type;
     };
 } // namespace sequential_line_search
 

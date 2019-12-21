@@ -22,20 +22,27 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
     SequentialLineSearchOptimizer
     )pbdoc";
 
+    py::enum_<sequential_line_search::KernelType>(m, "KernelType", py::arithmetic())
+        .value("ArdSquaredExponentialKernel", sequential_line_search::KernelType::ArdSquaredExponentialKernel)
+        .value("ArdMatern52Kernel", sequential_line_search::KernelType::ArdMatern52Kernel);
+
     py::class_<SequentialLineSearchOptimizer> optimizer_class(m, "SequentialLineSearchOptimizer");
 
-    optimizer_class.def(py::init<const int, const bool, const bool>(),
+    optimizer_class.def(py::init<const int, const bool, const bool, const sequential_line_search::KernelType>(),
                         "num_dims"_a,
                         "use_slider_enlargement"_a = true,
-                        "use_map_hyperparams"_a    = true);
+                        "use_map_hyperparams"_a    = true,
+                        "kernel_type"_a            = sequential_line_search::KernelType::ArdMatern52Kernel);
 
     optimizer_class.def(py::init<const int,
                                  const bool,
                                  const bool,
+                                 const sequential_line_search::KernelType,
                                  const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>&>(),
                         "num_dims"_a,
                         "use_slider_enlargement"_a = true,
                         "use_map_hyperparams"_a    = true,
+                        "kernel_type"_a            = sequential_line_search::KernelType::ArdMatern52Kernel,
                         "initial_slider_generator"_a);
 
     optimizer_class.def("set_hyperparams",

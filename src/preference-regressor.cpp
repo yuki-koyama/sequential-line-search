@@ -66,19 +66,21 @@ namespace
     }
 #endif
 
-    inline VectorXd CalcObjectiveThetaDerivative(const VectorXd&      y,
-                                                 const LLT<MatrixXd>& K_llt,
-                                                 const VectorXd&      K_inv_y,
-                                                 const MatrixXd&      X,
-                                                 const VectorXd&      kernel_hyperparams,
-                                                 const double         a_prior_mean,
-                                                 const double         a_prior_variance,
-                                                 const double         r_prior_mean,
-                                                 const double         r_prior_variance)
+    inline VectorXd CalcObjectiveThetaDerivative(const VectorXd&             y,
+                                                 const LLT<MatrixXd>&        K_llt,
+                                                 const VectorXd&             K_inv_y,
+                                                 const MatrixXd&             X,
+                                                 const VectorXd&             kernel_hyperparams,
+                                                 const double                a_prior_mean,
+                                                 const double                a_prior_variance,
+                                                 const double                r_prior_mean,
+                                                 const double                r_prior_variance,
+                                                 const KernelThetaDerivative kernel_theta_derivative)
     {
         VectorXd grad = VectorXd::Zero(kernel_hyperparams.size());
 
-        const std::vector<MatrixXd> K_y_grad_r = CalcLargeKYThetaDerivative(X, kernel_hyperparams);
+        const std::vector<MatrixXd> K_y_grad_r =
+            CalcLargeKYThetaDerivative(X, kernel_hyperparams, kernel_theta_derivative);
         for (unsigned i = 0; i < kernel_hyperparams.size(); ++i)
         {
             const MatrixXd& K_y_grad_theta_i = K_y_grad_r[i];
@@ -147,7 +149,8 @@ namespace
         constexpr double prod_of_two_and_pi = 2.0 * mathtoolbox::constants::pi;
 
         // Kernel matrix
-        const MatrixXd      K     = regressor->m_use_map_hyperparams ? CalcLargeKY(X, Concat(a, r), b) : regressor->m_K;
+        const MatrixXd K =
+            regressor->m_use_map_hyperparams ? CalcLargeKY(X, Concat(a, r), b, regressor->GetKernel()) : regressor->m_K;
         const LLT<MatrixXd> K_llt = regressor->m_use_map_hyperparams ? LLT<MatrixXd>(K) : regressor->m_K_llt;
 
         // Log likelihood of y distribution
@@ -219,7 +222,8 @@ namespace
                                                                          regressor->m_default_a,
                                                                          regressor->m_kernel_hyperparams_prior_var,
                                                                          regressor->m_default_r,
-                                                                         regressor->m_kernel_hyperparams_prior_var);
+                                                                         regressor->m_kernel_hyperparams_prior_var,
+                                                                         regressor->GetKernelThetaDerivative());
 
                 grad[M + 0] = grad_theta(0);
 #ifdef SEQUENTIAL_LINE_SEARCH_USE_NOISELESS_FORMULATION
@@ -246,10 +250,12 @@ sequential_line_search::PreferenceRegressor::PreferenceRegressor(const MatrixXd&
                                                                  const double                   default_a,
                                                                  const double                   default_r,
                                                                  const double                   default_b,
-                                                                 const double   kernel_hyperparams_prior_var,
-                                                                 const double   btl_scale,
-                                                                 const unsigned num_map_estimation_iters)
-    : m_use_map_hyperparams(use_map_hyperparams),
+                                                                 const double     kernel_hyperparams_prior_var,
+                                                                 const double     btl_scale,
+                                                                 const unsigned   num_map_estimation_iters,
+                                                                 const KernelType kernel_type)
+    : Regressor(kernel_type),
+      m_use_map_hyperparams(use_map_hyperparams),
       m_X(X),
       m_D(D),
       m_default_a(default_a),
@@ -265,19 +271,19 @@ sequential_line_search::PreferenceRegressor::PreferenceRegressor(const MatrixXd&
 
     PerformMapEstimation(num_map_estimation_iters);
 
-    m_K     = CalcLargeKY(X, m_kernel_hyperparams, m_noise_hyperparam);
+    m_K     = CalcLargeKY(X, m_kernel_hyperparams, m_noise_hyperparam, m_kernel);
     m_K_llt = LLT<MatrixXd>(m_K);
 }
 
 double sequential_line_search::PreferenceRegressor::PredictMu(const VectorXd& x) const
 {
-    const VectorXd k = CalcSmallK(x, m_X, m_kernel_hyperparams);
+    const VectorXd k = CalcSmallK(x, m_X, m_kernel_hyperparams, m_kernel);
     return k.transpose() * m_K_llt.solve(m_y);
 }
 
 double sequential_line_search::PreferenceRegressor::PredictSigma(const VectorXd& x) const
 {
-    const VectorXd k = CalcSmallK(x, m_X, m_kernel_hyperparams);
+    const VectorXd k = CalcSmallK(x, m_X, m_kernel_hyperparams, m_kernel);
 
     // This code assumes that the kernel is either ARD squared exponential or ARD Matern and the first hyperparameter
     // represents the intensity of the kernel.
@@ -290,15 +296,17 @@ double sequential_line_search::PreferenceRegressor::PredictSigma(const VectorXd&
 VectorXd sequential_line_search::PreferenceRegressor::PredictMuDerivative(const VectorXd& x) const
 {
     // TODO: Incorporate a mean function
-    const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, m_X, m_kernel_hyperparams);
+    const MatrixXd k_x_derivative =
+        CalcSmallKSmallXDerivative(x, m_X, m_kernel_hyperparams, m_kernel_first_arg_derivative);
     return k_x_derivative * m_K_llt.solve(m_y);
 }
 
 VectorXd sequential_line_search::PreferenceRegressor::PredictSigmaDerivative(const VectorXd& x) const
 {
-    const MatrixXd k_x_derivative = CalcSmallKSmallXDerivative(x, m_X, m_kernel_hyperparams);
-    const VectorXd k              = CalcSmallK(x, m_X, m_kernel_hyperparams);
-    const double   sigma          = PredictSigma(x);
+    const MatrixXd k_x_derivative =
+        CalcSmallKSmallXDerivative(x, m_X, m_kernel_hyperparams, m_kernel_first_arg_derivative);
+    const VectorXd k     = CalcSmallK(x, m_X, m_kernel_hyperparams, m_kernel);
+    const double   sigma = PredictSigma(x);
     return -(1.0 / sigma) * k_x_derivative * m_K_llt.solve(k);
 }
 
@@ -338,7 +346,7 @@ void sequential_line_search::PreferenceRegressor::PerformMapEstimation(const uns
         m_kernel_hyperparams = Concat(m_default_a, VectorXd::Constant(d, m_default_r));
         m_noise_hyperparam   = m_default_b;
 
-        m_K     = CalcLargeKY(m_X, m_kernel_hyperparams, m_noise_hyperparam);
+        m_K     = CalcLargeKY(m_X, m_kernel_hyperparams, m_noise_hyperparam, m_kernel);
         m_K_llt = LLT<MatrixXd>(m_K);
     }
 

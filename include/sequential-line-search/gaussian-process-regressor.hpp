@@ -10,13 +10,16 @@ namespace sequential_line_search
     {
     public:
         /// \details Hyperparameters will be set via MAP estimation.
-        GaussianProcessRegressor(const Eigen::MatrixXd& X, const Eigen::VectorXd& y);
+        GaussianProcessRegressor(const Eigen::MatrixXd& X,
+                                 const Eigen::VectorXd& y,
+                                 const KernelType       kernel_type = KernelType::ArdMatern52Kernel);
 
         /// \details Specified hyperparameters will be used.
         GaussianProcessRegressor(const Eigen::MatrixXd& X,
                                  const Eigen::VectorXd& y,
                                  const Eigen::VectorXd& kernel_hyperparams,
-                                 double                 noise_hyperparam);
+                                 double                 noise_hyperparam,
+                                 const KernelType       kernel_type = KernelType::ArdMatern52Kernel);
 
         double PredictMu(const Eigen::VectorXd& x) const override;
         double PredictSigma(const Eigen::VectorXd& x) const override;

@@ -25,7 +25,8 @@ namespace sequential_line_search
                             const double                   default_b                    = 0.005,
                             const double                   kernel_hyperparams_prior_var = 0.250,
                             const double                   btl_scale                    = 0.010,
-                            const unsigned                 num_map_estimation_iters     = 100);
+                            const unsigned                 num_map_estimation_iters     = 100,
+                            const KernelType               kernel_type = KernelType::ArdMatern52Kernel);
 
         double PredictMu(const Eigen::VectorXd& x) const override;
         double PredictSigma(const Eigen::VectorXd& x) const override;

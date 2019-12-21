@@ -25,6 +25,7 @@ sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptim
     const int                                                                    num_dims,
     const bool                                                                   use_slider_enlargement,
     const bool                                                                   use_map_hyperparams,
+    const KernelType                                                             kernel_type,
     const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>& initial_slider_generator)
     : m_use_slider_enlargement(use_slider_enlargement),
       m_use_map_hyperparams(use_map_hyperparams),
@@ -32,7 +33,8 @@ sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptim
       m_kernel_length_scale(0.500),
       m_noise_level(0.005),
       m_kernel_hyperparams_prior_var(0.250),
-      m_btl_scale(0.010)
+      m_btl_scale(0.010),
+      m_kernel_type(kernel_type)
 {
     const auto slider_ends = initial_slider_generator(num_dims);
 
@@ -87,7 +89,8 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResu
                                                         m_noise_level,
                                                         m_kernel_hyperparams_prior_var,
                                                         m_btl_scale,
-                                                        num_map_estimation_iters);
+                                                        num_map_estimation_iters,
+                                                        m_kernel_type);
 
     // Find the next search subspace
     const auto x_max = m_regressor->FindArgMax();

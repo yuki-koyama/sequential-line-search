@@ -5,18 +5,26 @@
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
-namespace sequential_line_search
+sequential_line_search::Regressor::Regressor(const KernelType kernel_type)
 {
-#ifdef SEQUENTIAL_LINE_SEARCH_USE_ARD_SQUARED_EXP_KERNEL
-    constexpr auto kernel                      = mathtoolbox::GetArdSquaredExpKernel;
-    constexpr auto kernel_theta_derivative     = mathtoolbox::GetArdSquaredExpKernelThetaDerivative;
-    constexpr auto kernel_first_arg_derivative = mathtoolbox::GetArdSquaredExpKernelFirstArgDerivative;
-#else
-    constexpr auto kernel                      = mathtoolbox::GetArdMatern52Kernel;
-    constexpr auto kernel_theta_derivative     = mathtoolbox::GetArdMatern52KernelThetaDerivative;
-    constexpr auto kernel_first_arg_derivative = mathtoolbox::GetArdMatern52KernelFirstArgDerivative;
-#endif
-} // namespace sequential_line_search
+    switch (kernel_type)
+    {
+        case KernelType::ArdSquaredExponentialKernel:
+        {
+            m_kernel                      = mathtoolbox::GetArdSquaredExpKernel;
+            m_kernel_theta_derivative     = mathtoolbox::GetArdSquaredExpKernelThetaDerivative;
+            m_kernel_first_arg_derivative = mathtoolbox::GetArdSquaredExpKernelFirstArgDerivative;
+            break;
+        }
+        case KernelType::ArdMatern52Kernel:
+        {
+            m_kernel                      = mathtoolbox::GetArdMatern52Kernel;
+            m_kernel_theta_derivative     = mathtoolbox::GetArdMatern52KernelThetaDerivative;
+            m_kernel_first_arg_derivative = mathtoolbox::GetArdMatern52KernelFirstArgDerivative;
+            break;
+        }
+    }
+}
 
 VectorXd sequential_line_search::Regressor::PredictMaximumPointFromData() const
 {
@@ -34,8 +42,10 @@ VectorXd sequential_line_search::Regressor::PredictMaximumPointFromData() const
     return GetLargeX().col(best_index);
 }
 
-VectorXd
-sequential_line_search::CalcSmallK(const VectorXd& x, const MatrixXd& X, const VectorXd& kernel_hyperparameters)
+VectorXd sequential_line_search::CalcSmallK(const VectorXd& x,
+                                            const MatrixXd& X,
+                                            const VectorXd& kernel_hyperparameters,
+                                            const Kernel    kernel)
 {
     const unsigned N = X.cols();
 
@@ -48,16 +58,19 @@ sequential_line_search::CalcSmallK(const VectorXd& x, const MatrixXd& X, const V
     return k;
 }
 
-MatrixXd
-sequential_line_search::CalcLargeKY(const MatrixXd& X, const VectorXd& kernel_hyperparameters, const double noise_level)
+MatrixXd sequential_line_search::CalcLargeKY(const MatrixXd& X,
+                                             const VectorXd& kernel_hyperparameters,
+                                             const double    noise_level,
+                                             const Kernel    kernel)
 {
     const unsigned N   = X.cols();
-    const MatrixXd K_f = CalcLargeKF(X, kernel_hyperparameters);
+    const MatrixXd K_f = CalcLargeKF(X, kernel_hyperparameters, kernel);
 
     return K_f + noise_level * MatrixXd::Identity(N, N);
 }
 
-MatrixXd sequential_line_search::CalcLargeKF(const MatrixXd& X, const VectorXd& kernel_hyperparameters)
+MatrixXd
+sequential_line_search::CalcLargeKF(const MatrixXd& X, const VectorXd& kernel_hyperparameters, const Kernel kernel)
 {
     const unsigned N = X.cols();
 
@@ -75,9 +88,10 @@ MatrixXd sequential_line_search::CalcLargeKF(const MatrixXd& X, const VectorXd& 
     return K_f;
 }
 
-MatrixXd sequential_line_search::CalcSmallKSmallXDerivative(const VectorXd& x,
-                                                            const MatrixXd& X,
-                                                            const VectorXd& kernel_hyperparameters)
+MatrixXd sequential_line_search::CalcSmallKSmallXDerivative(const VectorXd&                x,
+                                                            const MatrixXd&                X,
+                                                            const VectorXd&                kernel_hyperparameters,
+                                                            const KernelFirstArgDerivative kernel_first_arg_derivative)
 {
     const unsigned N   = X.cols();
     const unsigned dim = X.rows();
@@ -93,8 +107,10 @@ MatrixXd sequential_line_search::CalcSmallKSmallXDerivative(const VectorXd& x,
     return k_x_derivative;
 }
 
-std::vector<MatrixXd> sequential_line_search::CalcLargeKYThetaDerivative(const MatrixXd& X,
-                                                                         const VectorXd& kernel_hyperparameters)
+std::vector<MatrixXd>
+sequential_line_search::CalcLargeKYThetaDerivative(const MatrixXd&             X,
+                                                   const VectorXd&             kernel_hyperparameters,
+                                                   const KernelThetaDerivative kernel_theta_derivative)
 {
     const unsigned N = X.cols();
 

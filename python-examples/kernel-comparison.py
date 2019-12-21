@@ -64,51 +64,39 @@ num_dims_set = [
     15,
 ]
 
-map_condition_set = [
-    {
-        "use_map_hyperparams": False,
-        "kernel_hyperparams_prior_var": 0.00
-    },
-    {
-        "use_map_hyperparams": True,
-        "kernel_hyperparams_prior_var": 0.10
-    },
-    # {
-    #     "use_map_hyperparams": True,
-    #     "kernel_hyperparams_prior_var": 0.25
-    # },
+kernel_type_set = [
+    pySequentialLineSearch.KernelType.ArdSquaredExponentialKernel,
+    pySequentialLineSearch.KernelType.ArdMatern52Kernel,
 ]
 
 # Define constant values
 NUM_TRIALS = 3  # 10
 NUM_ITERS = 15  # 30
-KERNEL_TYPE = pySequentialLineSearch.KernelType.ArdMatern52Kernel
+USE_MAP_HYPERPARAMS = False
 
 # Instantiate a multi-dimensional array for storing results
-optimality_gaps = np.ndarray(shape=(NUM_ITERS, NUM_TRIALS,
-                                    len(length_scale_set),
-                                    len(map_condition_set), len(num_dims_set)))
+optimality_gaps = np.ndarray(shape=(NUM_ITERS,
+                                    NUM_TRIALS, len(length_scale_set),
+                                    len(kernel_type_set), len(num_dims_set)))
 
 # Perform sequential line search procedures with various conditions
 for index_num_dims, num_dims in enumerate(num_dims_set):
     print("Testing on a {}-dimensional function...".format(num_dims))
-    for index_map_condition, map_condition in enumerate(map_condition_set):
-        print("\t" + "Hyperparameters condition: " + str(map_condition))
+    for index_kernel_type, kernel_type in enumerate(kernel_type_set):
+        print("\t" + "Kernel type: " + kernel_type.name)
         for index_length_scale, length_scale in enumerate(length_scale_set):
             print("\t\t" + "Kernel length scale: " + str(length_scale))
             for trial in range(NUM_TRIALS):
 
                 optimizer = pySequentialLineSearch.SequentialLineSearchOptimizer(
                     num_dims=num_dims,
-                    use_map_hyperparams=map_condition["use_map_hyperparams"],
-                    kernel_type=KERNEL_TYPE,
+                    use_map_hyperparams=USE_MAP_HYPERPARAMS,
+                    kernel_type=kernel_type,
                     initial_slider_generator=generate_initial_slider)
 
-                optimizer.set_hyperparams(
-                    kernel_signal_var=0.50,
-                    kernel_length_scale=length_scale,
-                    kernel_hyperparams_prior_var=map_condition[
-                        "kernel_hyperparams_prior_var"])
+                optimizer.set_hyperparams(kernel_signal_var=0.50,
+                                          kernel_length_scale=length_scale,
+                                          kernel_hyperparams_prior_var=0.10)
 
                 for i in range(NUM_ITERS):
                     slider_ends = optimizer.get_slider_ends()
@@ -119,7 +107,7 @@ for index_num_dims, num_dims in enumerate(num_dims_set):
                     optimality_gap = -calc_simulated_objective_func(
                         optimizer.get_maximizer())
                     optimality_gaps[i, trial, index_length_scale,
-                                    index_map_condition,
+                                    index_kernel_type,
                                     index_num_dims] = optimality_gap
 
 # Set up the plot design
@@ -134,7 +122,7 @@ plt.rcParams['text.latex.preamble'] = [
 ]
 
 # Instantiate a figure object
-num_cols = len(map_condition_set)
+num_cols = len(length_scale_set)
 num_rows = len(num_dims_set)
 
 FIG_SIZE = (num_cols * 4, num_rows * 4)
@@ -145,29 +133,27 @@ fig = plt.figure(figsize=FIG_SIZE, dpi=DPI)
 # Plot data
 for index_num_dims, num_dims in enumerate(num_dims_set):
     ref_axes = None
-    for index_map_condition, map_condition in enumerate(map_condition_set):
+    for index_length_scale, length_scale in enumerate(length_scale_set):
         axes = fig.add_subplot(num_rows,
                                num_cols,
-                               index_num_dims * num_cols +
-                               index_map_condition + 1,
+                               index_num_dims * num_cols + index_length_scale +
+                               1,
                                sharey=ref_axes)
         ref_axes = axes
 
-        for index_length_scale, length_scale in enumerate(length_scale_set):
+        for index_kernel_type, kernel_type in enumerate(kernel_type_set):
 
-            label = r"$\theta_\text{length-scale} = " + str(
-                length_scale) + r"$"
+            label = kernel_type.name
 
             title_dim = str(num_dims) + "D"
-            title_map = r"MAP ($\sigma^{2} = " + str(
-                map_condition["kernel_hyperparams_prior_var"]
-            ) + r"$)" if map_condition["use_map_hyperparams"] else "Fixed"
-            title = title_dim + " / " + title_map
+            title_length_scale = r"$\theta_\text{length-scale} = " + str(
+                length_scale) + r"$"
+            title = title_dim + " / " + title_length_scale
 
             plot_mean_with_errors(
                 axes=axes,
                 data=optimality_gaps[:, :, index_length_scale,
-                                     index_map_condition, index_num_dims],
+                                     index_kernel_type, index_num_dims],
                 label=label)
 
             axes.set_title(title)
@@ -177,5 +163,5 @@ for index_num_dims, num_dims in enumerate(num_dims_set):
 
 # Export figures
 fig.tight_layout()
-plt.savefig("./map-vs-fixed-hyperparams.pdf")
-plt.savefig("./map-vs-fixed-hyperparams.png")
+plt.savefig("./kernel-comparison.pdf")
+plt.savefig("./kernel-comparison.png")
