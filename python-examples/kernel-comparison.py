@@ -73,6 +73,7 @@ kernel_type_set = [
 NUM_TRIALS = 3  # 10
 NUM_ITERS = 15  # 30
 USE_MAP_HYPERPARAMS = False
+OUTPUT_NAME = "kernel-comparison"
 
 # Instantiate a multi-dimensional array for storing results
 optimality_gaps = np.ndarray(shape=(NUM_ITERS,
@@ -109,6 +110,9 @@ for index_num_dims, num_dims in enumerate(num_dims_set):
                     optimality_gaps[i, trial, index_length_scale,
                                     index_kernel_type,
                                     index_num_dims] = optimality_gap
+
+# Export data
+np.save("./" + OUTPUT_NAME + ".npy", optimality_gaps)
 
 # Set up the plot design
 sns.set()
@@ -163,5 +167,5 @@ for index_num_dims, num_dims in enumerate(num_dims_set):
 
 # Export figures
 fig.tight_layout()
-plt.savefig("./kernel-comparison.pdf")
-plt.savefig("./kernel-comparison.png")
+plt.savefig("./" + OUTPUT_NAME + ".pdf")
+plt.savefig("./" + OUTPUT_NAME + ".png")
