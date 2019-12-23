@@ -24,7 +24,7 @@ jobs:
       run: pip install ./
     - name: install-test-dependencies
       run: |
-        pip install matplotlib seaborn scipy
+        pip install joblib matplotlib seaborn scipy
         brew tap homebrew/cask-fonts && brew cask install font-linux-biolinum
         brew cask install mactex-no-gui
     - name: test

@@ -25,7 +25,7 @@ jobs:
       run: pip install ./
     - name: install-test-dependencies
       run: |
-        pip install matplotlib seaborn scipy
+        pip install joblib matplotlib seaborn scipy
         sudo apt-get install -y fonts-linuxlibertine
         sudo apt-get --no-install-recommends install -y texlive-latex-extra texlive-fonts-extra dvipng
     - name: test
