@@ -3,6 +3,8 @@ import numpy as np
 import sys
 import matplotlib.pyplot as plt
 import seaborn as sns
+import itertools
+from joblib import Parallel, delayed
 from typing import Optional, Tuple
 
 
@@ -69,6 +71,10 @@ kernel_type_set = [
     pySequentialLineSearch.KernelType.ArdMatern52Kernel,
 ]
 
+condition_pattern = itertools.product(range(len(length_scale_set)),
+                                      range(len(kernel_type_set)),
+                                      range(len(num_dims_set)))
+
 # Define constant values
 NUM_TRIALS = 3  # 10
 NUM_ITERS = 15  # 30
@@ -81,35 +87,55 @@ optimality_gaps = np.ndarray(shape=(NUM_ITERS,
                                     len(kernel_type_set), len(num_dims_set)))
 
 # Perform sequential line search procedures with various conditions
-for index_num_dims, num_dims in enumerate(num_dims_set):
-    print("Testing on a {}-dimensional function...".format(num_dims))
-    for index_kernel_type, kernel_type in enumerate(kernel_type_set):
-        print("\t" + "Kernel type: " + kernel_type.name)
-        for index_length_scale, length_scale in enumerate(length_scale_set):
-            print("\t\t" + "Kernel length scale: " + str(length_scale))
-            for trial in range(NUM_TRIALS):
+for condition_index, condition in enumerate(condition_pattern):
 
-                optimizer = pySequentialLineSearch.SequentialLineSearchOptimizer(
-                    num_dims=num_dims,
-                    use_map_hyperparams=USE_MAP_HYPERPARAMS,
-                    kernel_type=kernel_type,
-                    initial_slider_generator=generate_initial_slider)
+    length_scale_index = condition[0]
+    length_scale = length_scale_set[length_scale_index]
 
-                optimizer.set_hyperparams(kernel_signal_var=0.50,
-                                          kernel_length_scale=length_scale,
-                                          kernel_hyperparams_prior_var=0.10)
+    kernel_type_index = condition[1]
+    kernel_type = kernel_type_set[kernel_type_index]
 
-                for i in range(NUM_ITERS):
-                    slider_ends = optimizer.get_slider_ends()
-                    slider_position = ask_human_for_slider_manipulation(
-                        slider_ends)
-                    optimizer.submit_line_search_result(slider_position)
+    num_dims_index = condition[2]
+    num_dims = num_dims_set[num_dims_index]
 
-                    optimality_gap = -calc_simulated_objective_func(
-                        optimizer.get_maximizer())
-                    optimality_gaps[i, trial, index_length_scale,
-                                    index_kernel_type,
-                                    index_num_dims] = optimality_gap
+    print("Condition No. {}:".format(condition_index + 1))
+    print("\tNo. dimensions = {}".format(num_dims))
+    print("\tKernel: {}".format(kernel_type))
+    print("\tKernel length scale = {}".format(length_scale))
+
+    def perform_sequential_line_search(trial_index: int) -> np.ndarray:
+
+        optimality_gaps = np.ndarray(NUM_ITERS, )
+
+        optimizer = pySequentialLineSearch.SequentialLineSearchOptimizer(
+            num_dims=num_dims,
+            use_map_hyperparams=USE_MAP_HYPERPARAMS,
+            kernel_type=kernel_type,
+            initial_slider_generator=generate_initial_slider)
+
+        optimizer.set_hyperparams(kernel_signal_var=0.50,
+                                  kernel_length_scale=length_scale,
+                                  kernel_hyperparams_prior_var=0.10)
+
+        for i in range(NUM_ITERS):
+            slider_ends = optimizer.get_slider_ends()
+            slider_position = ask_human_for_slider_manipulation(slider_ends)
+            optimizer.submit_line_search_result(slider_position)
+
+            optimality_gap = -calc_simulated_objective_func(
+                optimizer.get_maximizer())
+
+            optimality_gaps[i] = optimality_gap
+
+        return optimality_gaps
+
+    results = Parallel(n_jobs=-1)([
+        delayed(perform_sequential_line_search)(i) for i in range(NUM_TRIALS)
+    ])
+
+    for trial_index, trial_result in enumerate(results):
+        optimality_gaps[:, trial_index, length_scale_index, kernel_type_index,
+                        num_dims_index] = trial_result
 
 # Export data
 np.save("./" + OUTPUT_NAME + ".npy", optimality_gaps)
@@ -135,17 +161,17 @@ DPI = 200
 fig = plt.figure(figsize=FIG_SIZE, dpi=DPI)
 
 # Plot data
-for index_num_dims, num_dims in enumerate(num_dims_set):
+for num_dims_index, num_dims in enumerate(num_dims_set):
     ref_axes = None
-    for index_length_scale, length_scale in enumerate(length_scale_set):
+    for length_scale_index, length_scale in enumerate(length_scale_set):
         axes = fig.add_subplot(num_rows,
                                num_cols,
-                               index_num_dims * num_cols + index_length_scale +
+                               num_dims_index * num_cols + length_scale_index +
                                1,
                                sharey=ref_axes)
         ref_axes = axes
 
-        for index_kernel_type, kernel_type in enumerate(kernel_type_set):
+        for kernel_type_index, kernel_type in enumerate(kernel_type_set):
 
             label = kernel_type.name
 
@@ -156,8 +182,8 @@ for index_num_dims, num_dims in enumerate(num_dims_set):
 
             plot_mean_with_errors(
                 axes=axes,
-                data=optimality_gaps[:, :, index_length_scale,
-                                     index_kernel_type, index_num_dims],
+                data=optimality_gaps[:, :, length_scale_index,
+                                     kernel_type_index, num_dims_index],
                 label=label)
 
             axes.set_title(title)
