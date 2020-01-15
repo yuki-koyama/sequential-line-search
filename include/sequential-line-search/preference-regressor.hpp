@@ -20,9 +20,9 @@ namespace sequential_line_search
         PreferenceRegressor(const Eigen::MatrixXd&         X,
                             const std::vector<Preference>& D,
                             const bool                     use_map_hyperparams          = false,
-                            const double                   default_a                    = 0.500,
-                            const double                   default_r                    = 0.500,
-                            const double                   default_b                    = 0.005,
+                            const double                   default_kernel_signal_var    = 0.500,
+                            const double                   default_kernel_length_scale  = 0.500,
+                            const double                   default_noise_level          = 0.005,
                             const double                   kernel_hyperparams_prior_var = 0.250,
                             const double                   btl_scale                    = 0.010,
                             const unsigned                 num_map_estimation_iters     = 100,
@@ -70,9 +70,9 @@ namespace sequential_line_search
         double                 GetNoiseHyperparam() const override { return m_noise_hyperparam; }
 
         // Default hyperparameters; when MAP is enabled, they are used as initial guesses.
-        const double m_default_a;
-        const double m_default_r;
-        const double m_default_b;
+        const double m_default_kernel_signal_var;
+        const double m_default_kernel_length_scale;
+        const double m_default_noise_level;
 
         /// \brief Variance of the prior distribution. Used only when MAP is enabled.
         const double m_kernel_hyperparams_prior_var;
