@@ -6,11 +6,11 @@
 ![](https://github.com/yuki-koyama/sequential-line-search/workflows/Ubuntu-python/badge.svg)
 ![GitHub](https://img.shields.io/github/license/yuki-koyama/sequential-line-search)
 
-This repository provides a C++ library to perform the **sequential line search** method (which is a variant of **Bayesian optimization**).
+A C++ library for performing the **sequential line search** method (which is a human-in-the-loop variant of **Bayesian optimization**).
 
 ![](docs/concept.jpg)
 
-The core algorithm is implemented in `include/sequential-line-search/*.hpp` and `src/*.cpp`. This repository also contains the following example applications:
+The core algorithm is implemented in `include/sequential-line-search/*.hpp` and `src/*.cpp`. This repository also contains the following example demos:
 
 - **bayesian_optimization_1d**: A simple demo of the standard Bayesian optimization applied to a one-dimensional test function.
 - **sequential_line_search_nd**: A simple demo of the sequential line search method applied to a multi-dimensional test function.
@@ -19,7 +19,7 @@ The core algorithm is implemented in `include/sequential-line-search/*.hpp` and 
 - **sequential_line_search_2d_gui**: A visual interactive demo of the sequential line search method applied to a two-dimensional test function.
 - **sequential_line_search_photo**: A visual interactive demo of the sequential line search method where a photograph is enhanced using six-dimensional parameters.
 
-Now this library has a [python binding](./python).
+This library has a [python binding](./python), named `pySequentialLineSearch`.
 
 ## Project Web Site
 
@@ -91,7 +91,7 @@ We tested on macOS (10.15) only. We are aware that the visual demos cannot be bu
 
 ## How to Install (Python)
 
-pySequentialLineSearch is a subset of Python bindings of the C++ library. Tested on Python `3.6`, `3.7`, and `3.8`.
+`pySequentialLineSearch` is a subset of Python bindings of the C++ library. Tested on Python `3.6`, `3.7`, and `3.8`.
 
 It can be installed via PyPI:
 ```bash
