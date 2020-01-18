@@ -23,7 +23,7 @@ This library has a [python binding](./python), named `pySequentialLineSearch`.
 
 ## Project Web Site
 
-<http://koyama.xyz/project/sequential_line_search/>
+<https://koyama.xyz/project/sequential_line_search/>
 
 ## Publication
 
