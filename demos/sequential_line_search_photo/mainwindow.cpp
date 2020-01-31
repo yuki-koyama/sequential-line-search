@@ -2,9 +2,11 @@
 #include "core.hpp"
 #include "directoryutility.hpp"
 #include "imagemodifier.hpp"
+#include "mainwidget.hpp"
 #include "ui_mainwindow.h"
 #include <QDir>
 #include <QImage>
+#include <QLabel>
 #include <QTimer>
 #include <enhancer/enhancerwidget.hpp>
 #include <iostream>
@@ -23,32 +25,58 @@ namespace
     constexpr bool use_MAP_hyperparameters = true;
 } // namespace
 
-MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget* parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow), m_widgets({nullptr, nullptr, nullptr, nullptr})
 {
     core.mainWindow = this;
     ui->setupUi(this);
 
     // Instantiate and set the preview widget
     enhancer_widget = new enhancer::EnhancerWidget(this);
-    enhancer_widget->setMinimumSize(600, 400);
+    enhancer_widget->setMinimumSize(480, 320);
     ui->verticalLayout->insertWidget(0, enhancer_widget);
 
-    // Set Widgets
-    ui->widget_y->content           = MainWidget::Content::None;
-    ui->widget_y->draw_slider_space = true;
-    ui->widget_y->draw_slider_tick  = true;
+    // Instantiate visualization widgets if the target space is two-dimensional
+    if (core.dim == 2)
+    {
+        for (int i : {0, 1, 2, 3})
+        {
+            m_widgets[i] = new MainWidget(this);
 
-    ui->widget_e->content          = MainWidget::Content::ExpectedImprovement;
-    ui->widget_e->draw_maximum     = true;
-    ui->widget_e->draw_data_points = true;
+            m_widgets[i]->setFixedSize(160, 160);
+        }
 
-    ui->widget_m->content          = MainWidget::Content::Mean;
-    ui->widget_m->draw_maximum     = true;
-    ui->widget_m->draw_data_points = true;
+        m_widgets[0]->content           = MainWidget::Content::None;
+        m_widgets[0]->draw_slider_space = true;
+        m_widgets[0]->draw_slider_tick  = true;
 
-    ui->widget_s->content          = MainWidget::Content::StandardDeviation;
-    ui->widget_s->draw_maximum     = true;
-    ui->widget_s->draw_data_points = true;
+        m_widgets[1]->content          = MainWidget::Content::ExpectedImprovement;
+        m_widgets[1]->draw_maximum     = true;
+        m_widgets[1]->draw_data_points = true;
+
+        m_widgets[2]->content          = MainWidget::Content::Mean;
+        m_widgets[2]->draw_maximum     = false;
+        m_widgets[2]->draw_data_points = true;
+
+        m_widgets[3]->content          = MainWidget::Content::StandardDeviation;
+        m_widgets[3]->draw_maximum     = false;
+        m_widgets[3]->draw_data_points = true;
+
+        ui->gridLayout->addWidget(m_widgets[0], 1, 0);
+        ui->gridLayout->addWidget(new QLabel("<center>Slider space</center>"), 2, 0);
+
+        ui->gridLayout->addWidget(m_widgets[1], 1, 1);
+        ui->gridLayout->addWidget(new QLabel("<center>Expected improvement</center>"), 2, 1);
+
+        ui->gridLayout->addWidget(m_widgets[2], 3, 0);
+        ui->gridLayout->addWidget(new QLabel("<center>Predicted mean</center>"), 4, 0);
+
+        ui->gridLayout->addWidget(m_widgets[3], 3, 1);
+        ui->gridLayout->addWidget(new QLabel("<center>Predicted stdev</center>"), 4, 1);
+
+        ui->gridLayout->setRowStretch(5, 0);
+        ui->gridLayout->setRowStretch(5, 1);
+    }
 
     // Set a target photo
     const std::string photo_name = SEQUENTIAL_LINE_SEARCH_PHOTO_NAME;
@@ -65,7 +93,13 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     if (core.dim == 6)
     {
         names = std::vector<std::string>{
-            "Brightness", "Contrast", "Saturation", "Color Balance [R]", "Color Balance [G]", "Color Balance [B]"};
+            "Brightness",
+            "Contrast",
+            "Saturation",
+            "Color Balance [R]",
+            "Color Balance [G]",
+            "Color Balance [B]",
+        };
     }
     else if (core.dim == 2)
     {
@@ -88,18 +122,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->horizontalSlider->setValue((ui->horizontalSlider->maximum() + ui->horizontalSlider->minimum()) / 2);
     updateRawSliders();
-
-    if (core.dim != 2)
-    {
-        ui->widget_y->setVisible(false);
-        ui->widget_e->setVisible(false);
-        ui->widget_m->setVisible(false);
-        ui->widget_s->setVisible(false);
-        ui->label_y->setVisible(false);
-        ui->label_e->setVisible(false);
-        ui->label_m->setVisible(false);
-        ui->label_s->setVisible(false);
-    }
 
     this->adjustSize();
 }
@@ -131,9 +153,13 @@ void MainWindow::on_actionClear_all_data_triggered()
     core.optimizer =
         std::make_shared<SequentialLineSearchOptimizer>(core.dim, use_slider_enlargement, use_MAP_hyperparameters);
 
-    ui->widget_s->update();
-    ui->widget_m->update();
-    ui->widget_e->update();
+    for (auto widget : m_widgets)
+    {
+        if (widget != nullptr)
+        {
+            widget->update();
+        }
+    }
 }
 
 void MainWindow::on_actionProceed_optimization_triggered()
@@ -149,16 +175,23 @@ void MainWindow::on_actionProceed_optimization_triggered()
                                    ui->horizontalSlider->minimum());
 
     // Repaint evary widget
-    ui->widget_s->repaint();
-    ui->widget_m->repaint();
-    ui->widget_e->repaint();
+    for (auto widget : m_widgets)
+    {
+        if (widget != nullptr)
+        {
+            widget->update();
+        }
+    }
     ui->horizontalSlider->repaint();
     enhancer_widget->repaint();
 }
 
 void MainWindow::on_horizontalSlider_valueChanged(int /*value*/)
 {
-    ui->widget_y->update();
+    if (m_widgets[0] != nullptr)
+    {
+        m_widgets[0]->update();
+    }
     updateRawSliders();
 
     // Update the parameters for preview
@@ -171,10 +204,7 @@ void MainWindow::on_horizontalSlider_valueChanged(int /*value*/)
     }
     else
     {
-        for (unsigned i = 0; i < 6; ++i)
-        {
-            parameters[i] = x(i);
-        }
+        std::memcpy(parameters.data(), x.data(), sizeof(double) * 6);
     }
     enhancer_widget->setParameters(parameters);
     enhancer_widget->update();

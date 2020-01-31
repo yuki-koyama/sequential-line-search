@@ -2,8 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <array>
 
 class QSlider;
+class MainWidget;
 namespace Ui
 {
     class MainWindow;
@@ -37,6 +39,12 @@ private slots:
 private:
     Ui::MainWindow*           ui;
     enhancer::EnhancerWidget* enhancer_widget;
+
+    // 0: f (objective)
+    // 1: a (acquisition)
+    // 2: m (mean)
+    // 3: s (stdev)
+    std::array<MainWidget*, 4> m_widgets;
 };
 
 #endif // MAINWINDOW_H
