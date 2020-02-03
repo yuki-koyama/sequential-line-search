@@ -15,7 +15,10 @@ namespace
     Core& core = Core::getInstance();
 }
 
-WidgetPreview::WidgetPreview(QWidget* parent) : QWidget(parent) {}
+WidgetPreview::WidgetPreview(QWidget* parent) : QWidget(parent)
+{
+    this->setFixedSize(320, 320);
+}
 
 void WidgetPreview::paintEvent(QPaintEvent* event)
 {
