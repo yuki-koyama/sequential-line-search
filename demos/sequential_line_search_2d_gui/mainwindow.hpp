@@ -2,11 +2,13 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <array>
 
 namespace Ui
 {
     class MainWindow;
 }
+class MainWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -34,6 +36,8 @@ private slots:
 
 private:
     Ui::MainWindow* ui;
+
+    std::array<MainWidget*, 4> m_widgets;
 };
 
 #endif // MAINWINDOW_H

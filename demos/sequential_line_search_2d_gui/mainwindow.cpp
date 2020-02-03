@@ -1,9 +1,11 @@
 #include "mainwindow.hpp"
 #include "core.hpp"
+#include "mainwidget.hpp"
 #include "ui_mainwindow.h"
 #include <QDir>
 #include <QFileDialog>
 #include <QFutureWatcher>
+#include <QLabel>
 #include <QProgressDialog>
 #include <QtConcurrent>
 #include <fstream>
@@ -41,29 +43,42 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     core.optimizer->SetHyperparams(a, r, b, variance, btl_scale);
 
     // Setup widgets
-    ui->widget_y->content = MainWidget::Content::Objective;
-    ui->widget_e->content = MainWidget::Content::ExpectedImprovement;
-    ui->widget_m->content = MainWidget::Content::Mean;
-    ui->widget_s->content = MainWidget::Content::StandardDeviation;
+    for (int i : {0, 1, 2, 3})
+    {
+        constexpr unsigned s = 320;
 
-    ui->widget_y->draw_slider_space = true;
-    ui->widget_y->draw_slider_tick  = true;
+        m_widgets[i] = new MainWidget(this);
 
-    ui->widget_e->draw_data_points  = true;
-    ui->widget_e->draw_data_maximum = true;
-    ui->widget_e->draw_maximum      = true;
+        m_widgets[i]->setFixedSize(s, s);
+    }
 
-    ui->widget_m->draw_data_points  = true;
-    ui->widget_m->draw_data_maximum = true;
+    m_widgets[0]->content           = MainWidget::Content::Objective;
+    m_widgets[0]->draw_slider_space = true;
+    m_widgets[0]->draw_slider_tick  = true;
 
-    ui->widget_s->draw_data_points  = true;
-    ui->widget_s->draw_data_maximum = true;
+    m_widgets[1]->content          = MainWidget::Content::ExpectedImprovement;
+    m_widgets[1]->draw_maximum     = true;
+    m_widgets[1]->draw_data_points = true;
 
-    const unsigned s = 320;
-    ui->widget_y->setFixedSize(s, s);
-    ui->widget_s->setFixedSize(s, s);
-    ui->widget_m->setFixedSize(s, s);
-    ui->widget_e->setFixedSize(s, s);
+    m_widgets[2]->content          = MainWidget::Content::Mean;
+    m_widgets[2]->draw_maximum     = false;
+    m_widgets[2]->draw_data_points = true;
+
+    m_widgets[3]->content          = MainWidget::Content::StandardDeviation;
+    m_widgets[3]->draw_maximum     = false;
+    m_widgets[3]->draw_data_points = true;
+
+    ui->gridLayout->addWidget(m_widgets[0], 1, 0);
+    ui->gridLayout->addWidget(new QLabel("<center>Slider space</center>"), 2, 0);
+
+    ui->gridLayout->addWidget(m_widgets[1], 1, 1);
+    ui->gridLayout->addWidget(new QLabel("<center>Expected improvement</center>"), 2, 1);
+
+    ui->gridLayout->addWidget(m_widgets[2], 3, 0);
+    ui->gridLayout->addWidget(new QLabel("<center>Predicted mean</center>"), 4, 0);
+
+    ui->gridLayout->addWidget(m_widgets[3], 3, 1);
+    ui->gridLayout->addWidget(new QLabel("<center>Predicted stdev</center>"), 4, 1);
 
     ui->horizontalSlider->setValue((ui->horizontalSlider->maximum() + ui->horizontalSlider->minimum()) / 2);
 }
@@ -111,11 +126,16 @@ void MainWindow::on_actionBatch_visualization_triggered()
                                                        nlopt::LN_COBYLA,
                                                        nullptr);
 
-        ui->widget_y->draw_slider_space = false;
-        ui->widget_y->draw_slider_tick  = false;
-        ui->widget_y->grab().save(path + QString("y.png"));
-        ui->widget_y->draw_slider_space = true;
-        ui->widget_y->draw_slider_tick  = true;
+        MainWidget* widget_y = m_widgets[0];
+        MainWidget* widget_e = m_widgets[1];
+        MainWidget* widget_m = m_widgets[2];
+        MainWidget* widget_s = m_widgets[3];
+
+        widget_y->draw_slider_space = false;
+        widget_y->draw_slider_tick  = false;
+        widget_y->grab().save(path + QString("y.png"));
+        widget_y->draw_slider_space = true;
+        widget_y->draw_slider_tick  = true;
 
         for (unsigned i = 0; i <= n_iterations; ++i)
         {
@@ -138,18 +158,18 @@ void MainWindow::on_actionBatch_visualization_triggered()
 
             ui->horizontalSlider->setValue(max_slider);
             window()->grab().save(path + QString("window") + QString("%1").arg(i, 3, 10, QChar('0')) + QString(".png"));
-            ui->widget_e->grab().save(path + QString("e") + QString("%1").arg(i, 3, 10, QChar('0')) + QString(".png"));
-            ui->widget_m->grab().save(path + QString("m") + QString("%1").arg(i, 3, 10, QChar('0')) + QString(".png"));
-            ui->widget_s->grab().save(path + QString("s") + QString("%1").arg(i, 3, 10, QChar('0')) + QString(".png"));
-            ui->widget_y->grab().save(path + QString("y") + QString("%1").arg(i, 3, 10, QChar('0')) + QString(".png"));
+            widget_e->grab().save(path + QString("e") + QString("%1").arg(i, 3, 10, QChar('0')) + QString(".png"));
+            widget_m->grab().save(path + QString("m") + QString("%1").arg(i, 3, 10, QChar('0')) + QString(".png"));
+            widget_s->grab().save(path + QString("s") + QString("%1").arg(i, 3, 10, QChar('0')) + QString(".png"));
+            widget_y->grab().save(path + QString("y") + QString("%1").arg(i, 3, 10, QChar('0')) + QString(".png"));
 
-            ui->widget_e->draw_maximum = false;
-            ui->widget_e->grab().save(path + QString("_e") + QString("%1").arg(i, 3, 10, QChar('0')) + QString(".png"));
-            ui->widget_e->draw_maximum = true;
+            widget_e->draw_maximum = false;
+            widget_e->grab().save(path + QString("_e") + QString("%1").arg(i, 3, 10, QChar('0')) + QString(".png"));
+            widget_e->draw_maximum = true;
 
-            ui->widget_y->draw_slider_tick = false;
-            ui->widget_y->grab().save(path + QString("_y") + QString("%1").arg(i, 3, 10, QChar('0')) + QString(".png"));
-            ui->widget_y->draw_slider_tick = true;
+            widget_y->draw_slider_tick = false;
+            widget_y->grab().save(path + QString("_y") + QString("%1").arg(i, 3, 10, QChar('0')) + QString(".png"));
+            widget_y->draw_slider_tick = true;
 
             core.optimizer->SubmitLineSearchResult(obtainSliderPosition());
         }
@@ -172,25 +192,25 @@ void MainWindow::on_actionClear_all_data_triggered()
         std::make_shared<SequentialLineSearchOptimizer>(dimension, use_slider_enlargement, use_MAP_hyperparameters);
     core.optimizer->SetHyperparams(a, r, b, variance, btl_scale);
 
-    ui->widget_y->update();
-    ui->widget_s->update();
-    ui->widget_m->update();
-    ui->widget_e->update();
+    for (auto widget : m_widgets)
+    {
+        widget->update();
+    }
 }
 
 void MainWindow::on_actionProceed_optimization_triggered()
 {
     core.optimizer->SubmitLineSearchResult(obtainSliderPosition());
 
-    ui->widget_y->update();
-    ui->widget_s->update();
-    ui->widget_m->update();
-    ui->widget_e->update();
+    for (auto widget : m_widgets)
+    {
+        widget->update();
+    }
 }
 
 void MainWindow::on_horizontalSlider_valueChanged(int /*value*/)
 {
-    ui->widget_y->update();
+    m_widgets[0]->update();
     ui->widget_preview->update();
 }
 
@@ -199,10 +219,10 @@ void MainWindow::on_pushButton_clicked()
     core.optimizer->SubmitLineSearchResult(obtainSliderPosition());
 
     ui->horizontalSlider->setValue((ui->horizontalSlider->maximum() + ui->horizontalSlider->minimum()) / 2);
-    ui->widget_y->update();
-    ui->widget_s->update();
-    ui->widget_m->update();
-    ui->widget_e->update();
+    for (auto widget : m_widgets)
+    {
+        widget->update();
+    }
 }
 
 void MainWindow::on_actionPrint_current_best_triggered()
