@@ -12,9 +12,9 @@ public:
 protected:
     void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
 
-signals:
-
-public slots:
+private:
+    double m_f_min;
+    double m_f_max;
 };
 
 #endif // WIDGETPREVIEW_H

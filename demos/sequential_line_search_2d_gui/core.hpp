@@ -26,6 +26,7 @@ public:
 
     MainWindow* mainWindow;
 
+    // x in [0, 1]^2
     double evaluateObjectiveFunction(const Eigen::VectorXd& x) const;
 };
 
