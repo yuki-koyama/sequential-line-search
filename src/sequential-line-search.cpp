@@ -62,8 +62,12 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResu
     // not justified or validated.
     const int num_dims                 = GetMaximizer().size();
     const int num_map_estimation_iters = 100;
-    const int num_global_search_iters  = 50 * num_dims;
-    const int num_local_search_iters   = 10 * num_dims;
+#ifdef SEQUENTIAL_LINE_SEARCH_USE_PARALLELIZED_MULTI_START_SEARCH
+    const int num_global_search_iters = 10;
+#else
+    const int num_global_search_iters = 50 * num_dims;
+#endif
+    const int num_local_search_iters = 10 * num_dims;
 
     SubmitLineSearchResult(slider_position, num_map_estimation_iters, num_global_search_iters, num_local_search_iters);
 }
