@@ -24,13 +24,8 @@ namespace sequential_line_search
 
         inline double CalcBtl(const Eigen::VectorXd& f, double scale = 1.0)
         {
-            const unsigned dim = f.rows();
-            double         sum = 0.0;
-            for (unsigned i = 0; i < dim; ++i)
-            {
-                sum += std::exp(f(i) / scale);
-            }
-            return std::exp(f(0) / scale) / sum;
+            const auto exp_rep = ((1.0 / scale) * f).array().exp();
+            return exp_rep(0) / exp_rep.sum();
         }
 
         inline Eigen::VectorXd CalcBtlDerivative(const Eigen::VectorXd& f, double scale = 1.0)
