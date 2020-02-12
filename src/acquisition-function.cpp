@@ -15,60 +15,87 @@ namespace
 {
     using namespace sequential_line_search;
 
-    // A wrapper struct for an nlopt-style objective function
+    /// \brief A GP-UBC hyperparameter that controls the balance of exploitation and exploration.
+    constexpr double hyperparam = 1.0;
+
+    /// \brief A wrapper struct for an nlopt-style objective function
     struct RegressorWrapper
     {
-        const Regressor* regressor;
+        const Regressor*          regressor;
+        const AcquisitionFuncType function_type;
     };
 
-    // A wrapper struct for an nlopt-style objective function
+    /// \brief A wrapper struct for an nlopt-style objective function
     struct RegressorPairWrapper
     {
-        const Regressor* orig_regressor;
-        const Regressor* updated_regressor;
+        const Regressor*          orig_regressor;
+        const Regressor*          updated_regressor;
+        const AcquisitionFuncType function_type;
     };
 
+    /// \brief NLopt-style objective function definition for finding the next (single) point.
     double objective(const std::vector<double>& x, std::vector<double>& grad, void* data)
     {
-        const Regressor* regressor = static_cast<RegressorWrapper*>(data)->regressor;
+        const Regressor*           regressor     = static_cast<RegressorWrapper*>(data)->regressor;
+        const AcquisitionFuncType& function_type = static_cast<RegressorWrapper*>(data)->function_type;
+
+        const auto eigen_x = Eigen::Map<const VectorXd>(&x[0], x.size());
 
         if (!grad.empty())
         {
-            const VectorXd derivative = acquisition_function::CalcAcquisitionValueDerivative(
-                *regressor, Eigen::Map<const VectorXd>(&x[0], x.size()));
+            const VectorXd derivative =
+                acquisition_function::CalcAcquisitionValueDerivative(*regressor, eigen_x, function_type);
             std::memcpy(grad.data(), derivative.data(), sizeof(double) * derivative.size());
         }
 
-        return acquisition_function::CalcAcqusitionValue(*regressor, Eigen::Map<const VectorXd>(&x[0], x.size()));
+        return acquisition_function::CalcAcqusitionValue(*regressor, eigen_x, function_type);
     }
 
-    // Schonlau et al, Global Versus Local Search in Constrained Optimization of Computer Models, 1997.
+    /// \brief NLopt-style objective function definition for finding the next multiple points.
+    ///
+    /// \details Ref: Schonlau et al, Global Versus Local Search in Constrained Optimization of Computer Models, 1997.
     double objective_for_multiple_points(const std::vector<double>& x, std::vector<double>& grad, void* data)
     {
-        const Regressor* orig_regressor    = static_cast<RegressorPairWrapper*>(data)->orig_regressor;
-        const Regressor* updated_regressor = static_cast<RegressorPairWrapper*>(data)->updated_regressor;
+        const Regressor*           orig_regressor    = static_cast<RegressorPairWrapper*>(data)->orig_regressor;
+        const Regressor*           updated_regressor = static_cast<RegressorPairWrapper*>(data)->updated_regressor;
+        const AcquisitionFuncType& function_type     = static_cast<RegressorWrapper*>(data)->function_type;
 
-        const VectorXd eigen_x = Eigen::Map<const VectorXd>(&x[0], x.size());
+        const auto mu               = [&](const VectorXd& x) { return orig_regressor->PredictMu(x); };
+        const auto sigma            = [&](const VectorXd& x) { return updated_regressor->PredictSigma(x); };
+        const auto mu_derivative    = [&](const VectorXd& x) { return orig_regressor->PredictMuDerivative(x); };
+        const auto sigma_derivative = [&](const VectorXd& x) { return updated_regressor->PredictSigmaDerivative(x); };
 
-        const VectorXd x_best = orig_regressor->PredictMaximumPointFromData();
+        const auto eigen_x = Eigen::Map<const VectorXd>(&x[0], x.size());
 
-        const auto mu    = [&](const VectorXd& x) { return orig_regressor->PredictMu(x); };
-        const auto sigma = [&](const VectorXd& x) { return updated_regressor->PredictSigma(x); };
-
-        if (!grad.empty())
+        switch (function_type)
         {
-            const auto mu_derivative    = [&](const VectorXd& x) { return orig_regressor->PredictMuDerivative(x); };
-            const auto sigma_derivative = [&](const VectorXd& x) {
-                return updated_regressor->PredictSigmaDerivative(x);
-            };
+            case AcquisitionFuncType::ExpectedImprovement:
+            {
+                const VectorXd x_best = orig_regressor->PredictMaximumPointFromData();
 
-            const VectorXd derivative = mathtoolbox::GetExpectedImprovementDerivative(
-                eigen_x, mu, sigma, x_best, mu_derivative, sigma_derivative);
+                if (!grad.empty())
+                {
+                    const VectorXd derivative = mathtoolbox::GetExpectedImprovementDerivative(
+                        eigen_x, mu, sigma, x_best, mu_derivative, sigma_derivative);
 
-            std::memcpy(grad.data(), derivative.data(), sizeof(double) * derivative.size());
+                    std::memcpy(grad.data(), derivative.data(), sizeof(double) * derivative.size());
+                }
+
+                return mathtoolbox::GetExpectedImprovement(eigen_x, mu, sigma, x_best);
+            }
+            case AcquisitionFuncType::GaussianProcessUpperConfidenceBound:
+            {
+                if (!grad.empty())
+                {
+                    const VectorXd derivative = mathtoolbox::GetGaussianProcessUpperConfidenceBoundDerivative(
+                        eigen_x, mu, sigma, hyperparam, mu_derivative, sigma_derivative);
+
+                    std::memcpy(grad.data(), derivative.data(), sizeof(double) * derivative.size());
+                }
+
+                return mathtoolbox::GetGaussianProcessUpperConfidenceBound(eigen_x, mu, sigma, hyperparam);
+            }
         }
-
-        return mathtoolbox::GetExpectedImprovement(eigen_x, mu, sigma, x_best);
     }
 
     VectorXd FindGlobalSolution(nlopt::vfunc   objective,
@@ -126,56 +153,72 @@ namespace
     }
 } // namespace
 
-double sequential_line_search::acquisition_function::CalcAcqusitionValue(const Regressor&   regressor,
-                                                                         const VectorXd&    x,
-                                                                         const FunctionType function_type)
+double sequential_line_search::acquisition_function::CalcAcqusitionValue(const Regressor&          regressor,
+                                                                         const VectorXd&           x,
+                                                                         const AcquisitionFuncType function_type)
 {
-    assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
-
     if (regressor.GetSmallY().rows() == 0)
     {
         return 0.0;
     }
 
-    const VectorXd x_best = regressor.PredictMaximumPointFromData();
-
     const auto mu    = [&](const VectorXd& x) { return regressor.PredictMu(x); };
     const auto sigma = [&](const VectorXd& x) { return regressor.PredictSigma(x); };
 
-    return mathtoolbox::GetExpectedImprovement(x, mu, sigma, x_best);
+    switch (function_type)
+    {
+        case AcquisitionFuncType::ExpectedImprovement:
+        {
+            const VectorXd x_best = regressor.PredictMaximumPointFromData();
+
+            return mathtoolbox::GetExpectedImprovement(x, mu, sigma, x_best);
+        }
+        case AcquisitionFuncType::GaussianProcessUpperConfidenceBound:
+        {
+            return mathtoolbox::GetGaussianProcessUpperConfidenceBound(x, mu, sigma, hyperparam);
+        }
+    }
 }
 
-VectorXd sequential_line_search::acquisition_function::CalcAcquisitionValueDerivative(const Regressor&   regressor,
-                                                                                      const VectorXd&    x,
-                                                                                      const FunctionType function_type)
+VectorXd
+sequential_line_search::acquisition_function::CalcAcquisitionValueDerivative(const Regressor&          regressor,
+                                                                             const VectorXd&           x,
+                                                                             const AcquisitionFuncType function_type)
 {
-    assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
-
     if (regressor.GetSmallY().rows() == 0)
     {
         return VectorXd::Zero(x.size());
     }
-
-    const VectorXd x_best = regressor.PredictMaximumPointFromData();
 
     const auto mu               = [&](const VectorXd& x) { return regressor.PredictMu(x); };
     const auto sigma            = [&](const VectorXd& x) { return regressor.PredictSigma(x); };
     const auto mu_derivative    = [&](const VectorXd& x) { return regressor.PredictMuDerivative(x); };
     const auto sigma_derivative = [&](const VectorXd& x) { return regressor.PredictSigmaDerivative(x); };
 
-    return mathtoolbox::GetExpectedImprovementDerivative(x, mu, sigma, x_best, mu_derivative, sigma_derivative);
+    switch (function_type)
+    {
+        case AcquisitionFuncType::ExpectedImprovement:
+        {
+            const VectorXd x_best = regressor.PredictMaximumPointFromData();
+
+            return mathtoolbox::GetExpectedImprovementDerivative(x, mu, sigma, x_best, mu_derivative, sigma_derivative);
+        }
+        case AcquisitionFuncType::GaussianProcessUpperConfidenceBound:
+        {
+            return mathtoolbox::GetGaussianProcessUpperConfidenceBoundDerivative(
+                x, mu, sigma, hyperparam, mu_derivative, sigma_derivative);
+        }
+    }
 }
 
-VectorXd sequential_line_search::acquisition_function::FindNextPoint(const Regressor&   regressor,
-                                                                     const unsigned     num_global_search_iters,
-                                                                     const unsigned     num_local_search_iters,
-                                                                     const FunctionType function_type)
+VectorXd sequential_line_search::acquisition_function::FindNextPoint(const Regressor&          regressor,
+                                                                     const unsigned            num_global_search_iters,
+                                                                     const unsigned            num_local_search_iters,
+                                                                     const AcquisitionFuncType function_type)
 {
-    assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
-
     const unsigned num_dim = regressor.GetNumDims();
 
-    RegressorWrapper data = {&regressor};
+    RegressorWrapper data{&regressor, function_type};
 
     return FindGlobalSolution(objective, &data, num_dim, num_global_search_iters, num_local_search_iters);
 }
@@ -184,10 +227,8 @@ vector<VectorXd> sequential_line_search::acquisition_function::FindNextPoints(co
                                                                               const unsigned   num_points,
                                                                               const unsigned   num_global_search_iters,
                                                                               const unsigned   num_local_search_iters,
-                                                                              const FunctionType function_type)
+                                                                              const AcquisitionFuncType function_type)
 {
-    assert(function_type == FunctionType::ExpectedImprovement && "FunctionType not supported yet.");
-
     const unsigned num_dim = regressor.GetNumDims();
 
     vector<VectorXd> points;
@@ -200,7 +241,7 @@ vector<VectorXd> sequential_line_search::acquisition_function::FindNextPoints(co
     for (unsigned i = 0; i < num_points; ++i)
     {
         // Create a data object for the nlopt-style objective function
-        RegressorPairWrapper data{&regressor, &temporary_regressor};
+        RegressorPairWrapper data{&regressor, &temporary_regressor, function_type};
 
         // Find a global solution
         const VectorXd x_star = FindGlobalSolution(
