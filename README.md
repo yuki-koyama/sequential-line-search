@@ -206,6 +206,13 @@ This implementation offers two approaches for this problem:
 
 See `src/acquisition-function.cpp` for details.
 
+### Acquisition Function Choices
+
+The following acquisition functions are supported:
+
+- Expected improvement (EI) [default; used in the original paper]
+- Gaussian process upper confidence bound (GP-UCB)
+
 ### Search Space
 
 This implementation assumes that the search space is always [0, 1]^D. When you want to handle a different search space, you need to normalize the target space into [0, 1]^D manually.
