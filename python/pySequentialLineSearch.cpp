@@ -22,6 +22,11 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
     SequentialLineSearchOptimizer
     )pbdoc";
 
+    py::enum_<sequential_line_search::AcquisitionFuncType>(m, "AcquisitionFuncType", py::arithmetic())
+        .value("ExpectedImprovement", sequential_line_search::AcquisitionFuncType::ExpectedImprovement)
+        .value("GaussianProcessUpperConfidenceBound",
+               sequential_line_search::AcquisitionFuncType::GaussianProcessUpperConfidenceBound);
+
     py::enum_<sequential_line_search::KernelType>(m, "KernelType", py::arithmetic())
         .value("ArdSquaredExponentialKernel", sequential_line_search::KernelType::ArdSquaredExponentialKernel)
         .value("ArdMatern52Kernel", sequential_line_search::KernelType::ArdMatern52Kernel);
@@ -38,11 +43,13 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
                                  const bool,
                                  const bool,
                                  const sequential_line_search::KernelType,
+                                 const sequential_line_search::AcquisitionFuncType,
                                  const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>&>(),
                         "num_dims"_a,
                         "use_slider_enlargement"_a = true,
                         "use_map_hyperparams"_a    = true,
                         "kernel_type"_a            = sequential_line_search::KernelType::ArdMatern52Kernel,
+                        "acquisition_func_type"_a  = sequential_line_search::AcquisitionFuncType::ExpectedImprovement,
                         "initial_slider_generator"_a);
 
     optimizer_class.def("set_hyperparams",
@@ -81,11 +88,15 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
         "get_preference_value_stdev", &SequentialLineSearchOptimizer::GetPreferenceValueStdev, "point"_a);
 
     optimizer_class.def(
-        "get_expected_improvement_value", &SequentialLineSearchOptimizer::GetExpectedImprovementValue, "point"_a);
+        "get_acquisition_func_value", &SequentialLineSearchOptimizer::GetAcquisitionFuncValue, "point"_a);
 
     optimizer_class.def("get_raw_data_points", &SequentialLineSearchOptimizer::GetRawDataPoints);
 
     optimizer_class.def("damp_data", &SequentialLineSearchOptimizer::DampData, "directory_path"_a);
+
+    optimizer_class.def("set_gaussian_process_upper_confidence_bound_hyperparam",
+                        &SequentialLineSearchOptimizer::SetGaussianProcessUpperConfidenceBoundHyperparam,
+                        "hyperparam"_a);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;

@@ -3,6 +3,7 @@
 
 #include <Eigen/Core>
 #include <memory>
+#include <sequential-line-search/acquisition-function.hpp>
 #include <sequential-line-search/kernel-type.hpp>
 #include <utility>
 
@@ -29,12 +30,14 @@ namespace sequential_line_search
         /// \param use_map_hyperparams When this is set true, the optimizer always perform the MAP estimation for the
         /// GPR kernel hyperparameters. When this is set false, the optimizer performs the MAP estimation only for
         /// goodness values.
-        SequentialLineSearchOptimizer(const int        num_dims,
-                                      const bool       use_slider_enlargement = true,
-                                      const bool       use_map_hyperparams    = true,
-                                      const KernelType kernel_type            = KernelType::ArdMatern52Kernel,
-                                      const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>&
-                                          initial_slider_generator = GenerateRandomSliderEnds);
+        SequentialLineSearchOptimizer(
+            const int                 num_dims,
+            const bool                use_slider_enlargement = true,
+            const bool                use_map_hyperparams    = true,
+            const KernelType          kernel_type            = KernelType::ArdMatern52Kernel,
+            const AcquisitionFuncType acquisition_func_type  = AcquisitionFuncType::ExpectedImprovement,
+            const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>& initial_slider_generator =
+                GenerateRandomSliderEnds);
 
         /// \brief Specify (kernel and other) hyperparameter values.
         ///
@@ -77,11 +80,20 @@ namespace sequential_line_search
 
         double GetPreferenceValueMean(const Eigen::VectorXd& point) const;
         double GetPreferenceValueStdev(const Eigen::VectorXd& point) const;
-        double GetExpectedImprovementValue(const Eigen::VectorXd& point) const;
+        double GetAcquisitionFuncValue(const Eigen::VectorXd& point) const;
 
         const Eigen::MatrixXd& GetRawDataPoints() const;
 
         void DampData(const std::string& directory_path) const;
+
+        /// \brief Set the hyperparameter in the GP-UCB algorithm.
+        ///
+        /// \details This hyperparameter controls the trade-off of exploration and exploitation. If the acquisition
+        /// function is not GP-UCB, this value will be not used.
+        void SetGaussianProcessUpperConfidenceBoundHyperparam(const double hyperparam)
+        {
+            m_gaussian_process_upper_confidence_bound_hyperparam = hyperparam;
+        }
 
     private:
         const bool m_use_slider_enlargement;
@@ -97,7 +109,10 @@ namespace sequential_line_search
         double m_kernel_hyperparams_prior_var;
         double m_btl_scale;
 
-        const KernelType m_kernel_type;
+        const KernelType          m_kernel_type;
+        const AcquisitionFuncType m_acquisition_func_type;
+
+        double m_gaussian_process_upper_confidence_bound_hyperparam;
     };
 } // namespace sequential_line_search
 

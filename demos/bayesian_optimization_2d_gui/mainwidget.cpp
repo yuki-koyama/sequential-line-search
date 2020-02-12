@@ -60,7 +60,8 @@ void MainWidget::paintEvent(QPaintEvent* event)
                     break;
                 case Content::ExpectedImprovement:
                     val(pix_x, pix_y) = (core.regressor.get() != nullptr)
-                                            ? acquisition_function::CalcAcqusitionValue(*core.regressor, x)
+                                            ? acquisition_func::CalcAcqusitionValue(
+                                                  *core.regressor, x, AcquisitionFuncType::ExpectedImprovement)
                                             : 0.0;
                     break;
                 default:

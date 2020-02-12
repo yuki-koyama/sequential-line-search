@@ -26,6 +26,7 @@ sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptim
     const bool                                                                   use_slider_enlargement,
     const bool                                                                   use_map_hyperparams,
     const KernelType                                                             kernel_type,
+    const AcquisitionFuncType                                                    acquisition_func_type,
     const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>& initial_slider_generator)
     : m_use_slider_enlargement(use_slider_enlargement),
       m_use_map_hyperparams(use_map_hyperparams),
@@ -34,7 +35,9 @@ sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptim
       m_noise_level(0.005),
       m_kernel_hyperparams_prior_var(0.250),
       m_btl_scale(0.010),
-      m_kernel_type(kernel_type)
+      m_kernel_type(kernel_type),
+      m_acquisition_func_type(acquisition_func_type),
+      m_gaussian_process_upper_confidence_bound_hyperparam(1.0)
 {
     const auto slider_ends = initial_slider_generator(num_dims);
 
@@ -98,8 +101,11 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResu
 
     // Find the next search subspace
     const auto x_max = m_regressor->FindArgMax();
-    const auto x_ei =
-        acquisition_function::FindNextPoint(*m_regressor, num_global_search_iters, num_local_search_iters);
+    const auto x_ei  = acquisition_func::FindNextPoint(*m_regressor,
+                                                      num_global_search_iters,
+                                                      num_local_search_iters,
+                                                      m_acquisition_func_type,
+                                                      m_gaussian_process_upper_confidence_bound_hyperparam);
 
     m_slider = std::make_shared<Slider>(x_max, x_ei, m_use_slider_enlargement);
 }
@@ -132,9 +138,14 @@ sequential_line_search::SequentialLineSearchOptimizer::GetPreferenceValueStdev(c
 }
 
 double
-sequential_line_search::SequentialLineSearchOptimizer::GetExpectedImprovementValue(const Eigen::VectorXd& point) const
+sequential_line_search::SequentialLineSearchOptimizer::GetAcquisitionFuncValue(const Eigen::VectorXd& point) const
 {
-    return (m_regressor == nullptr) ? 0.0 : acquisition_function::CalcAcqusitionValue(*m_regressor, point);
+    return (m_regressor == nullptr)
+               ? 0.0
+               : acquisition_func::CalcAcqusitionValue(*m_regressor,
+                                                       point,
+                                                       m_acquisition_func_type,
+                                                       m_gaussian_process_upper_confidence_bound_hyperparam);
 }
 
 const Eigen::MatrixXd& sequential_line_search::SequentialLineSearchOptimizer::GetRawDataPoints() const
