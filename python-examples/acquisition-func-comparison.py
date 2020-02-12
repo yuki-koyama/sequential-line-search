@@ -62,7 +62,7 @@ acquisition_func_type_set = [
     (pySequentialLineSearch.AcquisitionFuncType.
      GaussianProcessUpperConfidenceBound, 1.0, r"GP-UCB ($\beta = 1.0$)"),
     (pySequentialLineSearch.AcquisitionFuncType.
-     GaussianProcessUpperConfidenceBound, 100.0, r"GP-UCB ($\beta = 5.0$)"),
+     GaussianProcessUpperConfidenceBound, 5.0, r"GP-UCB ($\beta = 5.0$)"),
 ]
 
 # Define constant values
