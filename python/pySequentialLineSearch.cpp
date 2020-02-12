@@ -94,6 +94,10 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
 
     optimizer_class.def("damp_data", &SequentialLineSearchOptimizer::DampData, "directory_path"_a);
 
+    optimizer_class.def("set_gaussian_process_upper_confidence_bound_hyperparam",
+                        &SequentialLineSearchOptimizer::SetGaussianProcessUpperConfidenceBoundHyperparam,
+                        "hyperparam"_a);
+
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;
 #else
