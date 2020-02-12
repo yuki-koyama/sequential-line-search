@@ -77,7 +77,7 @@ namespace sequential_line_search
 
         double GetPreferenceValueMean(const Eigen::VectorXd& point) const;
         double GetPreferenceValueStdev(const Eigen::VectorXd& point) const;
-        double GetExpectedImprovementValue(const Eigen::VectorXd& point) const;
+        double GetAcquisitionFuncValue(const Eigen::VectorXd& point) const;
 
         const Eigen::MatrixXd& GetRawDataPoints() const;
 

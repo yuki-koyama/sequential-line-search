@@ -68,7 +68,7 @@ void MainWidget::paintEvent(QPaintEvent* event)
                     val(pix_x, pix_y) = core.optimizer->GetPreferenceValueStdev(x);
                     break;
                 case Content::ExpectedImprovement:
-                    val(pix_x, pix_y) = core.optimizer->GetExpectedImprovementValue(x);
+                    val(pix_x, pix_y) = core.optimizer->GetAcquisitionFuncValue(x);
                     break;
                 default:
                     val(pix_x, pix_y) = 0.0;

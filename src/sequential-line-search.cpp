@@ -132,7 +132,7 @@ sequential_line_search::SequentialLineSearchOptimizer::GetPreferenceValueStdev(c
 }
 
 double
-sequential_line_search::SequentialLineSearchOptimizer::GetExpectedImprovementValue(const Eigen::VectorXd& point) const
+sequential_line_search::SequentialLineSearchOptimizer::GetAcquisitionFuncValue(const Eigen::VectorXd& point) const
 {
     return (m_regressor == nullptr) ? 0.0 : acquisition_function::CalcAcqusitionValue(*m_regressor, point);
 }

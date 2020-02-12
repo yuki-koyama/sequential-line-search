@@ -81,7 +81,7 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
         "get_preference_value_stdev", &SequentialLineSearchOptimizer::GetPreferenceValueStdev, "point"_a);
 
     optimizer_class.def(
-        "get_expected_improvement_value", &SequentialLineSearchOptimizer::GetExpectedImprovementValue, "point"_a);
+        "get_acquisition_func_value", &SequentialLineSearchOptimizer::GetAcquisitionFuncValue, "point"_a);
 
     optimizer_class.def("get_raw_data_points", &SequentialLineSearchOptimizer::GetRawDataPoints);
 
