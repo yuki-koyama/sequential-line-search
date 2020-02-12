@@ -102,6 +102,11 @@ namespace sequential_line_search
 
         const KernelType          m_kernel_type;
         const AcquisitionFuncType m_acquisition_func_type;
+
+        /// \brief The hyperparameter in the GP-UCB algorithm, which
+        /// controls the trade-off of exploration and exploitation. If the acquisition function is not GP-UCB, this
+        /// value will be not used.
+        const double m_gaussian_process_upper_confidence_bound_hyperparam;
     };
 } // namespace sequential_line_search
 
