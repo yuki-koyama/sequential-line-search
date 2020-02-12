@@ -12,7 +12,8 @@ namespace sequential_line_search
     {
         enum class FunctionType
         {
-            ExpectedImprovement
+            ExpectedImprovement,
+            GaussianProcessUpperConfidenceBound,
         };
 
         /// \brief Calculate the value of the acquisition function value.
