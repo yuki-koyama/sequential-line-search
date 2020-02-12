@@ -100,7 +100,7 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResu
 
     // Find the next search subspace
     const auto x_max = m_regressor->FindArgMax();
-    const auto x_ei  = acquisition_function::FindNextPoint(
+    const auto x_ei  = acquisition_func::FindNextPoint(
         *m_regressor, num_global_search_iters, num_local_search_iters, m_acquisition_func_type);
 
     m_slider = std::make_shared<Slider>(x_max, x_ei, m_use_slider_enlargement);
@@ -138,7 +138,7 @@ sequential_line_search::SequentialLineSearchOptimizer::GetAcquisitionFuncValue(c
 {
     return (m_regressor == nullptr)
                ? 0.0
-               : acquisition_function::CalcAcqusitionValue(*m_regressor, point, m_acquisition_func_type);
+               : acquisition_func::CalcAcqusitionValue(*m_regressor, point, m_acquisition_func_type);
 }
 
 const Eigen::MatrixXd& sequential_line_search::SequentialLineSearchOptimizer::GetRawDataPoints() const

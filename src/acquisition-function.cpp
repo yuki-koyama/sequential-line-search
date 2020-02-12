@@ -22,7 +22,7 @@ namespace
     struct RegressorWrapper
     {
         const Regressor*          regressor;
-        const AcquisitionFuncType function_type;
+        const AcquisitionFuncType func_type;
     };
 
     /// \brief A wrapper struct for an nlopt-style objective function
@@ -30,25 +30,25 @@ namespace
     {
         const Regressor*          orig_regressor;
         const Regressor*          updated_regressor;
-        const AcquisitionFuncType function_type;
+        const AcquisitionFuncType func_type;
     };
 
     /// \brief NLopt-style objective function definition for finding the next (single) point.
     double objective(const std::vector<double>& x, std::vector<double>& grad, void* data)
     {
-        const Regressor*           regressor     = static_cast<RegressorWrapper*>(data)->regressor;
-        const AcquisitionFuncType& function_type = static_cast<RegressorWrapper*>(data)->function_type;
+        const Regressor*           regressor = static_cast<RegressorWrapper*>(data)->regressor;
+        const AcquisitionFuncType& func_type = static_cast<RegressorWrapper*>(data)->func_type;
 
         const auto eigen_x = Eigen::Map<const VectorXd>(&x[0], x.size());
 
         if (!grad.empty())
         {
             const VectorXd derivative =
-                acquisition_function::CalcAcquisitionValueDerivative(*regressor, eigen_x, function_type);
+                acquisition_func::CalcAcquisitionValueDerivative(*regressor, eigen_x, func_type);
             std::memcpy(grad.data(), derivative.data(), sizeof(double) * derivative.size());
         }
 
-        return acquisition_function::CalcAcqusitionValue(*regressor, eigen_x, function_type);
+        return acquisition_func::CalcAcqusitionValue(*regressor, eigen_x, func_type);
     }
 
     /// \brief NLopt-style objective function definition for finding the next multiple points.
@@ -58,7 +58,7 @@ namespace
     {
         const Regressor*           orig_regressor    = static_cast<RegressorPairWrapper*>(data)->orig_regressor;
         const Regressor*           updated_regressor = static_cast<RegressorPairWrapper*>(data)->updated_regressor;
-        const AcquisitionFuncType& function_type     = static_cast<RegressorWrapper*>(data)->function_type;
+        const AcquisitionFuncType& func_type         = static_cast<RegressorWrapper*>(data)->func_type;
 
         const auto mu               = [&](const VectorXd& x) { return orig_regressor->PredictMu(x); };
         const auto sigma            = [&](const VectorXd& x) { return updated_regressor->PredictSigma(x); };
@@ -67,7 +67,7 @@ namespace
 
         const auto eigen_x = Eigen::Map<const VectorXd>(&x[0], x.size());
 
-        switch (function_type)
+        switch (func_type)
         {
             case AcquisitionFuncType::ExpectedImprovement:
             {
@@ -153,9 +153,9 @@ namespace
     }
 } // namespace
 
-double sequential_line_search::acquisition_function::CalcAcqusitionValue(const Regressor&          regressor,
-                                                                         const VectorXd&           x,
-                                                                         const AcquisitionFuncType function_type)
+double sequential_line_search::acquisition_func::CalcAcqusitionValue(const Regressor&          regressor,
+                                                                     const VectorXd&           x,
+                                                                     const AcquisitionFuncType func_type)
 {
     if (regressor.GetSmallY().rows() == 0)
     {
@@ -165,7 +165,7 @@ double sequential_line_search::acquisition_function::CalcAcqusitionValue(const R
     const auto mu    = [&](const VectorXd& x) { return regressor.PredictMu(x); };
     const auto sigma = [&](const VectorXd& x) { return regressor.PredictSigma(x); };
 
-    switch (function_type)
+    switch (func_type)
     {
         case AcquisitionFuncType::ExpectedImprovement:
         {
@@ -180,10 +180,9 @@ double sequential_line_search::acquisition_function::CalcAcqusitionValue(const R
     }
 }
 
-VectorXd
-sequential_line_search::acquisition_function::CalcAcquisitionValueDerivative(const Regressor&          regressor,
-                                                                             const VectorXd&           x,
-                                                                             const AcquisitionFuncType function_type)
+VectorXd sequential_line_search::acquisition_func::CalcAcquisitionValueDerivative(const Regressor&          regressor,
+                                                                                  const VectorXd&           x,
+                                                                                  const AcquisitionFuncType func_type)
 {
     if (regressor.GetSmallY().rows() == 0)
     {
@@ -195,7 +194,7 @@ sequential_line_search::acquisition_function::CalcAcquisitionValueDerivative(con
     const auto mu_derivative    = [&](const VectorXd& x) { return regressor.PredictMuDerivative(x); };
     const auto sigma_derivative = [&](const VectorXd& x) { return regressor.PredictSigmaDerivative(x); };
 
-    switch (function_type)
+    switch (func_type)
     {
         case AcquisitionFuncType::ExpectedImprovement:
         {
@@ -211,37 +210,37 @@ sequential_line_search::acquisition_function::CalcAcquisitionValueDerivative(con
     }
 }
 
-VectorXd sequential_line_search::acquisition_function::FindNextPoint(const Regressor&          regressor,
-                                                                     const unsigned            num_global_search_iters,
-                                                                     const unsigned            num_local_search_iters,
-                                                                     const AcquisitionFuncType function_type)
+VectorXd sequential_line_search::acquisition_func::FindNextPoint(const Regressor&          regressor,
+                                                                 const unsigned            num_global_search_iters,
+                                                                 const unsigned            num_local_search_iters,
+                                                                 const AcquisitionFuncType func_type)
 {
     const unsigned num_dim = regressor.GetNumDims();
 
-    RegressorWrapper data{&regressor, function_type};
+    RegressorWrapper data{&regressor, func_type};
 
     return FindGlobalSolution(objective, &data, num_dim, num_global_search_iters, num_local_search_iters);
 }
 
-vector<VectorXd> sequential_line_search::acquisition_function::FindNextPoints(const Regressor& regressor,
-                                                                              const unsigned   num_points,
-                                                                              const unsigned   num_global_search_iters,
-                                                                              const unsigned   num_local_search_iters,
-                                                                              const AcquisitionFuncType function_type)
+vector<VectorXd> sequential_line_search::acquisition_func::FindNextPoints(const Regressor& regressor,
+                                                                          const unsigned   num_points,
+                                                                          const unsigned   num_global_search_iters,
+                                                                          const unsigned   num_local_search_iters,
+                                                                          const AcquisitionFuncType func_type)
 {
     const unsigned num_dim = regressor.GetNumDims();
 
     vector<VectorXd> points;
 
-    const VectorXd kernel_hyperparameters = regressor.GetKernelHyperparams();
+    const VectorXd kernel_hyperparams = regressor.GetKernelHyperparams();
 
-    GaussianProcessRegressor temporary_regressor(
-        regressor.GetLargeX(), regressor.GetSmallY(), kernel_hyperparameters, regressor.GetNoiseHyperparam());
+    GaussianProcessRegressor temp_regressor(
+        regressor.GetLargeX(), regressor.GetSmallY(), kernel_hyperparams, regressor.GetNoiseHyperparam());
 
     for (unsigned i = 0; i < num_points; ++i)
     {
         // Create a data object for the nlopt-style objective function
-        RegressorPairWrapper data{&regressor, &temporary_regressor, function_type};
+        RegressorPairWrapper data{&regressor, &temp_regressor, func_type};
 
         // Find a global solution
         const VectorXd x_star = FindGlobalSolution(
@@ -253,17 +252,16 @@ vector<VectorXd> sequential_line_search::acquisition_function::FindNextPoints(co
         // If this is not the final iteration, prepare data for the next iteration
         if (points.size() != num_points)
         {
-            const unsigned N = temporary_regressor.GetLargeX().cols();
+            const unsigned N = temp_regressor.GetLargeX().cols();
 
             MatrixXd new_X(num_dim, N + 1);
-            new_X.block(0, 0, num_dim, N) = temporary_regressor.GetLargeX();
+            new_X.block(0, 0, num_dim, N) = temp_regressor.GetLargeX();
             new_X.col(N)                  = x_star;
 
-            VectorXd new_y(temporary_regressor.GetSmallY().rows() + 1);
-            new_y << temporary_regressor.GetSmallY(), temporary_regressor.PredictMu(x_star);
+            VectorXd new_y(temp_regressor.GetSmallY().rows() + 1);
+            new_y << temp_regressor.GetSmallY(), temp_regressor.PredictMu(x_star);
 
-            temporary_regressor =
-                GaussianProcessRegressor(new_X, new_y, kernel_hyperparameters, regressor.GetNoiseHyperparam());
+            temp_regressor = GaussianProcessRegressor(new_X, new_y, kernel_hyperparams, regressor.GetNoiseHyperparam());
         }
     }
 
