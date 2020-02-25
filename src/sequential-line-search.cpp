@@ -6,28 +6,29 @@
 #include <sequential-line-search/utils.hpp>
 #include <stdexcept>
 
-std::pair<Eigen::VectorXd, Eigen::VectorXd> sequential_line_search::GenerateRandomSliderEnds(const int num_dims)
+using Eigen::VectorXd;
+
+std::pair<VectorXd, VectorXd> sequential_line_search::GenerateRandomSliderEnds(const int num_dims)
 {
-    return {0.5 * (Eigen::VectorXd::Random(num_dims) + Eigen::VectorXd::Ones(num_dims)),
-            0.5 * (Eigen::VectorXd::Random(num_dims) + Eigen::VectorXd::Ones(num_dims))};
+    return {0.5 * (VectorXd::Random(num_dims) + VectorXd::Ones(num_dims)),
+            0.5 * (VectorXd::Random(num_dims) + VectorXd::Ones(num_dims))};
 }
 
-std::pair<Eigen::VectorXd, Eigen::VectorXd>
-sequential_line_search::GenerateCenteredFixedLengthRandomSliderEnds(const int num_dims)
+std::pair<VectorXd, VectorXd> sequential_line_search::GenerateCenteredFixedLengthRandomSliderEnds(const int num_dims)
 {
-    const Eigen::VectorXd x_center   = Eigen::VectorXd::Constant(num_dims, 0.50);
-    const Eigen::VectorXd random_dir = 0.5 * Eigen::VectorXd::Random(num_dims);
+    const VectorXd x_center   = VectorXd::Constant(num_dims, 0.50);
+    const VectorXd random_dir = 0.5 * VectorXd::Random(num_dims);
 
     return {x_center + random_dir, x_center - random_dir};
 }
 
 sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptimizer(
-    const int                                                                    num_dims,
-    const bool                                                                   use_slider_enlargement,
-    const bool                                                                   use_map_hyperparams,
-    const KernelType                                                             kernel_type,
-    const AcquisitionFuncType                                                    acquisition_func_type,
-    const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>& initial_slider_generator)
+    const int                                                      num_dims,
+    const bool                                                     use_slider_enlargement,
+    const bool                                                     use_map_hyperparams,
+    const KernelType                                               kernel_type,
+    const AcquisitionFuncType                                      acquisition_func_type,
+    const std::function<std::pair<VectorXd, VectorXd>(const int)>& initial_slider_generator)
     : m_use_slider_enlargement(use_slider_enlargement),
       m_use_map_hyperparams(use_map_hyperparams),
       m_kernel_signal_var(0.500),
@@ -110,35 +111,33 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResu
     m_slider = std::make_shared<Slider>(x_max, x_ei, m_use_slider_enlargement);
 }
 
-std::pair<Eigen::VectorXd, Eigen::VectorXd> sequential_line_search::SequentialLineSearchOptimizer::GetSliderEnds() const
+std::pair<VectorXd, VectorXd> sequential_line_search::SequentialLineSearchOptimizer::GetSliderEnds() const
 {
     return {m_slider->end_0, m_slider->end_1};
 }
 
-Eigen::VectorXd
+VectorXd
 sequential_line_search::SequentialLineSearchOptimizer::CalcPointFromSliderPosition(const double slider_position) const
 {
     return m_slider->GetValue(slider_position);
 }
 
-Eigen::VectorXd sequential_line_search::SequentialLineSearchOptimizer::GetMaximizer() const
+VectorXd sequential_line_search::SequentialLineSearchOptimizer::GetMaximizer() const
 {
     return m_slider->original_end_0;
 }
 
-double sequential_line_search::SequentialLineSearchOptimizer::GetPreferenceValueMean(const Eigen::VectorXd& point) const
+double sequential_line_search::SequentialLineSearchOptimizer::GetPreferenceValueMean(const VectorXd& point) const
 {
     return (m_regressor == nullptr) ? 0.0 : m_regressor->PredictMu(point);
 }
 
-double
-sequential_line_search::SequentialLineSearchOptimizer::GetPreferenceValueStdev(const Eigen::VectorXd& point) const
+double sequential_line_search::SequentialLineSearchOptimizer::GetPreferenceValueStdev(const VectorXd& point) const
 {
     return (m_regressor == nullptr) ? 0.0 : m_regressor->PredictSigma(point);
 }
 
-double
-sequential_line_search::SequentialLineSearchOptimizer::GetAcquisitionFuncValue(const Eigen::VectorXd& point) const
+double sequential_line_search::SequentialLineSearchOptimizer::GetAcquisitionFuncValue(const VectorXd& point) const
 {
     return (m_regressor == nullptr)
                ? 0.0
