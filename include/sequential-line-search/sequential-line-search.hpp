@@ -44,7 +44,9 @@ namespace sequential_line_search
             const KernelType          kernel_type            = KernelType::ArdMatern52Kernel,
             const AcquisitionFuncType acquisition_func_type  = AcquisitionFuncType::ExpectedImprovement,
             const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>& initial_slider_generator =
-                GenerateRandomSliderEnds);
+                GenerateRandomSliderEnds,
+            const SliderEndSelectionStrategy slider_end_selection_strategy =
+                SliderEndSelectionStrategy::LargestExpectValue);
 
         /// \brief Specify (kernel and other) hyperparameter values.
         ///
@@ -105,6 +107,8 @@ namespace sequential_line_search
     private:
         const bool m_use_slider_enlargement;
         const bool m_use_map_hyperparams;
+
+        const SliderEndSelectionStrategy m_slider_end_selection_strategy;
 
         std::shared_ptr<PreferenceRegressor>   m_regressor;
         std::shared_ptr<Slider>                m_slider;
