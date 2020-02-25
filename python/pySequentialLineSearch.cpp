@@ -37,21 +37,22 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
 
     py::class_<SequentialLineSearchOptimizer> optimizer_class(m, "SequentialLineSearchOptimizer");
 
-    optimizer_class.def(py::init<const int,
-                                 const bool,
-                                 const bool,
-                                 const sequential_line_search::KernelType,
-                                 const sequential_line_search::AcquisitionFuncType,
-                                 const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>&,
-                                 const sequential_line_search::SliderEndSelectionStrategy>(),
-                        "num_dims"_a,
-                        "use_slider_enlargement"_a   = true,
-                        "use_map_hyperparams"_a      = true,
-                        "kernel_type"_a              = sequential_line_search::KernelType::ArdMatern52Kernel,
-                        "acquisition_func_type"_a    = sequential_line_search::AcquisitionFuncType::ExpectedImprovement,
-                        "initial_slider_generator"_a = sequential_line_search::GenerateRandomSliderEnds,
-                        "slider_end_selection_strategy"_a =
-                            sequential_line_search::SliderEndSelectionStrategy::LargestExpectValue);
+    optimizer_class.def(
+        py::init<const int,
+                 const bool,
+                 const bool,
+                 const sequential_line_search::KernelType,
+                 const sequential_line_search::AcquisitionFuncType,
+                 const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>&,
+                 const sequential_line_search::SliderEndSelectionStrategy>(),
+        "num_dims"_a,
+        "use_slider_enlargement"_a   = true,
+        "use_map_hyperparams"_a      = true,
+        "kernel_type"_a              = sequential_line_search::KernelType::ArdMatern52Kernel,
+        "acquisition_func_type"_a    = sequential_line_search::AcquisitionFuncType::ExpectedImprovement,
+        "initial_slider_generator"_a = std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>(
+            sequential_line_search::GenerateRandomSliderEnds),
+        "slider_end_selection_strategy"_a = sequential_line_search::SliderEndSelectionStrategy::LargestExpectValue);
 
     optimizer_class.def("set_hyperparams",
                         &SequentialLineSearchOptimizer::SetHyperparams,
