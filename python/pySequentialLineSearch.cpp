@@ -22,6 +22,10 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
     SequentialLineSearchOptimizer
     )pbdoc";
 
+    py::enum_<sequential_line_search::SliderEndSelectionStrategy>(m, "SliderEndSelectionStrategy", py::arithmetic())
+        .value("LargestExpectValue", sequential_line_search::SliderEndSelectionStrategy::LargestExpectValue)
+        .value("LastSelection", sequential_line_search::SliderEndSelectionStrategy::LastSelection);
+
     py::enum_<sequential_line_search::AcquisitionFuncType>(m, "AcquisitionFuncType", py::arithmetic())
         .value("ExpectedImprovement", sequential_line_search::AcquisitionFuncType::ExpectedImprovement)
         .value("GaussianProcessUpperConfidenceBound",
@@ -44,13 +48,16 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
                                  const bool,
                                  const sequential_line_search::KernelType,
                                  const sequential_line_search::AcquisitionFuncType,
-                                 const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>&>(),
+                                 const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>&,
+                                 const sequential_line_search::SliderEndSelectionStrategy>(),
                         "num_dims"_a,
                         "use_slider_enlargement"_a = true,
                         "use_map_hyperparams"_a    = true,
                         "kernel_type"_a            = sequential_line_search::KernelType::ArdMatern52Kernel,
                         "acquisition_func_type"_a  = sequential_line_search::AcquisitionFuncType::ExpectedImprovement,
-                        "initial_slider_generator"_a);
+                        "initial_slider_generator"_a,
+                        "slider_end_selection_strategy"_a =
+                            sequential_line_search::SliderEndSelectionStrategy::LargestExpectValue);
 
     optimizer_class.def("set_hyperparams",
                         &SequentialLineSearchOptimizer::SetHyperparams,
