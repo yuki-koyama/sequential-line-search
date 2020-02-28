@@ -22,7 +22,7 @@ namespace sequential_line_search
         ///
         /// \param gaussian_process_upper_confidence_bound_hyperparam The hyperparameter in the GP-UCB algorithm, which
         /// controls the trade-off of exploration and exploitation. If the acquisition function is not GP-UCB, this
-        /// value will be not used.
+        /// value will not be used.
         double CalcAcqusitionValue(const Regressor&          regressor,
                                    const Eigen::VectorXd&    x,
                                    const AcquisitionFuncType func_type,
@@ -30,7 +30,7 @@ namespace sequential_line_search
 
         /// \param gaussian_process_upper_confidence_bound_hyperparam The hyperparameter in the GP-UCB algorithm, which
         /// controls the trade-off of exploration and exploitation. If the acquisition function is not GP-UCB, this
-        /// value will be not used.
+        /// value will not be used.
         Eigen::VectorXd
         CalcAcquisitionValueDerivative(const Regressor&          regressor,
                                        const Eigen::VectorXd&    x,
@@ -43,7 +43,7 @@ namespace sequential_line_search
         ///
         /// \param gaussian_process_upper_confidence_bound_hyperparam The hyperparameter in the GP-UCB algorithm, which
         /// controls the trade-off of exploration and exploitation. If the acquisition function is not GP-UCB, this
-        /// value will be not used.
+        /// value will not be used.
         Eigen::VectorXd FindNextPoint(const Regressor&          regressor,
                                       const unsigned            num_global_search_iters = 100,
                                       const unsigned            num_local_search_iters  = 50,
@@ -62,7 +62,7 @@ namespace sequential_line_search
         ///
         /// \param gaussian_process_upper_confidence_bound_hyperparam The hyperparameter in the GP-UCB algorithm, which
         /// controls the trade-off of exploration and exploitation. If the acquisition function is not GP-UCB, this
-        /// value will be not used.
+        /// value will not be used.
         std::vector<Eigen::VectorXd>
         FindNextPoints(const Regressor&          regressor,
                        const unsigned            num_points,

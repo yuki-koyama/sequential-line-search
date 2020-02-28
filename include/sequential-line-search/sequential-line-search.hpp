@@ -98,7 +98,7 @@ namespace sequential_line_search
         /// \brief Set the hyperparameter in the GP-UCB algorithm.
         ///
         /// \details This hyperparameter controls the trade-off of exploration and exploitation. If the acquisition
-        /// function is not GP-UCB, this value will be not used.
+        /// function is not GP-UCB, this value will not be used. 
         void SetGaussianProcessUpperConfidenceBoundHyperparam(const double hyperparam)
         {
             m_gaussian_process_upper_confidence_bound_hyperparam = hyperparam;
