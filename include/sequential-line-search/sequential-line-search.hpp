@@ -20,7 +20,8 @@ namespace sequential_line_search
     enum class SliderEndSelectionStrategy
     {
         LargestExpectValue, /// Select the point that has the largest expected value, x^{+}, as in [Koyama+17].
-        LastSelection,      /// Select the point that was chosen in the last subtask, x^{chosen}.
+        LastSelection,      /// Select the point that was chosen in the last subtask, x^{chosen}, as suggested in
+                            /// [Koyama+20].
     };
 
     /// \brief Optimizer class for performing sequential line search

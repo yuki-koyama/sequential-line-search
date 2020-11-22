@@ -221,8 +221,8 @@ This implementation assumes that the search space is always [0, 1]^D. When you w
 
 A slider space is constructed by choosing two end points. One of the two end points is always selected by maximizing the acquisition function (i.e., x^{EI} when using EI as the acquisition function). The other end point is selected by one of the following options:
 
-- The point that provides the largest expected value (i.e., x^{+}) [default; used in the original paper]
-- The point that is selected in the last subtask (i.e., x^{chosen})
+- The point that provides the largest expected value (i.e., x^{+}) (default; used in the original paper)
+- The point that is selected in the last subtask (i.e., x^{chosen}) (suggested in [Koyama+, 2020])
 
 ## License
 
