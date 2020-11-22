@@ -119,6 +119,7 @@ if(SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS)
 
 	add_subdirectory(demos/bayesian_optimization_1d_gui)
 	add_subdirectory(demos/bayesian_optimization_2d_gui)
+	add_subdirectory(demos/preferential_bayesian_optimization_1d_gui)
 	add_subdirectory(demos/sequential_line_search_2d_gui)
 endif()
 if(SEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS)

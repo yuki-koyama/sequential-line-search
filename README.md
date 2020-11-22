@@ -16,6 +16,7 @@ The core algorithm is implemented in `include/sequential-line-search/*.hpp` and 
 - **sequential_line_search_nd**: A simple demo of the sequential line search method applied to a multi-dimensional test function.
 - **bayesian_optimization_1d_gui**: A visual demo of the standard Bayesian optimization applied to a one-dimensional test function.
 - **bayesian_optimization_2d_gui**: A visual demo of the standard Bayesian optimization applied to a two-dimensional test function.
+- **preferential_bayesian_optimization_1d_gui**: A visual demo of the preferential Bayesian optimization with a simple pairwise comparison query style applied to a one-dimensional test function.
 - **sequential_line_search_2d_gui**: A visual interactive demo of the sequential line search method applied to a two-dimensional test function.
 - **sequential_line_search_photo**: A visual interactive demo of the sequential line search method where a photograph is enhanced using six-dimensional parameters.
 
