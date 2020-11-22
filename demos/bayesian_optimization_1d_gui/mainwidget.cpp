@@ -42,7 +42,7 @@ void MainWidget::paintEvent(QPaintEvent* event)
     // Draw setting
     const QBrush backgroundBrush = QBrush(QColor(0xf0, 0xf0, 0xf0));
     const QPen   mainLinePen     = QPen(QBrush(QColor(120, 0, 0)), 6.0);
-    const QPen   EILinePen       = QPen(QBrush(QColor(20, 40, 100)), 6.0);
+    const QPen   EILinePen       = QPen(QBrush(QColor(20, 40, 100)), 6.0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
     const QPen   functionLinePen = QPen(QBrush(QColor(150, 150, 150)), 4.5, Qt::DashLine);
     const QPen   dataPointPen    = QPen(QBrush(QColor(0, 0, 0)), 6.0);
     const QBrush dataPointBrush  = QBrush(QColor(0, 0, 0));
