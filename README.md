@@ -74,7 +74,7 @@ To enable python binding, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_PYTH
 
 ## How to Compile and Run (C++)
 
-We use [cmake](https://cmake.org/) for managing the source codes. You can compile the core module and the demo applications at once by, for example,
+We use [cmake](https://cmake.org/) (3.3 or above) for managing the source codes. You can compile the core module and the demo applications at once by, for example,
 ```bash
 git clone https://github.com/yuki-koyama/sequential-line-search.git --recursive
 cd sequential-line-search
