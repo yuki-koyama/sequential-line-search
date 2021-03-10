@@ -52,7 +52,7 @@ To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_
 
 ### Required for Visual Demos
 
-- Qt5 <http://doc.qt.io/qt-5/> (`brew install qt` / `sudo apt install qt5-default`)
+- Qt5 <http://doc.qt.io/qt-5/> (`brew install qt@5` / `sudo apt install qt5-default`)
 - rand-util <https://github.com/yuki-koyama/rand-util> (included via gitsubmodule)
 - tinycolormap <https://github.com/yuki-koyama/tinycolormap> (included via gitsubmodule)
 
@@ -60,7 +60,7 @@ To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_D
 
 ### Required for Photo Enhancement Demos
 
-- Qt5 <http://doc.qt.io/qt-5/> (`brew install qt` / `sudo apt install qt5-default`)
+- Qt5 <http://doc.qt.io/qt-5/> (`brew install qt@5` / `sudo apt install qt5-default`)
 - enhancer <https://github.com/yuki-koyama/enhancer> (included via gitsubmodule)
 - tinycolormap <https://github.com/yuki-koyama/tinycolormap> (included via gitsubmodule)
 
