@@ -225,6 +225,12 @@ A slider space is constructed by choosing two end points. One of the two end poi
 - The point that provides the largest expected value (i.e., x^{+}) (default; used in the original paper)
 - The point that is selected in the last subtask (i.e., x^{chosen}) (suggested in [Koyama+, 2020])
 
+## See Also
+
+Sequential Gallery (SIGGRAPH 2020) is a more recent publication on the same topic.
+- Project page: <https://koyama.xyz/project/sequential_gallery/>
+- GitHub: <https://github.com/yuki-koyama/sequential-gallery>
+
 ## License
 
 MIT License.
