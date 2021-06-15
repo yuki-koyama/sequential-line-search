@@ -22,9 +22,9 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
     SequentialLineSearchOptimizer
     )pbdoc";
 
-    py::enum_<sequential_line_search::SliderEndSelectionStrategy>(m, "SliderEndSelectionStrategy", py::arithmetic())
-        .value("LargestExpectValue", sequential_line_search::SliderEndSelectionStrategy::LargestExpectValue)
-        .value("LastSelection", sequential_line_search::SliderEndSelectionStrategy::LastSelection);
+    py::enum_<sequential_line_search::CurrentBestSelectionStrategy>(m, "CurrentBestSelectionStrategy", py::arithmetic())
+        .value("LargestExpectValue", sequential_line_search::CurrentBestSelectionStrategy::LargestExpectValue)
+        .value("LastSelection", sequential_line_search::CurrentBestSelectionStrategy::LastSelection);
 
     py::enum_<sequential_line_search::AcquisitionFuncType>(m, "AcquisitionFuncType", py::arithmetic())
         .value("ExpectedImprovement", sequential_line_search::AcquisitionFuncType::ExpectedImprovement)
@@ -44,7 +44,7 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
                  const sequential_line_search::KernelType,
                  const sequential_line_search::AcquisitionFuncType,
                  const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>&,
-                 const sequential_line_search::SliderEndSelectionStrategy>(),
+                 const sequential_line_search::CurrentBestSelectionStrategy>(),
         "num_dims"_a,
         "use_slider_enlargement"_a   = true,
         "use_map_hyperparams"_a      = true,
@@ -52,7 +52,7 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
         "acquisition_func_type"_a    = sequential_line_search::AcquisitionFuncType::ExpectedImprovement,
         "initial_slider_generator"_a = std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>(
             sequential_line_search::GenerateRandomSliderEnds),
-        "slider_end_selection_strategy"_a = sequential_line_search::SliderEndSelectionStrategy::LargestExpectValue);
+        "current_best_selection_strategy"_a = sequential_line_search::CurrentBestSelectionStrategy::LargestExpectValue);
 
     optimizer_class.def("set_hyperparams",
                         &SequentialLineSearchOptimizer::SetHyperparams,

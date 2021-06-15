@@ -16,8 +16,8 @@ namespace sequential_line_search
     std::pair<Eigen::VectorXd, Eigen::VectorXd> GenerateRandomSliderEnds(const int num_dims);
     std::pair<Eigen::VectorXd, Eigen::VectorXd> GenerateCenteredFixedLengthRandomSliderEnds(const int num_dims);
 
-    /// \brief Strategy for selecting one of the two ends of the slider.
-    enum class SliderEndSelectionStrategy
+    /// \brief Strategy for selecting the so-far-observed current best point
+    enum class CurrentBestSelectionStrategy
     {
         LargestExpectValue, /// Select the point that has the largest expected value, x^{+}, as in [Koyama+17].
         LastSelection,      /// Select the point that was chosen in the last subtask, x^{chosen}, as suggested in
@@ -46,8 +46,8 @@ namespace sequential_line_search
             const AcquisitionFuncType acquisition_func_type  = AcquisitionFuncType::ExpectedImprovement,
             const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>& initial_slider_generator =
                 GenerateRandomSliderEnds,
-            const SliderEndSelectionStrategy slider_end_selection_strategy =
-                SliderEndSelectionStrategy::LargestExpectValue);
+            const CurrentBestSelectionStrategy current_best_selection_strategy =
+                CurrentBestSelectionStrategy::LargestExpectValue);
 
         /// \brief Specify (kernel and other) hyperparameter values.
         ///
@@ -111,7 +111,7 @@ namespace sequential_line_search
         const bool m_use_slider_enlargement;
         const bool m_use_map_hyperparams;
 
-        const SliderEndSelectionStrategy m_slider_end_selection_strategy;
+        const CurrentBestSelectionStrategy m_current_best_selection_strategy;
 
         std::shared_ptr<PreferenceRegressor>   m_regressor;
         std::shared_ptr<Slider>                m_slider;

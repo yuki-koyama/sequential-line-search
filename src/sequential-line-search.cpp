@@ -29,10 +29,10 @@ sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptim
     const KernelType                                               kernel_type,
     const AcquisitionFuncType                                      acquisition_func_type,
     const std::function<std::pair<VectorXd, VectorXd>(const int)>& initial_slider_generator,
-    const SliderEndSelectionStrategy                               slider_end_selection_strategy)
+    const CurrentBestSelectionStrategy                             current_best_selection_strategy)
     : m_use_slider_enlargement(use_slider_enlargement),
       m_use_map_hyperparams(use_map_hyperparams),
-      m_slider_end_selection_strategy(slider_end_selection_strategy),
+      m_current_best_selection_strategy(current_best_selection_strategy),
       m_kernel_signal_var(0.500),
       m_kernel_length_scale(0.500),
       m_noise_level(0.005),
@@ -103,13 +103,13 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResu
                                                         m_kernel_type);
 
     // Find the next search subspace
-        switch (m_slider_end_selection_strategy)
     const auto x_max = [&]() -> VectorXd
     {
+        switch (m_current_best_selection_strategy)
         {
-            case SliderEndSelectionStrategy::LargestExpectValue:
+            case CurrentBestSelectionStrategy::LargestExpectValue:
                 return m_regressor->FindArgMax();
-            case SliderEndSelectionStrategy::LastSelection:
+            case CurrentBestSelectionStrategy::LastSelection:
                 return x_chosen;
         }
     }();
