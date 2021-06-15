@@ -103,8 +103,9 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResu
                                                         m_kernel_type);
 
     // Find the next search subspace
-    const auto x_max = [&]() -> VectorXd {
         switch (m_slider_end_selection_strategy)
+    const auto x_max = [&]() -> VectorXd
+    {
         {
             case SliderEndSelectionStrategy::LargestExpectValue:
                 return m_regressor->FindArgMax();

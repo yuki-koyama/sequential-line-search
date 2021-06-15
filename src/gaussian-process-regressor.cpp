@@ -178,7 +178,8 @@ namespace
         // Computing the regularization terms from a prior assumptions
         const double a_prior = calc_a_prior(a);
         const double b_prior = calc_b_prior(b);
-        const double r_prior = [&r]() {
+        const double r_prior = [&r]()
+        {
             double sum = 0.0;
             for (unsigned i = 0; i < r.rows(); ++i)
             {
@@ -272,7 +273,8 @@ namespace sequential_line_search
 
         Data data{m_X, m_y, m_kernel, m_kernel_theta_derivative};
 
-        const VectorXd x_ini = [&]() {
+        const VectorXd x_ini = [&]()
+        {
             VectorXd x(D + 2);
 
             x(0)            = std::exp(a_prior_mu);

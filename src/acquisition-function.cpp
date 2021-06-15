@@ -114,11 +114,13 @@ namespace
         MatrixXd x_stars(num_dim, num_global_search_iters);
         VectorXd y_stars(num_global_search_iters);
 
-        const auto perform_local_optimization_from_random_initialization = [&](const int i) {
+        const auto perform_local_optimization_from_random_initialization = [&](const int i)
+        {
             const VectorXd x_ini = 0.5 * (VectorXd::Random(num_dim) + VectorXd::Ones(num_dim));
             const VectorXd x_star =
                 nloptutil::solve(x_ini, upper, lower, objective, nlopt::LD_LBFGS, data, true, num_local_search_iters);
-            const double y_star = [&]() {
+            const double y_star = [&]()
+            {
                 vector<double> x_star_std(num_dim);
                 vector<double> grad_std;
                 std::memcpy(x_star_std.data(), x_star.data(), sizeof(double) * num_dim);
@@ -133,7 +135,8 @@ namespace
         parallelutil::queue_based_parallel_for(num_global_search_iters,
                                                perform_local_optimization_from_random_initialization);
 
-        const int best_index = [&]() {
+        const int best_index = [&]()
+        {
             int index;
             y_stars.maxCoeff(&index);
             return index;
