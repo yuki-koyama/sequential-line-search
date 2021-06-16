@@ -171,7 +171,7 @@ void MainWindow::on_actionBatch_visualization_triggered()
             widget_y->grab().save(path + QString("_y") + QString("%1").arg(i, 3, 10, QChar('0')) + QString(".png"));
             widget_y->draw_slider_tick = true;
 
-            core.optimizer->SubmitLineSearchResult(obtainSliderPosition());
+            core.optimizer->SubmitFeedbackData(obtainSliderPosition());
         }
     };
 
@@ -200,7 +200,7 @@ void MainWindow::on_actionClear_all_data_triggered()
 
 void MainWindow::on_actionProceed_optimization_triggered()
 {
-    core.optimizer->SubmitLineSearchResult(obtainSliderPosition());
+    core.optimizer->SubmitFeedbackData(obtainSliderPosition());
 
     for (auto widget : m_widgets)
     {
@@ -216,7 +216,7 @@ void MainWindow::on_horizontalSlider_valueChanged(int /*value*/)
 
 void MainWindow::on_pushButton_clicked()
 {
-    core.optimizer->SubmitLineSearchResult(obtainSliderPosition());
+    core.optimizer->SubmitFeedbackData(obtainSliderPosition());
 
     ui->horizontalSlider->setValue((ui->horizontalSlider->maximum() + ui->horizontalSlider->minimum()) / 2);
     for (auto widget : m_widgets)

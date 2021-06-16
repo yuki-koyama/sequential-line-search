@@ -102,7 +102,7 @@ for condition_index, acquisition_func_type in enumerate(
         for i in range(NUM_ITERS):
             slider_ends = optimizer.get_slider_ends()
             slider_position = ask_human_for_slider_manipulation(slider_ends)
-            optimizer.submit_line_search_result(slider_position)
+            optimizer.submit_feedback_data(slider_position)
 
             optimality_gap = -calc_simulated_objective_func(
                 optimizer.get_maximizer())

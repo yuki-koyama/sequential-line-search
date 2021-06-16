@@ -62,7 +62,7 @@ void sequential_line_search::SequentialLineSearchOptimizer::SetHyperparams(const
     m_btl_scale                    = btl_scale;
 }
 
-void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResult(const double slider_position)
+void sequential_line_search::SequentialLineSearchOptimizer::SubmitFeedbackData(const double slider_position)
 {
     // A heuristics to set the computational effort for solving the maximization of the acquisition function. This is
     // not justified or validated.
@@ -75,13 +75,13 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResu
 #endif
     const int num_local_search_iters = 10 * num_dims;
 
-    SubmitLineSearchResult(slider_position, num_map_estimation_iters, num_global_search_iters, num_local_search_iters);
+    SubmitFeedbackData(slider_position, num_map_estimation_iters, num_global_search_iters, num_local_search_iters);
 }
 
-void sequential_line_search::SequentialLineSearchOptimizer::SubmitLineSearchResult(const double slider_position,
-                                                                                   const int num_map_estimation_iters,
-                                                                                   const int num_global_search_iters,
-                                                                                   const int num_local_search_iters)
+void sequential_line_search::SequentialLineSearchOptimizer::SubmitFeedbackData(const double slider_position,
+                                                                               const int    num_map_estimation_iters,
+                                                                               const int    num_global_search_iters,
+                                                                               const int    num_local_search_iters)
 {
     const auto  x_chosen   = CalcPointFromSliderPosition(slider_position);
     const auto& x_prev_max = m_slider->original_end_0;

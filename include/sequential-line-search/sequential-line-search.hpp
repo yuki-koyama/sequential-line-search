@@ -68,13 +68,13 @@ namespace sequential_line_search
         ///
         /// \details The computational effort for finding the global maximizer of the acquisition function will be
         /// automatically set by a naive heuristics.
-        void SubmitLineSearchResult(const double slider_position);
+        void SubmitFeedbackData(const double slider_position);
 
         /// \brief Submit the result of user-performed line search and go to the next iteration step.
-        void SubmitLineSearchResult(const double slider_position,
-                                    const int    num_map_estimation_iters,
-                                    const int    num_global_search_iters,
-                                    const int    num_local_search_iters);
+        void SubmitFeedbackData(const double slider_position,
+                                const int    num_map_estimation_iters,
+                                const int    num_global_search_iters,
+                                const int    num_local_search_iters);
 
         /// \brief Get the slider end-points.
         ///

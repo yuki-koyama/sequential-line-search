@@ -62,15 +62,15 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
                         "kernel_hyperparams_prior_var"_a = 0.250,
                         "btl_scale"_a                    = 0.010);
 
-    optimizer_class.def("submit_line_search_result",
+    optimizer_class.def("submit_feedback_data",
                         static_cast<void (SequentialLineSearchOptimizer::*)(const double)>(
-                            &SequentialLineSearchOptimizer::SubmitLineSearchResult),
+                            &SequentialLineSearchOptimizer::SubmitFeedbackData),
                         "slider_position"_a);
 
     optimizer_class.def(
-        "submit_line_search_result",
+        "submit_feedback_data",
         static_cast<void (SequentialLineSearchOptimizer::*)(const double, const int, const int, const int)>(
-            &SequentialLineSearchOptimizer::SubmitLineSearchResult),
+            &SequentialLineSearchOptimizer::SubmitFeedbackData),
         "slider_position"_a,
         "num_map_estimation_iters"_a,
         "num_global_search_iters"_a,

@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
             timer::Timer t;
 
             // Perform Bayesian optimization
-            optimizer.SubmitLineSearchResult(max_slider_position);
+            optimizer.SubmitFeedbackData(max_slider_position);
 
             elapsed_times(i, trial_index) = t.get_elapsed_time_in_milliseconds();
         }
