@@ -25,7 +25,8 @@ VectorXd Core::findNextPoint() const
 
 void Core::proceedOptimization()
 {
-    const VectorXd x = [&]() {
+    const VectorXd x = [&]()
+    {
         if (X.cols() == 0)
         {
             VectorXd x(2);
@@ -80,9 +81,8 @@ double Core::evaluateObjectiveFunction(Eigen::VectorXd x) const
 {
     assert(x.rows() == 2);
 
-    auto lambda = [](const Eigen::VectorXd& x, const Eigen::VectorXd& mu, const double sigma) {
-        return std::exp(-(x - mu).squaredNorm() / (sigma * sigma));
-    };
+    auto lambda = [](const Eigen::VectorXd& x, const Eigen::VectorXd& mu, const double sigma)
+    { return std::exp(-(x - mu).squaredNorm() / (sigma * sigma)); };
 
     return lambda(x, Eigen::Vector2d(0.3, 0.3), 0.3) + 1.5 * lambda(x, Eigen::Vector2d(0.7, 0.7), 0.4);
 }

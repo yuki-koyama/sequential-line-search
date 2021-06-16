@@ -27,9 +27,8 @@ namespace
     {
         assert(x.rows() == test_dimension);
 
-        auto lambda = [](const Eigen::VectorXd& x, const Eigen::VectorXd& mu, const double sigma) {
-            return std::exp(-(x - mu).squaredNorm() / (sigma * sigma));
-        };
+        auto lambda = [](const Eigen::VectorXd& x, const Eigen::VectorXd& mu, const double sigma)
+        { return std::exp(-(x - mu).squaredNorm() / (sigma * sigma)); };
 
         return lambda(x, Eigen::VectorXd::Constant(test_dimension, 0.4), 1.0);
     }
@@ -45,7 +44,8 @@ int main(int argc, char* argv[])
     Eigen::MatrixXd residual_norms(n_iterations, n_trials);
     Eigen::MatrixXd elapsed_times(n_iterations, n_trials);
 
-    const auto perform_test = [&](const int trial_index) {
+    const auto perform_test = [&](const int trial_index)
+    {
         sequential_line_search::SequentialLineSearchOptimizer optimizer(
             test_dimension, use_slider_enlargement, use_MAP_hyperparams);
 

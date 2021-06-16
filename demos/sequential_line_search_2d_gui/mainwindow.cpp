@@ -118,7 +118,8 @@ void MainWindow::on_actionBatch_visualization_triggered()
 
     std::ofstream ofs(path.toStdString() + "residuals.csv");
 
-    auto background_process = [&]() {
+    auto background_process = [&]()
+    {
         const Eigen::Vector2d x_opt = nloptutil::solve(Eigen::Vector2d(0.5, 0.5),
                                                        Eigen::Vector2d(1.0, 1.0),
                                                        Eigen::Vector2d(0.0, 0.0),

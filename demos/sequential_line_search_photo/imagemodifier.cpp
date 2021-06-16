@@ -37,7 +37,8 @@ namespace ImageModifier
 
         QImage newImg = QImage(w, h, QImage::Format_RGB32);
 
-        auto changePixelColor = [&](const int x, const int y) {
+        auto changePixelColor = [&](const int x, const int y)
+        {
             const QRgb            original_rgb = image.pixel(x, y);
             const Eigen::Vector3d input_rgb    = qRgb2rgb(original_rgb);
             const Eigen::Vector3d output_rgb   = enhancer::enhance(input_rgb, parameters);
