@@ -103,7 +103,7 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitFeedbackData(c
                                                         m_kernel_type);
 
     // Find the next search subspace
-    const auto x_max = [&]() -> VectorXd
+    const auto x_plus = [&]() -> VectorXd
     {
         switch (m_current_best_selection_strategy)
         {
@@ -113,13 +113,13 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitFeedbackData(c
                 return x_chosen;
         }
     }();
-    const auto x_ei = acquisition_func::FindNextPoint(*m_regressor,
-                                                      num_global_search_iters,
-                                                      num_local_search_iters,
-                                                      m_acquisition_func_type,
-                                                      m_gaussian_process_upper_confidence_bound_hyperparam);
+    const auto x_acquisition = acquisition_func::FindNextPoint(*m_regressor,
+                                                               num_global_search_iters,
+                                                               num_local_search_iters,
+                                                               m_acquisition_func_type,
+                                                               m_gaussian_process_upper_confidence_bound_hyperparam);
 
-    m_slider = std::make_shared<Slider>(x_max, x_ei, m_use_slider_enlargement);
+    m_slider = std::make_shared<Slider>(x_plus, x_acquisition, m_use_slider_enlargement);
 }
 
 std::pair<VectorXd, VectorXd> sequential_line_search::SequentialLineSearchOptimizer::GetSliderEnds() const
