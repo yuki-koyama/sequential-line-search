@@ -37,7 +37,7 @@ namespace sequential_line_search
             const bool                use_map_hyperparams    = true,
             const KernelType          kernel_type            = KernelType::ArdMatern52Kernel,
             const AcquisitionFuncType acquisition_func_type  = AcquisitionFuncType::ExpectedImprovement,
-            const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>& initial_slider_generator =
+            const std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>& initial_query_generator =
                 GenerateRandomSliderEnds,
             const CurrentBestSelectionStrategy current_best_selection_strategy =
                 CurrentBestSelectionStrategy::LargestExpectValue);

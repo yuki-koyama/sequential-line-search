@@ -102,7 +102,7 @@ for index_num_dims, num_dims in enumerate(num_dims_set):
                     num_dims=num_dims,
                     use_map_hyperparams=map_condition["use_map_hyperparams"],
                     kernel_type=KERNEL_TYPE,
-                    initial_slider_generator=generate_initial_slider)
+                    initial_query_generator=generate_initial_slider)
 
                 optimizer.set_hyperparams(
                     kernel_signal_var=0.50,

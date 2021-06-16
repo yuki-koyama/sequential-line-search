@@ -50,7 +50,7 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
         "use_map_hyperparams"_a      = true,
         "kernel_type"_a              = sequential_line_search::KernelType::ArdMatern52Kernel,
         "acquisition_func_type"_a    = sequential_line_search::AcquisitionFuncType::ExpectedImprovement,
-        "initial_slider_generator"_a = std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>(
+        "initial_query_generator"_a  = std::function<std::pair<Eigen::VectorXd, Eigen::VectorXd>(const int)>(
             sequential_line_search::GenerateRandomSliderEnds),
         "current_best_selection_strategy"_a = sequential_line_search::CurrentBestSelectionStrategy::LargestExpectValue);
 

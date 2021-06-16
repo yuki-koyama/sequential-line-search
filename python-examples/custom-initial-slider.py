@@ -39,7 +39,7 @@ def main():
     optimizer = pySequentialLineSearch.SequentialLineSearchOptimizer(
         num_dims=5,
         use_map_hyperparams=True,
-        initial_slider_generator=generate_initial_slider)
+        initial_query_generator=generate_initial_slider)
 
     optimizer.set_hyperparams(kernel_signal_var=0.50,
                               kernel_length_scale=0.10,

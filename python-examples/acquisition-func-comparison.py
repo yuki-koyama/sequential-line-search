@@ -93,7 +93,7 @@ for condition_index, acquisition_func_type in enumerate(
             num_dims=num_dims,
             use_map_hyperparams=USE_MAP_HYPERPARAMS,
             acquisition_func_type=acquisition_func_type[0],
-            initial_slider_generator=generate_initial_slider)
+            initial_query_generator=generate_initial_slider)
 
         # Specify a hyperparameter in case the acquisition function is GP-UCB
         optimizer.set_gaussian_process_upper_confidence_bound_hyperparam(

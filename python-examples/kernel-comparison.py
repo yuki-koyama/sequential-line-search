@@ -111,7 +111,7 @@ for condition_index, condition in enumerate(condition_pattern):
             num_dims=num_dims,
             use_map_hyperparams=USE_MAP_HYPERPARAMS,
             kernel_type=kernel_type,
-            initial_slider_generator=generate_initial_slider)
+            initial_query_generator=generate_initial_slider)
 
         optimizer.set_hyperparams(kernel_signal_var=0.50,
                                   kernel_length_scale=length_scale,

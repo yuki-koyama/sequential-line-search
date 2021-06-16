@@ -28,7 +28,7 @@ sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptim
     const bool                                                     use_map_hyperparams,
     const KernelType                                               kernel_type,
     const AcquisitionFuncType                                      acquisition_func_type,
-    const std::function<std::pair<VectorXd, VectorXd>(const int)>& initial_slider_generator,
+    const std::function<std::pair<VectorXd, VectorXd>(const int)>& initial_query_generator,
     const CurrentBestSelectionStrategy                             current_best_selection_strategy)
     : m_use_slider_enlargement(use_slider_enlargement),
       m_use_map_hyperparams(use_map_hyperparams),
@@ -42,7 +42,7 @@ sequential_line_search::SequentialLineSearchOptimizer::SequentialLineSearchOptim
       m_acquisition_func_type(acquisition_func_type),
       m_gaussian_process_upper_confidence_bound_hyperparam(1.0)
 {
-    const auto slider_ends = initial_slider_generator(num_dims);
+    const auto slider_ends = initial_query_generator(num_dims);
 
     m_data      = std::make_shared<PreferenceDataManager>();
     m_regressor = nullptr;
