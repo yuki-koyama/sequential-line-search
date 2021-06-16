@@ -4,9 +4,7 @@
 #include <QPainter>
 #include <iostream>
 #include <mathtoolbox/data-normalization.hpp>
-#include <sequential-line-search/acquisition-function.hpp>
-#include <sequential-line-search/preference-data-manager.hpp>
-#include <sequential-line-search/preference-regressor.hpp>
+#include <sequential-line-search/preferential-bayesian-optimizer.hpp>
 
 using namespace sequential_line_search;
 using Eigen::VectorXd;
@@ -73,8 +71,8 @@ void MainWidget::paintEvent(QPaintEvent* event)
         {
             const double x = static_cast<double>(pix_x) / static_cast<double>(rect.width());
 
-            const double y_raw = core.m_regressor->PredictMu(VectorXd::Constant(1, x));
-            const double s_raw = core.m_regressor->PredictSigma(VectorXd::Constant(1, x));
+            const double y_raw = core.m_optimizer->GetPreferenceValueMean(VectorXd::Constant(1, x));
+            const double s_raw = core.m_optimizer->GetPreferenceValueStdev(VectorXd::Constant(1, x));
 
             const double y = 1.0 + core.m_normalizer->Normalize(VectorXd::Constant(1, y_raw))(0, 0);
             const double s = s_raw / core.m_normalizer->GetStdev()(0);
@@ -89,8 +87,8 @@ void MainWidget::paintEvent(QPaintEvent* event)
         {
             const double x = static_cast<double>(pix_x) / static_cast<double>(rect.width());
 
-            const double y_raw = core.m_regressor->PredictMu(VectorXd::Constant(1, x));
-            const double s_raw = core.m_regressor->PredictSigma(VectorXd::Constant(1, x));
+            const double y_raw = core.m_optimizer->GetPreferenceValueMean(VectorXd::Constant(1, x));
+            const double s_raw = core.m_optimizer->GetPreferenceValueStdev(VectorXd::Constant(1, x));
 
             const double y = 1.0 + core.m_normalizer->Normalize(VectorXd::Constant(1, y_raw))(0, 0);
             const double s = s_raw / core.m_normalizer->GetStdev()(0);
@@ -116,9 +114,8 @@ void MainWidget::paintEvent(QPaintEvent* event)
         for (int pix_x = 0; pix_x <= rect.width(); ++pix_x)
         {
             const double x  = static_cast<double>(pix_x) / static_cast<double>(rect.width());
-            const double EI = acquisition_func::CalcAcqusitionValue(
-                *core.m_regressor, VectorXd::Constant(1, x), AcquisitionFuncType::ExpectedImprovement);
-            EIs(pix_x) = EI;
+            const double EI = core.m_optimizer->GetAcquisitionFuncValue(VectorXd::Constant(1, x));
+            EIs(pix_x)      = EI;
         }
         EIs /= EIs.maxCoeff();
         EIs *= 0.15;
@@ -157,10 +154,10 @@ void MainWidget::paintEvent(QPaintEvent* event)
     if (draw_points)
     {
         // Data points
-        unsigned N = core.m_data->m_X.cols();
+        unsigned N = core.m_optimizer->GetRawDataPoints().cols();
         for (unsigned i = 0; i < N; ++i)
         {
-            const double x = core.m_data->m_X(0, i);
+            const double x = core.m_optimizer->GetRawDataPoints()(0, i);
             const double y = core.m_y(i);
 
             const double pix_x = x * rect.width();

@@ -29,11 +29,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionBatch_visualization_triggered()
 {
-    core.m_data->m_X = MatrixXd::Constant(0, 0, 0.0);
-    core.m_y         = VectorXd::Constant(0, 0.0);
-    core.m_x_max     = VectorXd::Constant(0, 0.0);
-    core.m_y_max     = NAN;
-    core.computeRegression();
+    core.reset();
     ui->widget->update();
 
     constexpr unsigned n_iterations = 10;
@@ -50,11 +46,7 @@ void MainWindow::on_actionBatch_visualization_triggered()
 
 void MainWindow::on_actionClear_all_data_triggered()
 {
-    core.m_data->m_X = MatrixXd::Constant(0, 0, 0.0);
-    core.m_y         = VectorXd::Constant(0, 0.0);
-    core.m_x_max     = VectorXd::Constant(0, 0.0);
-    core.m_y_max     = NAN;
-    core.computeRegression();
+    core.reset();
     ui->widget->update();
 }
 
