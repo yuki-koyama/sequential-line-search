@@ -165,7 +165,7 @@ void MainWindow::on_actionClear_all_data_triggered()
 void MainWindow::on_actionProceed_optimization_triggered()
 {
     // Proceed optimization step
-    core.optimizer->SubmitLineSearchResult(obtainSliderPosition());
+    core.optimizer->SubmitFeedbackData(obtainSliderPosition());
 
     // Damp data
     core.optimizer->DampData(DirectoryUtility::getTemporaryDirectory());
