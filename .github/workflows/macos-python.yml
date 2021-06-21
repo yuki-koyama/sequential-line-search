@@ -35,3 +35,4 @@ jobs:
         python ./python-examples/custom-initial-slider.py
         python ./python-examples/map-vs-fixed-hyperparams.py
         python ./python-examples/kernel-comparison.py
+        python ./python-examples/pairwise-comparison-query.py
