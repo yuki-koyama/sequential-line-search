@@ -126,17 +126,14 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
                        "btl_scale"_a                    = 0.010);
 
     pref_opt_class.def("submit_feedback_data",
-                       static_cast<void (PreferentialBayesianOptimizer::*)(const int)>(
-                           &PreferentialBayesianOptimizer::SubmitFeedbackData),
-                       "option_index"_a);
-
-    pref_opt_class.def("submit_feedback_data",
-                       static_cast<void (PreferentialBayesianOptimizer::*)(const int, const int, const int, const int)>(
-                           &PreferentialBayesianOptimizer::SubmitFeedbackData),
+                       &PreferentialBayesianOptimizer::SubmitFeedbackData,
                        "option_index"_a,
-                       "num_map_estimation_iters"_a,
-                       "num_global_search_iters"_a,
-                       "num_local_search_iters"_a);
+                       "num_map_estimation_iters"_a = 0);
+
+    pref_opt_class.def("determine_next_query",
+                       &PreferentialBayesianOptimizer::DetermineNextQuery,
+                       "num_global_search_iters"_a = 0,
+                       "num_local_search_iters"_a  = 0);
 
     pref_opt_class.def("get_current_options", &PreferentialBayesianOptimizer::GetCurrentOptions);
 
