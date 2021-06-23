@@ -50,17 +50,14 @@ namespace sequential_line_search
                             const double kernel_hyperparams_prior_var = 0.250,
                             const double btl_scale                    = 0.010);
 
-        /// \brief Submit the result of the user's selection and go to the next iteration step.
+        /// \brief Submit the result of the user's selection and update the internal surrogate model.
         ///
-        /// \details The computational effort for finding the global maximizer of the acquisition function will be
-        /// automatically set by a naive heuristics.
-        void SubmitFeedbackData(const int option_index);
+        /// \param num_map_estimation_iters The number of iterations for the MAP estimation. When a non-positive value
+        /// (e.g., 0) is specified, this is heuristically set.
+        void SubmitFeedbackData(const int option_index, const int num_map_estimation_iters = 0);
 
-        /// \brief Submit the result of the user's selection and go to the next iteration step.
-        void SubmitFeedbackData(const int option_index,
-                                const int num_map_estimation_iters,
-                                const int num_global_search_iters,
-                                const int num_local_search_iters);
+        /// \brief Determine the preferential query for the next iteration by using an acquisition function.
+        void DetermineNextQuery(const int num_global_search_iters = 0, const int num_local_search_iters = 0);
 
         /// \brief Get the current options.
         const std::vector<Eigen::VectorXd>& GetCurrentOptions() const { return m_current_options; }

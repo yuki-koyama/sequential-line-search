@@ -57,26 +57,8 @@ void sequential_line_search::PreferentialBayesianOptimizer::SetHyperparams(const
     m_btl_scale                    = btl_scale;
 }
 
-void sequential_line_search::PreferentialBayesianOptimizer::SubmitFeedbackData(const int option_index)
-{
-    // A heuristics to set the computational effort for solving the maximization of the acquisition function. This is
-    // not justified or validated.
-    const int num_dims                 = GetMaximizer().size();
-    const int num_map_estimation_iters = 100;
-#ifdef SEQUENTIAL_LINE_SEARCH_USE_PARALLELIZED_MULTI_START_SEARCH
-    const int num_global_search_iters = 10;
-#else
-    const int num_global_search_iters = 50 * num_dims;
-#endif
-    const int num_local_search_iters = 10 * num_dims;
-
-    SubmitFeedbackData(option_index, num_map_estimation_iters, num_global_search_iters, num_local_search_iters);
-}
-
 void sequential_line_search::PreferentialBayesianOptimizer::SubmitFeedbackData(const int option_index,
-                                                                               const int num_map_estimation_iters,
-                                                                               const int num_global_search_iters,
-                                                                               const int num_local_search_iters)
+                                                                               int       num_map_estimation_iters)
 {
     assert(option_index >= 0 && option_index < m_current_options.size());
 
@@ -87,6 +69,15 @@ void sequential_line_search::PreferentialBayesianOptimizer::SubmitFeedbackData(c
 
     // Update the data
     m_data->AddNewPoints(x_chosen, x_others, true);
+
+    if (num_map_estimation_iters <= 0)
+    {
+        const int num_dims = GetMaximizer().size();
+
+        // A heuristics to set the computational effort for solving the maximization of the acquisition function. This
+        // is not justified or validated.
+        num_map_estimation_iters = 10 * (num_dims + m_data->GetNumDataPoints());
+    }
 
     // Perform the MAP estimation
     m_regressor = std::make_shared<PreferenceRegressor>(m_data->m_X,
@@ -99,6 +90,20 @@ void sequential_line_search::PreferentialBayesianOptimizer::SubmitFeedbackData(c
                                                         m_btl_scale,
                                                         num_map_estimation_iters,
                                                         m_kernel_type);
+}
+
+void sequential_line_search::PreferentialBayesianOptimizer::DetermineNextQuery(int num_global_search_iters,
+                                                                               int num_local_search_iters)
+{
+    // A heuristics to set the computational effort for solving the maximization of the acquisition function. This is
+    // not justified or validated.
+    const int num_dims = GetMaximizer().size();
+#ifdef SEQUENTIAL_LINE_SEARCH_USE_PARALLELIZED_MULTI_START_SEARCH
+    num_global_search_iters = num_global_search_iters > 0 ? num_global_search_iters : 10;
+#else
+    num_global_search_iters = num_global_search_iters > 0 ? num_global_search_iters : 50 * num_dims;
+#endif
+    num_local_search_iters = num_local_search_iters > 0 ? num_local_search_iters : 10 * num_dims;
 
     // Find the next search space
     const auto x_plus = [&]() -> VectorXd
@@ -108,6 +113,9 @@ void sequential_line_search::PreferentialBayesianOptimizer::SubmitFeedbackData(c
             case CurrentBestSelectionStrategy::LargestExpectValue:
                 return m_regressor->FindArgMax();
             case CurrentBestSelectionStrategy::LastSelection:
+                // Retrieve the latest preferential feedback data and its selected option
+                const auto x_chosen = m_data->m_X.col(m_data->GetLastDataSample()[0]);
+
                 return x_chosen;
         }
     }();

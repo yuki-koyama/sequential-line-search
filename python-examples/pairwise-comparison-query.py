@@ -56,6 +56,7 @@ def run_optimization() -> None:
         options = optimizer.get_current_options()
         chosen_index = ask_human_for_feedback(options)
         optimizer.submit_feedback_data(chosen_index)
+        optimizer.determine_next_query()
 
         residual = np.linalg.norm(optimizer.get_maximizer() - 0.2)
         value = calc_simulated_objective_func(optimizer.get_maximizer())
