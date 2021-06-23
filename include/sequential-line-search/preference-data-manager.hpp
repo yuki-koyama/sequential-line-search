@@ -22,6 +22,12 @@ namespace sequential_line_search
                           const std::vector<Eigen::VectorXd>& xs_other,
                           const bool                          merge_close_points = true,
                           const double                        epsilon            = 1e-04);
+
+        /// \brief Get the last preferential feedback data sample
+        const Preference& GetLastDataSample() const { return m_D.back(); }
+
+        /// \brief Get the number of data points
+        int GetNumDataPoints() const { return m_X.cols(); }
     };
 } // namespace sequential_line_search
 
