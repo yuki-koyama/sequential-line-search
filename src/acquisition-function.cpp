@@ -49,7 +49,7 @@ namespace
             std::memcpy(grad.data(), derivative.data(), sizeof(double) * derivative.size());
         }
 
-        return acquisition_func::CalcAcqusitionValue(*regressor, eigen_x, func_type, hyperparam);
+        return acquisition_func::CalcAcquisitionValue(*regressor, eigen_x, func_type, hyperparam);
     }
 
     /// \brief NLopt-style objective function definition for finding the next multiple points.
@@ -159,7 +159,7 @@ namespace
     }
 } // namespace
 
-double sequential_line_search::acquisition_func::CalcAcqusitionValue(
+double sequential_line_search::acquisition_func::CalcAcquisitionValue(
     const Regressor&          regressor,
     const VectorXd&           x,
     const AcquisitionFuncType func_type,

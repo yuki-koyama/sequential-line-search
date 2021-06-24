@@ -23,10 +23,10 @@ namespace sequential_line_search
         /// \param gaussian_process_upper_confidence_bound_hyperparam The hyperparameter in the GP-UCB algorithm, which
         /// controls the trade-off of exploration and exploitation. If the acquisition function is not GP-UCB, this
         /// value will not be used.
-        double CalcAcqusitionValue(const Regressor&          regressor,
-                                   const Eigen::VectorXd&    x,
-                                   const AcquisitionFuncType func_type,
-                                   const double              gaussian_process_upper_confidence_bound_hyperparam = 1.0);
+        double CalcAcquisitionValue(const Regressor&          regressor,
+                                    const Eigen::VectorXd&    x,
+                                    const AcquisitionFuncType func_type,
+                                    const double              gaussian_process_upper_confidence_bound_hyperparam = 1.0);
 
         /// \param gaussian_process_upper_confidence_bound_hyperparam The hyperparameter in the GP-UCB algorithm, which
         /// controls the trade-off of exploration and exploitation. If the acquisition function is not GP-UCB, this

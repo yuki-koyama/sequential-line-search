@@ -148,10 +148,10 @@ double sequential_line_search::PreferentialBayesianOptimizer::GetAcquisitionFunc
 {
     return (m_regressor == nullptr)
                ? 0.0
-               : acquisition_func::CalcAcqusitionValue(*m_regressor,
-                                                       point,
-                                                       m_acquisition_func_type,
-                                                       m_gaussian_process_upper_confidence_bound_hyperparam);
+               : acquisition_func::CalcAcquisitionValue(*m_regressor,
+                                                        point,
+                                                        m_acquisition_func_type,
+                                                        m_gaussian_process_upper_confidence_bound_hyperparam);
 }
 
 const Eigen::MatrixXd& sequential_line_search::PreferentialBayesianOptimizer::GetRawDataPoints() const
