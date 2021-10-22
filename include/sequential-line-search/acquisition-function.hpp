@@ -52,7 +52,14 @@ namespace sequential_line_search
 
         /// \brief Find the next n sampled points that should be observed.
         ///
-        /// \details The points will be determined by the method by Schonlau et al. (1997)
+        /// \details The points will be determined by Schonlau et al.'s method [1998]. This method determines the points
+        /// one by one sequentially by maximizing the acquisition function. In each maximization, the variance of the
+        /// surrogate function (or the covariance matrix of the underlying GP model) is updated using the newly sampled
+        /// point, by which it avoids sampling similar points.
+        ///
+        /// Matthias Schonlau, William J. Welch, and Donald R. Jones. 1998. Global versus local search in constrained
+        /// optimization of computer models. Institute of Mathematical Statistics Lecture Notes - Monograph Series,
+        /// 1998: 11-25 (1998). DOI: https://doi.org/10.1214/lnms/1215456182
         ///
         /// \param num_points The number of the sampled points.
         ///

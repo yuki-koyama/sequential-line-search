@@ -54,7 +54,7 @@ namespace
 
     /// \brief NLopt-style objective function definition for finding the next multiple points.
     ///
-    /// \details Ref: Schonlau et al, Global Versus Local Search in Constrained Optimization of Computer Models, 1997.
+    /// \details Ref: Schonlau et al, Global Versus Local Search in Constrained Optimization of Computer Models, 1998.
     double objective_for_multiple_points(const std::vector<double>& x, std::vector<double>& grad, void* data)
     {
         const Regressor*           orig_regressor    = static_cast<RegressorPairWrapper*>(data)->orig_regressor;
@@ -249,6 +249,7 @@ vector<VectorXd> sequential_line_search::acquisition_func::FindNextPoints(
 
     const VectorXd kernel_hyperparams = regressor.GetKernelHyperparams();
 
+    // Instantiate a dummy regressor object for calculating variances
     GaussianProcessRegressor temp_regressor(
         regressor.GetLargeX(), regressor.GetSmallY(), kernel_hyperparams, regressor.GetNoiseHyperparam());
 
@@ -258,7 +259,7 @@ vector<VectorXd> sequential_line_search::acquisition_func::FindNextPoints(
         RegressorPairWrapper data{
             &regressor, &temp_regressor, func_type, gaussian_process_upper_confidence_bound_hyperparam};
 
-        // Find a global solution
+        // Find a global solution that maximizes the acquisition function
         const VectorXd x_star = FindGlobalSolution(
             objective_for_multiple_points, &data, num_dim, num_global_search_iters, num_local_search_iters);
 
@@ -270,13 +271,17 @@ vector<VectorXd> sequential_line_search::acquisition_func::FindNextPoints(
         {
             const unsigned N = temp_regressor.GetLargeX().cols();
 
+            // Add the newly sampled point
             MatrixXd new_X(num_dim, N + 1);
             new_X.block(0, 0, num_dim, N) = temp_regressor.GetLargeX();
             new_X.col(N)                  = x_star;
 
+            // Add the predicted value of the newly sampled point (actually, this value will not be used in predicting
+            // variances and thus it can be arbitrary)
             VectorXd new_y(temp_regressor.GetSmallY().rows() + 1);
             new_y << temp_regressor.GetSmallY(), temp_regressor.PredictMu(x_star);
 
+            // Override the dummy regressor
             temp_regressor = GaussianProcessRegressor(new_X, new_y, kernel_hyperparams, regressor.GetNoiseHyperparam());
         }
     }
