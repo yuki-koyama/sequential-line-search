@@ -96,6 +96,44 @@ void sequential_line_search::PreferentialBayesianOptimizer::SubmitFeedbackData(c
                                                         m_kernel_type);
 }
 
+void sequential_line_search::PreferentialBayesianOptimizer::SubmitCustomFeedbackData(
+    const Eigen::VectorXd& chosen_option,
+    const Eigen::MatrixXd& other_options,
+    int                    num_map_estimation_iters)
+{
+    const auto& x_chosen = chosen_option;
+
+    std::vector<VectorXd> x_others(other_options.cols());
+    for (int i = 0; i < other_options.cols(); ++i)
+    {
+        x_others[i] = other_options.col(i);
+    }
+
+    // Update the data
+    m_data->AddNewPoints(x_chosen, x_others, true);
+
+    if (num_map_estimation_iters <= 0)
+    {
+        const int num_dims = GetMaximizer().size();
+
+        // A heuristics to set the computational effort for solving the maximization of the acquisition function. This
+        // is not justified or validated.
+        num_map_estimation_iters = 10 * (num_dims + m_data->GetNumDataPoints());
+    }
+
+    // Perform the MAP estimation
+    m_regressor = std::make_shared<PreferenceRegressor>(m_data->m_X,
+                                                        m_data->m_D,
+                                                        m_use_map_hyperparams,
+                                                        m_kernel_signal_var,
+                                                        m_kernel_length_scale,
+                                                        m_noise_level,
+                                                        m_kernel_hyperparams_prior_var,
+                                                        m_btl_scale,
+                                                        num_map_estimation_iters,
+                                                        m_kernel_type);
+}
+
 void sequential_line_search::PreferentialBayesianOptimizer::DetermineNextQuery(int num_global_search_iters,
                                                                                int num_local_search_iters)
 {

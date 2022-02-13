@@ -62,6 +62,23 @@ namespace sequential_line_search
         /// (e.g., 0) is specified, this is heuristically set.
         void SubmitFeedbackData(const int option_index, const int num_map_estimation_iters = 0);
 
+        /// \brief Submit the result of the user's selection from custom arbitrary options and update the internal
+        /// surrogate model.
+        ///
+        /// \details This method can be used intead of the `SubmitFeedbackData` method. While `SubmitFeedbackData`
+        /// requires to use the options retrieved by `GetCurrentOptions`, this method allows to use arbitrary options.
+        /// This may be useful for researchers who explore new variants of the PBO framework.
+        ///
+        /// \param chosen_option The option that is chosen.
+        ///
+        /// \param other_options The other options that are not chosen. Each column represents an option.
+        ///
+        /// \param num_map_estimation_iters The number of iterations for the MAP estimation. When a non-positive value
+        /// (e.g., 0) is specified, this is heuristically set.
+        void SubmitCustomFeedbackData(const Eigen::VectorXd& chosen_option,
+                                      const Eigen::MatrixXd& other_options,
+                                      const int              num_map_estimation_iters = 0);
+
         /// \brief Determine the preferential query for the next iteration by using an acquisition function.
         void DetermineNextQuery(const int num_global_search_iters = 0, const int num_local_search_iters = 0);
 
