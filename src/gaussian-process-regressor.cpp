@@ -247,7 +247,11 @@ namespace sequential_line_search
         assert(m_kernel_hyperparams.size() == x.size() + 1);
         const double intensity = m_kernel_hyperparams[0];
 
-        return std::sqrt(intensity - k.transpose() * m_K_y_inv * k);
+        // Calculate the variance value
+        const double sigma_2 = intensity - k.transpose() * m_K_y_inv * k;
+        
+        // Note: The value of `sigma_2` can be negative due to numerical errors.
+        return sigma_2 < 0 ? 0.0 : std::sqrt(sigma_2);
     }
 
     Eigen::VectorXd GaussianProcessRegressor::PredictMuDerivative(const Eigen::VectorXd& x) const
