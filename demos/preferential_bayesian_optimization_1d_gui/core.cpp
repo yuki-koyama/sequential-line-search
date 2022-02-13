@@ -43,9 +43,10 @@ void Core::reset()
 
 void Core::proceedOptimization()
 {
+    // Retrieve the current options
     const auto options = m_optimizer->GetCurrentOptions();
 
-    // The current implementation assumes pairwise comparison queries
+    // This sample app assumes pairwise comparison queries
     assert(options.size() == 2);
 
     // Simulate human response
@@ -61,8 +62,11 @@ void Core::proceedOptimization()
             max_value = value;
         }
     }
+
+    // Submit the human's feedback and let the optimizer calculate a new preference model
     m_optimizer->SubmitFeedbackData(max_index);
 
+    // Update internal data according to the new preference model
     const auto data_points     = m_optimizer->GetRawDataPoints();
     const int  num_data_points = data_points.cols();
 
