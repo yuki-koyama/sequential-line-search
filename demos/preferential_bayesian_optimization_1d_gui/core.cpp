@@ -27,12 +27,19 @@ void Core::reset()
     constexpr double noise_level  = 0.0;
     constexpr double prior        = 0.0;
 
-    m_optimizer = std::make_shared<PreferentialBayesianOptimizer>(1,
+    // Note: This app is for a one-dimensional problem.
+    constexpr int num_dims = 1;
+
+    // Note: This app uses pairwise comparison.
+    constexpr int num_options = 2;
+
+    m_optimizer = std::make_shared<PreferentialBayesianOptimizer>(num_dims,
                                                                   use_map,
                                                                   KernelType::ArdMatern52Kernel,
                                                                   AcquisitionFuncType::ExpectedImprovement,
                                                                   generator,
-                                                                  CurrentBestSelectionStrategy::LastSelection);
+                                                                  CurrentBestSelectionStrategy::LastSelection,
+                                                                  num_options);
     m_optimizer->SetHyperparams(signal_var, length_scale, noise_level, prior);
 
     m_y = VectorXd::Zero(0);
@@ -46,9 +53,6 @@ void Core::proceedOptimization()
     // Retrieve the current options
     const auto options = m_optimizer->GetCurrentOptions();
 
-    // This sample app assumes pairwise comparison queries
-    assert(options.size() == 2);
-
     // Simulate human response
     std::vector<double> values(options.size());
     for (int i = 0; i < options.size(); ++i)
@@ -56,7 +60,7 @@ void Core::proceedOptimization()
         values[i] = evaluateObjectiveFunction(options[i]);
     }
     const int max_index = std::distance(values.begin(), std::max_element(values.begin(), values.end()));
-    
+
     // Submit the human's feedback and let the optimizer calculate a new preference model
     m_optimizer->SubmitFeedbackData(max_index);
 
