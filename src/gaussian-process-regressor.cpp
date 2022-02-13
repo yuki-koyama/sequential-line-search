@@ -249,7 +249,7 @@ namespace sequential_line_search
 
         // Calculate the variance value
         const double sigma_2 = intensity - k.transpose() * m_K_y_inv * k;
-        
+
         // Note: The value of `sigma_2` can be negative due to numerical errors.
         return sigma_2 < 0 ? 0.0 : std::sqrt(sigma_2);
     }
