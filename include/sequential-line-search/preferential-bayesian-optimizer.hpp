@@ -66,6 +66,9 @@ namespace sequential_line_search
         void DetermineNextQuery(const int num_global_search_iters = 0, const int num_local_search_iters = 0);
 
         /// \brief Get the current options.
+        ///
+        /// \details This getter method returns a list of `num_options` points. The first option is always the "current
+        /// best" option, and the others are the new options determined by maximizing the acquisition function.
         const std::vector<Eigen::VectorXd>& GetCurrentOptions() const { return m_current_options; }
 
         /// \brief Get the point that has the highest value among the observed points.
