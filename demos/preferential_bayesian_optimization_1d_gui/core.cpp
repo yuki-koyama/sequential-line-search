@@ -78,6 +78,9 @@ void Core::proceedOptimization()
     int best_index;
     m_y_max = m_y.maxCoeff(&best_index);
     m_x_max = data_points.col(best_index);
+
+    // Determine the next pairwise comparison query
+    m_optimizer->DetermineNextQuery();
 }
 
 double Core::evaluateObjectiveFunction(const Eigen::VectorXd& x) const
