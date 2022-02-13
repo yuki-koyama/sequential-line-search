@@ -101,6 +101,8 @@ namespace
 
                 return mathtoolbox::GetGaussianProcessUpperConfidenceBound(eigen_x, mu, sigma, hyperparam);
             }
+            default:
+                assert(false);
         }
     }
 
