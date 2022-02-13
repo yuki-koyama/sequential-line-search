@@ -71,13 +71,13 @@ namespace sequential_line_search
         ///
         /// \param chosen_option The option that is chosen.
         ///
-        /// \param other_options The other options that are not chosen. Each column represents an option.
+        /// \param other_options The other options that are not chosen.
         ///
         /// \param num_map_estimation_iters The number of iterations for the MAP estimation. When a non-positive value
         /// (e.g., 0) is specified, this is heuristically set.
-        void SubmitCustomFeedbackData(const Eigen::VectorXd& chosen_option,
-                                      const Eigen::MatrixXd& other_options,
-                                      const int              num_map_estimation_iters = 0);
+        void SubmitCustomFeedbackData(const Eigen::VectorXd&              chosen_option,
+                                      const std::vector<Eigen::VectorXd>& other_options,
+                                      const int                           num_map_estimation_iters = 0);
 
         /// \brief Determine the preferential query for the next iteration by using an acquisition function.
         void DetermineNextQuery(const int num_global_search_iters = 0, const int num_local_search_iters = 0);

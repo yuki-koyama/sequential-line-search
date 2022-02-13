@@ -79,20 +79,12 @@ void sequential_line_search::PreferentialBayesianOptimizer::SubmitFeedbackData(c
 }
 
 void sequential_line_search::PreferentialBayesianOptimizer::SubmitCustomFeedbackData(
-    const Eigen::VectorXd& chosen_option,
-    const Eigen::MatrixXd& other_options,
-    const int              num_map_estimation_iters)
+    const Eigen::VectorXd&              chosen_option,
+    const std::vector<Eigen::VectorXd>& other_options,
+    const int                           num_map_estimation_iters)
 {
-    const auto& x_chosen = chosen_option;
-
-    std::vector<VectorXd> x_others(other_options.cols());
-    for (int i = 0; i < other_options.cols(); ++i)
-    {
-        x_others[i] = other_options.col(i);
-    }
-
     // Update the data
-    m_data->AddNewPoints(x_chosen, x_others, true);
+    m_data->AddNewPoints(chosen_option, other_options, true);
 
     // Perform MAP estimation of the goodness values
     PerformMapEstimation(num_map_estimation_iters);
