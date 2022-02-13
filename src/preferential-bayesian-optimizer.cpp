@@ -27,8 +27,10 @@ sequential_line_search::PreferentialBayesianOptimizer::PreferentialBayesianOptim
     const KernelType                                       kernel_type,
     const AcquisitionFuncType                              acquisition_func_type,
     const std::function<std::vector<VectorXd>(const int)>& initial_query_generator,
-    const CurrentBestSelectionStrategy                     current_best_selection_strategy)
+    const CurrentBestSelectionStrategy                     current_best_selection_strategy,
+    const int                                              num_options)
     : m_use_map_hyperparams(use_map_hyperparams),
+      m_num_options(num_options),
       m_current_best_selection_strategy(current_best_selection_strategy),
       m_kernel_signal_var(0.500),
       m_kernel_length_scale(0.500),
@@ -42,6 +44,8 @@ sequential_line_search::PreferentialBayesianOptimizer::PreferentialBayesianOptim
     m_data            = std::make_shared<PreferenceDataManager>();
     m_regressor       = nullptr;
     m_current_options = initial_query_generator(num_dims);
+
+    assert(m_current_options.size() == m_num_options);
 }
 
 void sequential_line_search::PreferentialBayesianOptimizer::SetHyperparams(const double kernel_signal_var,
@@ -95,13 +99,13 @@ void sequential_line_search::PreferentialBayesianOptimizer::SubmitFeedbackData(c
 void sequential_line_search::PreferentialBayesianOptimizer::DetermineNextQuery(int num_global_search_iters,
                                                                                int num_local_search_iters)
 {
-    // A heuristics to set the computational effort for solving the maximization of the acquisition function. This is
-    // not justified or validated.
+    // Note: A heuristics to set the computational effort for solving the maximization of the acquisition function. This
+    // is not justified or validated at all.
     const int num_dims = GetMaximizer().size();
 #ifdef SEQUENTIAL_LINE_SEARCH_USE_PARALLELIZED_MULTI_START_SEARCH
-    num_global_search_iters = num_global_search_iters > 0 ? num_global_search_iters : 10;
+    num_global_search_iters = num_global_search_iters > 0 ? num_global_search_iters : 500 * num_dims;
 #else
-    num_global_search_iters = num_global_search_iters > 0 ? num_global_search_iters : 50 * num_dims;
+    num_global_search_iters = num_global_search_iters > 0 ? num_global_search_iters : 50 * num_dims * num_dims;
 #endif
     num_local_search_iters = num_local_search_iters > 0 ? num_local_search_iters : 10 * num_dims;
 
@@ -119,13 +123,22 @@ void sequential_line_search::PreferentialBayesianOptimizer::DetermineNextQuery(i
                 return x_chosen;
         }
     }();
-    const auto x_acquisition = acquisition_func::FindNextPoint(*m_regressor,
-                                                               num_global_search_iters,
-                                                               num_local_search_iters,
-                                                               m_acquisition_func_type,
-                                                               m_gaussian_process_upper_confidence_bound_hyperparam);
 
-    m_current_options = {x_plus, x_acquisition};
+    const auto next_points = acquisition_func::FindNextPoints(*m_regressor,
+                                                              m_num_options - 1,
+                                                              num_global_search_iters,
+                                                              num_local_search_iters,
+                                                              m_acquisition_func_type,
+                                                              m_gaussian_process_upper_confidence_bound_hyperparam);
+
+    // This code assumes that `m_current_options` has been appropriately allocated.
+    assert(m_current_options.size() == m_num_options);
+
+    m_current_options[0] = x_plus;
+    for (int i = 1; i < m_num_options; ++i)
+    {
+        m_current_options[i] = next_points[i - 1];
+    }
 }
 
 VectorXd sequential_line_search::PreferentialBayesianOptimizer::GetMaximizer() const

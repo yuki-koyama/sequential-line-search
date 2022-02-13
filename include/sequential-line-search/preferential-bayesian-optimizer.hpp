@@ -19,7 +19,7 @@ namespace sequential_line_search
     /// \brief Optimizer class for performing preferential Bayesian optimization with discrete choice.
     ///
     /// \details This optimizer requests discrete choice queries. In the current implementation, the number of choices
-    /// for each query is fixed to two (i.e., pairwise comparison). This class assumes that the search space is [0,
+    /// for each query is two by default (i.e., pairwise comparison). This class assumes that the search space is [0,
     /// 1]^{D}.
     class PreferentialBayesianOptimizer
     {
@@ -29,6 +29,9 @@ namespace sequential_line_search
         /// \param use_map_hyperparams When this is set true, the optimizer always perform the MAP estimation for the
         /// GPR kernel hyperparameters. When this is set false, the optimizer performs the MAP estimation only for
         /// goodness values.
+        ///
+        /// \param num_options The number of discrete choices in each iteration. The default value is two (i.e.,
+        /// pairwise comparison). The value should be no less than two.
         PreferentialBayesianOptimizer(
             const int                 num_dims,
             const bool                use_map_hyperparams   = true,
@@ -37,7 +40,8 @@ namespace sequential_line_search
             const std::function<std::vector<Eigen::VectorXd>(const int)>& initial_query_generator =
                 GenerateRandomPoints,
             const CurrentBestSelectionStrategy current_best_selection_strategy =
-                CurrentBestSelectionStrategy::LargestExpectValue);
+                CurrentBestSelectionStrategy::LargestExpectValue,
+            const int num_options = 2);
 
         /// \brief Specify (kernel and other) hyperparameter values.
         ///
@@ -51,6 +55,8 @@ namespace sequential_line_search
                             const double btl_scale                    = 0.010);
 
         /// \brief Submit the result of the user's selection and update the internal surrogate model.
+        ///
+        /// \param option_index The index of the chosen option, starting at zero.
         ///
         /// \param num_map_estimation_iters The number of iterations for the MAP estimation. When a non-positive value
         /// (e.g., 0) is specified, this is heuristically set.
@@ -86,13 +92,15 @@ namespace sequential_line_search
 
     private:
         const bool m_use_map_hyperparams;
+        const int  m_num_options;
 
         const CurrentBestSelectionStrategy m_current_best_selection_strategy;
 
         std::shared_ptr<PreferenceRegressor>   m_regressor;
         std::shared_ptr<PreferenceDataManager> m_data;
 
-        /// \details In the case of using pairwise comparison, the number of options is always two.
+        /// \details The number of options is always equivalent to `m_num_options`. For example, the size of this list
+        /// is two in case of using pairwise comparison.
         std::vector<Eigen::VectorXd> m_current_options;
 
         double m_kernel_signal_var;
