@@ -50,19 +50,13 @@ void Core::proceedOptimization()
     assert(options.size() == 2);
 
     // Simulate human response
-    int    max_index;
-    double max_value = -std::numeric_limits<double>::max();
+    std::vector<double> values(options.size());
     for (int i = 0; i < options.size(); ++i)
     {
-        double value = evaluateObjectiveFunction(options[i]);
-
-        if (max_value < value)
-        {
-            max_index = i;
-            max_value = value;
-        }
+        values[i] = evaluateObjectiveFunction(options[i]);
     }
-
+    const int max_index = std::distance(values.begin(), std::max_element(values.begin(), values.end()));
+    
     // Submit the human's feedback and let the optimizer calculate a new preference model
     m_optimizer->SubmitFeedbackData(max_index);
 
