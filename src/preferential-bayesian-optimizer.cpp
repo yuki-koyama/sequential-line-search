@@ -62,11 +62,11 @@ void sequential_line_search::PreferentialBayesianOptimizer::SetHyperparams(const
 }
 
 void sequential_line_search::PreferentialBayesianOptimizer::SubmitFeedbackData(const int option_index,
-                                                                               int       num_map_estimation_iters)
+                                                                               const int num_map_estimation_iters)
 {
     assert(option_index >= 0 && option_index < m_current_options.size());
 
-    const auto x_chosen = m_current_options[option_index];
+    const auto& x_chosen = m_current_options[option_index];
 
     std::vector<VectorXd> x_others = m_current_options;
     x_others.erase(x_others.begin() + option_index);
