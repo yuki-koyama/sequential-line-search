@@ -12,18 +12,6 @@ using namespace py::literals;
 
 PYBIND11_MODULE(pySequentialLineSearch, m)
 {
-    m.doc() = R"pbdoc(
-    Sequential Line Search Python Bindings
-    -----------------------------------------
-
-    .. currentmodule:: pySequentialLineSearch
-
-    .. autosummary::
-    :toctree: _generate
-
-    SequentialLineSearchOptimizer
-    )pbdoc";
-
     py::enum_<sequential_line_search::CurrentBestSelectionStrategy>(m, "CurrentBestSelectionStrategy", py::arithmetic())
         .value("LargestExpectValue", sequential_line_search::CurrentBestSelectionStrategy::LargestExpectValue)
         .value("LastSelection", sequential_line_search::CurrentBestSelectionStrategy::LastSelection);
