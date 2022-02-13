@@ -107,7 +107,7 @@ void MainWidget::paintEvent(QPaintEvent* event)
 
     if (!std::isnan(core.m_y_max) && draw_ei)
     {
-        // Expected Improvement
+        // Acquisition function values
         std::vector<QPointF> EIPolyline;
         std::vector<QPointF> EIPolygon;
         VectorXd             EIs(rect.width() + 1);
@@ -117,8 +117,14 @@ void MainWidget::paintEvent(QPaintEvent* event)
             const double EI = core.m_optimizer->GetAcquisitionFuncValue(VectorXd::Constant(1, x));
             EIs(pix_x)      = EI;
         }
-        EIs /= EIs.maxCoeff();
+
+        // Normalize the values into [0, 1]
+        EIs = (EIs - VectorXd::Constant(EIs.size(), EIs.minCoeff())) / (EIs.maxCoeff() - EIs.minCoeff());
+
+        // Scale the values
         EIs *= 0.15;
+
+        // Draw values
         for (int pix_x = 0; pix_x <= rect.width(); ++pix_x)
         {
             const double offset = -2.0;
