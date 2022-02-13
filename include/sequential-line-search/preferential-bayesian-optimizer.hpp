@@ -133,6 +133,14 @@ namespace sequential_line_search
         const AcquisitionFuncType m_acquisition_func_type;
 
         double m_gaussian_process_upper_confidence_bound_hyperparam;
+
+        /// \brief Peform MAP estimation of the latent goodness values (and optionally the kernel hyperparameters).
+        ///
+        /// \details This private method is called by `SubmitFeedbackData` and `SubmitCustomFeedbackData`.
+        ///
+        /// \param num_map_estimation_iters The number of iterations for the MAP estimation. When a non-positive value
+        /// (e.g., 0) is specified, this is heuristically set.
+        void PerformMapEstimation(const int num_map_estimation_iters);
     };
 } // namespace sequential_line_search
 

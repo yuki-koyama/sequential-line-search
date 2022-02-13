@@ -74,32 +74,14 @@ void sequential_line_search::PreferentialBayesianOptimizer::SubmitFeedbackData(c
     // Update the data
     m_data->AddNewPoints(x_chosen, x_others, true);
 
-    if (num_map_estimation_iters <= 0)
-    {
-        const int num_dims = GetMaximizer().size();
-
-        // A heuristics to set the computational effort for solving the maximization of the acquisition function. This
-        // is not justified or validated.
-        num_map_estimation_iters = 10 * (num_dims + m_data->GetNumDataPoints());
-    }
-
-    // Perform the MAP estimation
-    m_regressor = std::make_shared<PreferenceRegressor>(m_data->m_X,
-                                                        m_data->m_D,
-                                                        m_use_map_hyperparams,
-                                                        m_kernel_signal_var,
-                                                        m_kernel_length_scale,
-                                                        m_noise_level,
-                                                        m_kernel_hyperparams_prior_var,
-                                                        m_btl_scale,
-                                                        num_map_estimation_iters,
-                                                        m_kernel_type);
+    // Perform MAP estimation of the goodness values
+    PerformMapEstimation(num_map_estimation_iters);
 }
 
 void sequential_line_search::PreferentialBayesianOptimizer::SubmitCustomFeedbackData(
     const Eigen::VectorXd& chosen_option,
     const Eigen::MatrixXd& other_options,
-    int                    num_map_estimation_iters)
+    const int              num_map_estimation_iters)
 {
     const auto& x_chosen = chosen_option;
 
@@ -112,26 +94,8 @@ void sequential_line_search::PreferentialBayesianOptimizer::SubmitCustomFeedback
     // Update the data
     m_data->AddNewPoints(x_chosen, x_others, true);
 
-    if (num_map_estimation_iters <= 0)
-    {
-        const int num_dims = GetMaximizer().size();
-
-        // A heuristics to set the computational effort for solving the maximization of the acquisition function. This
-        // is not justified or validated.
-        num_map_estimation_iters = 10 * (num_dims + m_data->GetNumDataPoints());
-    }
-
-    // Perform the MAP estimation
-    m_regressor = std::make_shared<PreferenceRegressor>(m_data->m_X,
-                                                        m_data->m_D,
-                                                        m_use_map_hyperparams,
-                                                        m_kernel_signal_var,
-                                                        m_kernel_length_scale,
-                                                        m_noise_level,
-                                                        m_kernel_hyperparams_prior_var,
-                                                        m_btl_scale,
-                                                        num_map_estimation_iters,
-                                                        m_kernel_type);
+    // Perform MAP estimation of the goodness values
+    PerformMapEstimation(num_map_estimation_iters);
 }
 
 void sequential_line_search::PreferentialBayesianOptimizer::DetermineNextQuery(int num_global_search_iters,
@@ -218,4 +182,28 @@ void sequential_line_search::PreferentialBayesianOptimizer::DampData(const std::
     }
 
     m_regressor->DampData(directory_path);
+}
+
+void sequential_line_search::PreferentialBayesianOptimizer::PerformMapEstimation(int num_map_estimation_iters)
+{
+    if (num_map_estimation_iters <= 0)
+    {
+        const int num_dims = GetMaximizer().size();
+
+        // A heuristics to set the computational effort for solving the maximization of the acquisition function. This
+        // is not justified or validated.
+        num_map_estimation_iters = 10 * (num_dims + m_data->GetNumDataPoints());
+    }
+
+    // Perform MAP estimation
+    m_regressor = std::make_shared<PreferenceRegressor>(m_data->m_X,
+                                                        m_data->m_D,
+                                                        m_use_map_hyperparams,
+                                                        m_kernel_signal_var,
+                                                        m_kernel_length_scale,
+                                                        m_noise_level,
+                                                        m_kernel_hyperparams_prior_var,
+                                                        m_btl_scale,
+                                                        num_map_estimation_iters,
+                                                        m_kernel_type);
 }
