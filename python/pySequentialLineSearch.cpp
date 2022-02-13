@@ -120,6 +120,12 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
                        "option_index"_a,
                        "num_map_estimation_iters"_a = 0);
 
+    pref_opt_class.def("submit_custom_feedback_data",
+                       &PreferentialBayesianOptimizer::SubmitCustomFeedbackData,
+                       "chosen_option"_a,
+                       "other_options"_a,
+                       "num_map_estimation_iters"_a = 0);
+
     pref_opt_class.def("determine_next_query",
                        &PreferentialBayesianOptimizer::DetermineNextQuery,
                        "num_global_search_iters"_a = 0,
