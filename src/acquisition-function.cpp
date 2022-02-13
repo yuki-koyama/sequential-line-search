@@ -55,13 +55,16 @@ namespace
     /// \brief NLopt-style objective function definition for finding the next multiple points.
     ///
     /// \details Ref: Schonlau et al, Global Versus Local Search in Constrained Optimization of Computer Models, 1998.
+    ///
+    /// \param data A point for a `RegressorPairWrapper` object.
     double objective_for_multiple_points(const std::vector<double>& x, std::vector<double>& grad, void* data)
     {
-        const Regressor*           orig_regressor    = static_cast<RegressorPairWrapper*>(data)->orig_regressor;
-        const Regressor*           updated_regressor = static_cast<RegressorPairWrapper*>(data)->updated_regressor;
-        const AcquisitionFuncType& func_type         = static_cast<RegressorWrapper*>(data)->func_type;
-        const double&              hyperparam =
-            static_cast<RegressorWrapper*>(data)->gaussian_process_upper_confidence_bound_hyperparam;
+        const auto casted_data = static_cast<RegressorPairWrapper*>(data);
+
+        const Regressor*           orig_regressor    = casted_data->orig_regressor;
+        const Regressor*           updated_regressor = casted_data->updated_regressor;
+        const AcquisitionFuncType& func_type         = casted_data->func_type;
+        const double&              hyperparam        = casted_data->gaussian_process_upper_confidence_bound_hyperparam;
 
         const auto mu               = [&](const VectorXd& x) { return orig_regressor->PredictMu(x); };
         const auto sigma            = [&](const VectorXd& x) { return updated_regressor->PredictSigma(x); };
