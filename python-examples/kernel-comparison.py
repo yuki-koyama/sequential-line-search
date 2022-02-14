@@ -39,7 +39,8 @@ def generate_initial_slider(num_dims: int) -> Tuple[np.ndarray, np.ndarray]:
 
 
 # A helper function to plot a mean and confidence interval of multiple sequences
-def plot_mean_with_errors(axes, data: np.ndarray,
+def plot_mean_with_errors(axes,
+                          data: np.ndarray,
                           label: Optional[str] = None) -> None:
     CONFIDENT_REGION_ALPHA = 0.2
 
@@ -145,11 +146,8 @@ sns.set()
 sns.set_context()
 
 plt.rcParams['text.usetex'] = True
-plt.rcParams['text.latex.preamble'] = [
-    r"\usepackage{libertine}",
-    r"\usepackage{amsmath}",
-    r"\usepackage{amssymb}",
-]
+plt.rcParams[
+    'text.latex.preamble'] = r"\usepackage{libertine} \usepackage{amsmath} \usepackage{amssymb}"
 
 # Instantiate a figure object
 num_cols = len(length_scale_set)
@@ -180,11 +178,12 @@ for num_dims_index, num_dims in enumerate(num_dims_set):
                 length_scale) + r"$"
             title = title_dim + " / " + title_length_scale
 
-            plot_mean_with_errors(
-                axes=axes,
-                data=optimality_gaps[:, :, length_scale_index,
-                                     kernel_type_index, num_dims_index],
-                label=label)
+            plot_mean_with_errors(axes=axes,
+                                  data=optimality_gaps[:, :,
+                                                       length_scale_index,
+                                                       kernel_type_index,
+                                                       num_dims_index],
+                                  label=label)
 
             axes.set_title(title)
             axes.legend()
