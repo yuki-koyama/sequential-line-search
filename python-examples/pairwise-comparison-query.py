@@ -6,19 +6,16 @@ from typing import List
 
 def gen_initial_query(num_dims: int, num_options: int) -> List[np.ndarray]:
     """Generate a query for the first iteration."""
-
     return [np.random.rand(num_dims) for i in range(num_options)]
 
 
 def calc_simulated_objective_func(x: np.ndarray) -> float:
     """Calculate a synthetic objective function value."""
-
-    return -np.linalg.norm(x - 0.2)
+    return float(-np.linalg.norm(x - 0.2))
 
 
 def ask_human_for_feedback(options: List[np.ndarray]) -> int:
     """Simulate human response to a pairwise comparison query."""
-
     assert len(options) == 2
 
     i_max = -1
@@ -36,8 +33,7 @@ def ask_human_for_feedback(options: List[np.ndarray]) -> int:
 
 
 def run_optimization() -> None:
-    """Run an optimization sequence based on preferential Bayesian optimization."""
-
+    """Run optimization using preferential Bayesian optimizer."""
     num_dims = 5
     strategy = pysls.CurrentBestSelectionStrategy.LastSelection
 
