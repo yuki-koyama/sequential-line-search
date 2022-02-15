@@ -79,6 +79,8 @@ namespace sequential_line_search
         Eigen::VectorXd CalcPointFromSliderPosition(const double slider_position) const;
 
         /// \brief Get the point that has the highest value among the observed points.
+        ///
+        /// \details The point is selected according to `CurrentBestSelectionStrategy`.
         Eigen::VectorXd GetMaximizer() const;
 
         double GetPreferenceValueMean(const Eigen::VectorXd& point) const;

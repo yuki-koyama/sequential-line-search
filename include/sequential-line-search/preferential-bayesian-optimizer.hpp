@@ -88,6 +88,8 @@ namespace sequential_line_search
                                       const int                           num_map_estimation_iters = 0);
 
         /// \brief Determine the preferential query for the next iteration by using an acquisition function.
+        ///
+        /// \details This method is expected to be called right after `SubmitFeedbackData` is called.
         void DetermineNextQuery(const int num_global_search_iters = 0, const int num_local_search_iters = 0);
 
         /// \brief Get the current options.
@@ -97,6 +99,8 @@ namespace sequential_line_search
         const std::vector<Eigen::VectorXd>& GetCurrentOptions() const { return m_current_options; }
 
         /// \brief Get the point that has the highest value among the observed points.
+        ///
+        /// \details The point is selected according to `CurrentBestSelectionStrategy`.
         Eigen::VectorXd GetMaximizer() const;
 
         double GetPreferenceValueMean(const Eigen::VectorXd& point) const;
