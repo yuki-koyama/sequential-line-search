@@ -5,6 +5,7 @@
 #include <sequential-line-search/utils.hpp>
 #include <stdexcept>
 
+using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
 std::vector<VectorXd> sequential_line_search::GenerateRandomPoints(const int num_dims, const int num_options)
@@ -76,9 +77,9 @@ void sequential_line_search::PreferentialBayesianOptimizer::SubmitFeedbackData(c
 }
 
 void sequential_line_search::PreferentialBayesianOptimizer::SubmitCustomFeedbackData(
-    const Eigen::VectorXd&              chosen_option,
-    const std::vector<Eigen::VectorXd>& other_options,
-    const int                           num_map_estimation_iters)
+    const VectorXd&              chosen_option,
+    const std::vector<VectorXd>& other_options,
+    const int                    num_map_estimation_iters)
 {
     // Update the data
     m_data->AddNewPoints(chosen_option, other_options, true);
@@ -158,7 +159,7 @@ double sequential_line_search::PreferentialBayesianOptimizer::GetAcquisitionFunc
                                                         m_gaussian_process_upper_confidence_bound_hyperparam);
 }
 
-const Eigen::MatrixXd& sequential_line_search::PreferentialBayesianOptimizer::GetRawDataPoints() const
+const MatrixXd& sequential_line_search::PreferentialBayesianOptimizer::GetRawDataPoints() const
 {
     return m_data->m_X;
 }
