@@ -4,10 +4,10 @@ import sys
 from typing import List
 
 
-def gen_initial_query(num_dims: int) -> List[np.ndarray]:
+def gen_initial_query(num_dims: int, num_options: int) -> List[np.ndarray]:
     """Generate a query for the first iteration."""
 
-    return [np.random.rand(num_dims) for i in range(2)]
+    return [np.random.rand(num_dims) for i in range(num_options)]
 
 
 def calc_simulated_objective_func(x: np.ndarray) -> float:
