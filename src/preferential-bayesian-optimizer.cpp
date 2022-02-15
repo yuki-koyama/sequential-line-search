@@ -7,11 +7,8 @@
 
 using Eigen::VectorXd;
 
-std::vector<VectorXd> sequential_line_search::GenerateRandomPoints(const int num_dims)
+std::vector<VectorXd> sequential_line_search::GenerateRandomPoints(const int num_dims, const int num_options)
 {
-    // Note: Currently, the number of options is always fixed to two.
-    constexpr int num_options = 2;
-
     std::vector<VectorXd> options;
     for (int i = 0; i < num_options; ++i)
     {
@@ -22,13 +19,13 @@ std::vector<VectorXd> sequential_line_search::GenerateRandomPoints(const int num
 }
 
 sequential_line_search::PreferentialBayesianOptimizer::PreferentialBayesianOptimizer(
-    const int                                              num_dims,
-    const bool                                             use_map_hyperparams,
-    const KernelType                                       kernel_type,
-    const AcquisitionFuncType                              acquisition_func_type,
-    const std::function<std::vector<VectorXd>(const int)>& initial_query_generator,
-    const CurrentBestSelectionStrategy                     current_best_selection_strategy,
-    const int                                              num_options)
+    const int                          num_dims,
+    const bool                         use_map_hyperparams,
+    const KernelType                   kernel_type,
+    const AcquisitionFuncType          acquisition_func_type,
+    const InitialQueryGenerator&       initial_query_generator,
+    const CurrentBestSelectionStrategy current_best_selection_strategy,
+    const int                          num_options)
     : m_use_map_hyperparams(use_map_hyperparams),
       m_num_options(num_options),
       m_current_best_selection_strategy(current_best_selection_strategy),
@@ -43,7 +40,7 @@ sequential_line_search::PreferentialBayesianOptimizer::PreferentialBayesianOptim
 {
     m_data            = std::make_shared<PreferenceDataManager>();
     m_regressor       = nullptr;
-    m_current_options = initial_query_generator(num_dims);
+    m_current_options = initial_query_generator(num_dims, num_options);
 
     assert(m_current_options.size() == m_num_options);
 }

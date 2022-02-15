@@ -17,7 +17,7 @@ Core::Core()
 void Core::reset()
 {
     // Define a generator that generates the initial options
-    auto generator = [](int num_dims) {
+    auto generator = [](const int num_dims, const int) {
         return std::vector<VectorXd>{VectorXd::Constant(1, 0.3), VectorXd::Constant(1, 0.6)};
     };
 

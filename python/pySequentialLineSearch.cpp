@@ -90,22 +90,22 @@ PYBIND11_MODULE(pySequentialLineSearch, m)
 
     py::class_<PreferentialBayesianOptimizer> pref_opt_class(m, "PreferentialBayesianOptimizer");
 
-    pref_opt_class.def(
-        py::init<const int,
-                 const bool,
-                 const sequential_line_search::KernelType,
-                 const sequential_line_search::AcquisitionFuncType,
-                 const std::function<std::vector<Eigen::VectorXd>(const int)>&,
-                 const sequential_line_search::CurrentBestSelectionStrategy,
-                 const int>(),
-        "num_dims"_a,
-        "use_map_hyperparams"_a   = true,
-        "kernel_type"_a           = sequential_line_search::KernelType::ArdMatern52Kernel,
-        "acquisition_func_type"_a = sequential_line_search::AcquisitionFuncType::ExpectedImprovement,
-        "initial_query_generator"_a =
-            std::function<std::vector<Eigen::VectorXd>(const int)>(sequential_line_search::GenerateRandomPoints),
-        "current_best_selection_strategy"_a = sequential_line_search::CurrentBestSelectionStrategy::LargestExpectValue,
-        "num_options"_a                     = 2);
+    pref_opt_class.def(py::init<const int,
+                                const bool,
+                                const sequential_line_search::KernelType,
+                                const sequential_line_search::AcquisitionFuncType,
+                                const sequential_line_search::InitialQueryGenerator&,
+                                const sequential_line_search::CurrentBestSelectionStrategy,
+                                const int>(),
+                       "num_dims"_a,
+                       "use_map_hyperparams"_a   = true,
+                       "kernel_type"_a           = sequential_line_search::KernelType::ArdMatern52Kernel,
+                       "acquisition_func_type"_a = sequential_line_search::AcquisitionFuncType::ExpectedImprovement,
+                       "initial_query_generator"_a =
+                           sequential_line_search::InitialQueryGenerator(sequential_line_search::GenerateRandomPoints),
+                       "current_best_selection_strategy"_a =
+                           sequential_line_search::CurrentBestSelectionStrategy::LargestExpectValue,
+                       "num_options"_a = 2);
 
     pref_opt_class.def("set_hyperparams",
                        &PreferentialBayesianOptimizer::SetHyperparams,

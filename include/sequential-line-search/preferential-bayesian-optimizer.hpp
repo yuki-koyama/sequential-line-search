@@ -14,7 +14,16 @@ namespace sequential_line_search
     class PreferenceRegressor;
     class PreferenceDataManager;
 
-    std::vector<Eigen::VectorXd> GenerateRandomPoints(const int num_dims);
+    /// \brief A function type for specifying how initial query should be generated.
+    ///
+    /// \details The first parameter is the number of dimensions of the target problem. The second parameter is the
+    /// number of options in each iteration (e.g., two in case of pairwise comparison).
+    using InitialQueryGenerator = std::function<std::vector<Eigen::VectorXd>(const int, const int)>;
+
+    /// \brief A utility function for initial query generation.
+    ///
+    /// \details This function is compatible with `InitialQueryGenerator`.
+    std::vector<Eigen::VectorXd> GenerateRandomPoints(const int num_dims, const int num_options);
 
     /// \brief Optimizer class for performing preferential Bayesian optimization with discrete choice.
     ///
@@ -33,12 +42,11 @@ namespace sequential_line_search
         /// \param num_options The number of discrete choices in each iteration. The default value is two (i.e.,
         /// pairwise comparison). The value should be no less than two.
         PreferentialBayesianOptimizer(
-            const int                 num_dims,
-            const bool                use_map_hyperparams   = true,
-            const KernelType          kernel_type           = KernelType::ArdMatern52Kernel,
-            const AcquisitionFuncType acquisition_func_type = AcquisitionFuncType::ExpectedImprovement,
-            const std::function<std::vector<Eigen::VectorXd>(const int)>& initial_query_generator =
-                GenerateRandomPoints,
+            const int                          num_dims,
+            const bool                         use_map_hyperparams     = true,
+            const KernelType                   kernel_type             = KernelType::ArdMatern52Kernel,
+            const AcquisitionFuncType          acquisition_func_type   = AcquisitionFuncType::ExpectedImprovement,
+            const InitialQueryGenerator&       initial_query_generator = GenerateRandomPoints,
             const CurrentBestSelectionStrategy current_best_selection_strategy =
                 CurrentBestSelectionStrategy::LargestExpectValue,
             const int num_options = 2);
