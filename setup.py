@@ -53,7 +53,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name="pySequentialLineSearch",
-    version="0.1.dev0",
+    version="0.2",
     author="Yuki Koyama",
     author_email="yuki@koyama.xyz",
     description="Python bindings of sequential line search",
