@@ -31,6 +31,7 @@ class CMakeBuild(build_ext):
 
         target_version = str(sys.version_info.major) + "." + str(
             sys.version_info.minor)
+        executable_path = sys.executable
 
         cmake_args = [
             "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + extdir,
@@ -40,6 +41,7 @@ class CMakeBuild(build_ext):
             "-DSEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS=OFF",
             "-DSEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING=ON",
             "-DPYBIND11_PYTHON_VERSION=" + target_version,
+            "-DPYTHON_EXECUTABLE=" + executable_path,
         ]
 
         cmake_list_dir = os.path.abspath(os.path.dirname(__file__))
