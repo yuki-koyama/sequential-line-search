@@ -91,8 +91,8 @@ void sequential_line_search::SequentialLineSearchOptimizer::SubmitFeedbackData(c
     m_data->AddNewPoints(x_chosen, {x_prev_max, x_prev_ei}, true);
 
     // Perform the MAP estimation
-    m_regressor = std::make_shared<PreferenceRegressor>(m_data->m_X,
-                                                        m_data->m_D,
+    m_regressor = std::make_shared<PreferenceRegressor>(m_data->GetX(),
+                                                        m_data->GetD(),
                                                         m_use_map_hyperparams,
                                                         m_kernel_signal_var,
                                                         m_kernel_length_scale,
@@ -160,7 +160,7 @@ double sequential_line_search::SequentialLineSearchOptimizer::GetAcquisitionFunc
 
 const Eigen::MatrixXd& sequential_line_search::SequentialLineSearchOptimizer::GetRawDataPoints() const
 {
-    return m_data->m_X;
+    return m_data->GetX();
 }
 
 void sequential_line_search::SequentialLineSearchOptimizer::DampData(const std::string& directory_path) const

@@ -110,7 +110,7 @@ void sequential_line_search::PreferentialBayesianOptimizer::DetermineNextQuery(i
                 return m_regressor->FindArgMax();
             case CurrentBestSelectionStrategy::LastSelection:
                 // Retrieve the latest preferential feedback data and its selected option
-                const auto x_chosen = m_data->m_X.col(m_data->GetLastDataSample()[0]);
+                const auto x_chosen = m_data->GetLastSelectedDataPoint();
 
                 return x_chosen;
         }
@@ -161,7 +161,7 @@ double sequential_line_search::PreferentialBayesianOptimizer::GetAcquisitionFunc
 
 const MatrixXd& sequential_line_search::PreferentialBayesianOptimizer::GetRawDataPoints() const
 {
-    return m_data->m_X;
+    return m_data->GetX();
 }
 
 void sequential_line_search::PreferentialBayesianOptimizer::DampData(const std::string& directory_path) const
@@ -186,8 +186,8 @@ void sequential_line_search::PreferentialBayesianOptimizer::PerformMapEstimation
     }
 
     // Perform MAP estimation
-    m_regressor = std::make_shared<PreferenceRegressor>(m_data->m_X,
-                                                        m_data->m_D,
+    m_regressor = std::make_shared<PreferenceRegressor>(m_data->GetX(),
+                                                        m_data->GetD(),
                                                         m_use_map_hyperparams,
                                                         m_kernel_signal_var,
                                                         m_kernel_length_scale,
