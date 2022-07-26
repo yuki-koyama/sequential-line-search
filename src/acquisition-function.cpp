@@ -33,12 +33,15 @@ namespace
     };
 
     /// \brief NLopt-style objective function definition for finding the next (single) point.
+    ///
+    /// \param data A pointer for a `RegressorWrapper` object.
     double objective(const std::vector<double>& x, std::vector<double>& grad, void* data)
     {
-        const Regressor*           regressor = static_cast<RegressorWrapper*>(data)->regressor;
-        const AcquisitionFuncType& func_type = static_cast<RegressorWrapper*>(data)->func_type;
-        const double&              hyperparam =
-            static_cast<RegressorWrapper*>(data)->gaussian_process_upper_confidence_bound_hyperparam;
+        const auto casted_data = static_cast<RegressorWrapper*>(data);
+
+        const Regressor*           regressor  = casted_data->regressor;
+        const AcquisitionFuncType& func_type  = casted_data->func_type;
+        const double&              hyperparam = casted_data->gaussian_process_upper_confidence_bound_hyperparam;
 
         const auto eigen_x = Eigen::Map<const VectorXd>(&x[0], x.size());
 
@@ -56,7 +59,7 @@ namespace
     ///
     /// \details Ref: Schonlau et al, Global Versus Local Search in Constrained Optimization of Computer Models, 1998.
     ///
-    /// \param data A point for a `RegressorPairWrapper` object.
+    /// \param data A pointer for a `RegressorPairWrapper` object.
     double objective_for_multiple_points(const std::vector<double>& x, std::vector<double>& grad, void* data)
     {
         const auto casted_data = static_cast<RegressorPairWrapper*>(data);
