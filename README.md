@@ -227,9 +227,12 @@ A slider space is constructed by choosing two end points. One of the two end poi
 
 ## See Also
 
-Sequential Gallery (SIGGRAPH 2020) is a more recent publication on the same topic.
+Sequential Gallery (SIGGRAPH 2020) is a more recent publication on the same topic (i.e., human-in-the-loop design optimization).
 - Project page: <https://koyama.xyz/project/sequential_gallery/>
 - GitHub: <https://github.com/yuki-koyama/sequential-gallery>
+
+BO as Assistant (UIST 2022) is a research project using this library for a different purpose (i.e., for generating design suggestions during slider manipulation).
+- Project page: <https://koyama.xyz/project/bo-as-assistant/>
 
 ## License
 
