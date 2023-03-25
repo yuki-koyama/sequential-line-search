@@ -25,7 +25,7 @@ jobs:
         run: |
           pip install joblib matplotlib seaborn scipy
           brew tap homebrew/cask-fonts && brew install font-linux-biolinum
-          brew install mactex-no-gui
+          brew install --cask mactex-no-gui
       - name: test
         run: |
           export PATH=$PATH:/Library/TeX/texbin
