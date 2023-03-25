@@ -4,7 +4,6 @@ on: [push]
 
 jobs:
   build-test:
-
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -12,20 +11,20 @@ jobs:
         os: [ubuntu-18.04]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: install-build-dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install libeigen3-dev qt5-default
-    - name: submodule
-      run: git submodule update --init --recursive
-    - name: build-test-library
-      run: |
-        cmake -DSEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS=OFF -DSEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS=OFF -DSEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS=OFF -DSEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING=OFF .
-        make
-    - name: build-test-apps
-      run: |
-        cmake -DSEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS=ON -DSEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS=ON -DSEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS=ON -DSEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING=OFF .
-        make
-    - name: ctest
-      run: ctest
+      - uses: actions/checkout@v2
+      - name: install-build-dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install libeigen3-dev qt5-default
+      - name: submodule
+        run: git submodule update --init --recursive
+      - name: build-test-library
+        run: |
+          cmake -DSEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS=OFF -DSEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS=OFF -DSEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS=OFF -DSEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING=OFF .
+          make
+      - name: build-test-apps
+        run: |
+          cmake -DSEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_DEMOS=ON -DSEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_DEMOS=ON -DSEQUENTIAL_LINE_SEARCH_BUILD_PHOTO_DEMOS=ON -DSEQUENTIAL_LINE_SEARCH_BUILD_PYTHON_BINDING=OFF .
+          make
+      - name: ctest
+        run: ctest
