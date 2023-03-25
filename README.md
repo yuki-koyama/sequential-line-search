@@ -106,7 +106,7 @@ macOS
 brew install cmake eigen
 ```
 
-Ubuntu 16.04/18.04
+Ubuntu 18.04/20.04
 ```
 sudo apt install cmake libeigen3-dev
 ```
@@ -184,6 +184,10 @@ def main():
 if __name__ == '__main__':
     main()
 ```
+
+## Supported Environments
+
+We have tested the C++ portion of our codebase on macOS using the clang compiler and on Ubuntu 20.04 using the g++ compiler. As for the Python portion, it has been tested on versions 3.7 through 3.11.
 
 ## Technical Details
 
