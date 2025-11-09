@@ -1,4 +1,7 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.16)
+
+# A temporary workaround to allow building with older CMake versions.
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
 project(SequentialLineSearch CXX)
 
