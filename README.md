@@ -92,7 +92,7 @@ We tested on macOS (10.15) only. We are aware that the visual demos cannot be bu
 
 ## How to Install (Python)
 
-`pySequentialLineSearch` is a subset of Python bindings of the C++ library. Tested on Python `3.6`, `3.7`, and `3.8`.
+`pySequentialLineSearch` is a subset of Python bindings of the C++ library. Tested on Python `3.10` and `3.11`.
 
 It can be installed via PyPI:
 ```bash
@@ -106,7 +106,7 @@ macOS
 brew install cmake eigen
 ```
 
-Ubuntu 18.04/20.04
+Ubuntu 24.04
 ```
 sudo apt install cmake libeigen3-dev
 ```
@@ -187,7 +187,7 @@ if __name__ == '__main__':
 
 ## Supported Environments
 
-We have tested the C++ portion of our codebase on macOS using the clang compiler and on Ubuntu 20.04 using the g++ compiler. As for the Python portion, it has been tested on versions 3.7 through 3.11.
+We have tested the C++ portion of our codebase on macOS using the clang compiler and on Ubuntu 20.04 using the g++ compiler. As for the Python portion, it has been tested on versions 3.10 through 3.11.
 
 ## Technical Details
 
