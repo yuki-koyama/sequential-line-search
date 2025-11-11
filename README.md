@@ -52,7 +52,7 @@ To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_COMMAND_
 
 ### Required for Visual Demos
 
-- Qt5 <http://doc.qt.io/qt-5/> (`brew install qt@5` / `sudo apt install qt5-default`)
+- Qt5 <http://doc.qt.io/qt-5/> (`brew install qt@5` / `sudo apt install qtbase5-dev`)
 - rand-util <https://github.com/yuki-koyama/rand-util> (included via gitsubmodule)
 - tinycolormap <https://github.com/yuki-koyama/tinycolormap> (included via gitsubmodule)
 
@@ -60,7 +60,7 @@ To build these demos, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_VISUAL_D
 
 ### Required for Photo Enhancement Demos
 
-- Qt5 <http://doc.qt.io/qt-5/> (`brew install qt@5` / `sudo apt install qt5-default`)
+- Qt5 <http://doc.qt.io/qt-5/> (`brew install qt@5` / `sudo apt install qtbase5-dev`)
 - enhancer <https://github.com/yuki-koyama/enhancer> (included via gitsubmodule)
 - tinycolormap <https://github.com/yuki-koyama/tinycolormap> (included via gitsubmodule)
 
@@ -74,7 +74,7 @@ To enable python binding, the CMake variable: `SEQUENTIAL_LINE_SEARCH_BUILD_PYTH
 
 ## How to Compile and Run (C++)
 
-We use [cmake](https://cmake.org/) (3.3 or above) for managing the source codes. You can compile the core module and the demo applications at once by, for example,
+We use [cmake](https://cmake.org/) (3.16 or above) for managing the source codes. You can compile the core module and the demo applications at once by, for example,
 ```bash
 git clone https://github.com/yuki-koyama/sequential-line-search.git --recursive
 cd sequential-line-search
@@ -187,7 +187,7 @@ if __name__ == '__main__':
 
 ## Supported Environments
 
-We have tested the C++ portion of our codebase on macOS using the clang compiler and on Ubuntu 20.04 using the g++ compiler. As for the Python portion, it has been tested on versions 3.10 through 3.11.
+We have tested the C++ portion of our codebase on macOS using the clang compiler and on Ubuntu 24.04 using the g++ compiler. As for the Python portion, it has been tested on versions 3.10 through 3.11.
 
 ## Technical Details
 
